@@ -3,6 +3,9 @@ plugins {
     id 'org.springframework.boot' version '2.3.12.RELEASE'
 }
 
+ext {
+    springBootVersion = '2.3.12.RELEASE'
+}
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -16,8 +19,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.3.12.RELEASE'
-    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.3.12.RELEASE'
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: springBootVersion
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: springBootVersion
     implementation 'org.projectlombok:lombok:1.18.16'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
