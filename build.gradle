@@ -3,6 +3,8 @@ plugins {
     id 'org.springframework.boot' version '2.3.12.RELEASE'
 }
 
+apply plugin: 'io.spring.dependency-management'
+
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
