@@ -1,0 +1,9 @@
+CREATE TYPE status_type as ENUM ('REQUEST', 'FRIEND', 'BLOCKED', 'DECLINED', 'SUBSCRIBED');
+
+CREATE TABLE friendship_status 
+(
+	id SERIAL PRIMARY KEY  NOT NULL,
+	time TIMESTAMP NOT NULL,
+	name CHARACTER VARYING(255)  NOT NULL,
+	code status_type
+);
