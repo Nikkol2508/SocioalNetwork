@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS users
 	name TEXT  NOT NULL,
 	e_mail TEXT  NOT NULL,
 	password TEXT  NOT NULL,
-	type user_type
+	type user_type NOT NULL,
   PRIMARY KEY(id)
 );
