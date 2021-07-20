@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS notification;
+
+CREATE TABLE notification(
+id SERIAL NOT NULL,
+type_id INT NOT NULL,
+send_time TIMESTAMP NOT NULL,
+person_id INT NOT NULL,
+entity_id INT NOT NULL,
+contact VARCHAR(255) NOT NULL,
+PRIMARY KEY(id),
+FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE RESTRICT,
+FOREIGN KEY(type_id) REFERENCES notification_type(id) ON DELETE RESTRICT
+);
