@@ -9,4 +9,6 @@ CREATE TABLE IF NOT EXISTS messages
  	message_text TEXT,
 	read_status message_status_type,
 	PRIMARY KEY(id)
+	FOREIGN KEY(author_id) REFERENCES person(id) ON DELETE RESTRICT,
+	FOREIGN KEY(recipient_id) REFERENCES person(id) ON DELETE RESTRICT
 );
