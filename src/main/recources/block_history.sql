@@ -1,12 +1,15 @@
 CREATE TYPE action_type as ENUM ('BLOCK', 'UNBLOCK');
 
-CREATE TABLE block_history 
+CREATE TABLE IF NOT EXISTS block_history
 (
-	id SERIAL PRIMARY KEY  NOT NULL,
+	id SERIAL  NOT NULL,
 	time TIMESTAMP NOT NULL,
 	person_id INT NOT NULL,
 	post_id INT NOT NULL,
 	comment_id INT NOT NULL,
-	action action_type 
-
+	action action_type ,
+  PRIMARY KEY(id),
+  FOREIGN KEY(person_id) REFERENCES person(id) ON DELETE RESTRICT,
+  FOREIGN KEY(post_id) REFERENCES post(id) ON DELETE RESTRICT,
+  FOREIGN KEY(comment_id) REFERENCES comment(id) ON DELETE RESTRICT
 );
