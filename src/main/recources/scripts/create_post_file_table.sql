@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS post_file;
 
-CREATE TABLE post_file(
+CREATE TABLE IF NOT EXISTS post_file(
 id SERIAL NOT NULL,
 post_id INT NOT NULL,
 name TEXT,

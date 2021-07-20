@@ -1,20 +1,21 @@
 CREATE TYPE permission_type as ENUM ('ALL', 'FRIENDS');
 
-CREATE TABLE person 
+CREATE TABLE IF NOT EXISTS person
 (
-	Id SERIAL PRIMARY KEY  NOT NULL,
-	first_name CHARACTER VARYING(255)  NOT NULL,
-	last_name CHARACTER VARYING(255)  NOT NULL,
+	Id SERIAL  NOT NULL,
+	first_name TEXT NOT NULL,
+	last_name TEXT NOT NULL,
 	reg_date  TIMESTAMP NOT NULL,
 	birth_date DATE,
-	e_mail CHARACTER VARYING(255)  NOT NULL,
-	phone CHARACTER VARYING(255) NOT NULL,
-	password CHARACTER VARYING(255)  NOT NULL,
+	e_mail TEXT  NOT NULL,
+	phone TEXT NOT NULL,
+	password TEXT NOT NULL,
 	photo TEXT,
 	about TEXT, 
-	town CHARACTER VARYING(255),
-	confirmation_code CHARACTER VARYING(255),
+	town TEXT,
+	confirmation_code TEXT,
 	is_approved BOOLEAN,
 	messages_permission permission_type,
-	last_online_time TIMESTAMP 
+	last_online_time TIMESTAMP,
+	PRIMARY KEY(id)
 );

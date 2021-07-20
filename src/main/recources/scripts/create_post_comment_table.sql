@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS post_comment;
 
-CREATE TABLE post_comment(
+CREATE TABLE IF NOT EXISTS post_comment(
 id SERIAL NOT NULL,
 time TIMESTAMP NOT NULL,
 post_id INT NOT NULL,

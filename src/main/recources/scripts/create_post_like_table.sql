@@ -1,6 +1,5 @@
-DROP TABLE IF EXISTS post_like;
 
-CREATE TABLE post_like(
+CREATE TABLE IF NOT EXISTS post_like(
 id SERIAL NOT NULL,
 time TIMESTAMP NOT NULL,
 person_id INT NOT NULL,
