@@ -1,7 +1,0 @@
-
-CREATE TABLE IF NOT EXISTS notification_type(
-id SERIAL NOT NULL,
-code TEXT NOT NULL,
-name TEXT NOT NULL,
-PRIMARY KEY(id)
-);
