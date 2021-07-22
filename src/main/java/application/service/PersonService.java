@@ -25,10 +25,10 @@ public class PersonService {
         person.setFirstName("Петр");
         person.setLastName("Иванов");
         Date date = new Date();
-        person.setRegDate(date);
+        person.setRegDate(System.currentTimeMillis());
         GregorianCalendar birthCalendar = new GregorianCalendar(2000, 05, 21);
         Date birthDay = birthCalendar.getTime();
-        person.setBirthDate(birthDay);
+        person.setBirthDate(System.currentTimeMillis());
         person.setEmail("petriva@gmail.com");
         person.setPhone("88005553535");
         person.setPhoto("");

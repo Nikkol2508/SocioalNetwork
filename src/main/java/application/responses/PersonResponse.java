@@ -11,6 +11,7 @@ import java.util.HashMap;
 
 @Getter
 @Setter
+@Component
 public class PersonResponse {
     private String error;
     private long timestamp;

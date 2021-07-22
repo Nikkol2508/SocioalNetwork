@@ -1,19 +1,17 @@
 package application.service;
 
 import application.responses.LanguageResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 @Service
+@RequiredArgsConstructor
 public class PlatformService {
 
     private final LanguageResponse languageResponse;
-
-    public PlatformService(LanguageResponse languageResponse) {
-        this.languageResponse = languageResponse;
-    }
 
     public LanguageResponse getLanguage() {
 
