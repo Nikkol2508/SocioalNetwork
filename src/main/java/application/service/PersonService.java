@@ -3,9 +3,11 @@ package application.service;
 import application.models.Person;
 import application.responses.PersonResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Service
 @RequiredArgsConstructor
 public class PersonService {
     private final PersonResponse personResponse;
