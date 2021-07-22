@@ -23,7 +23,8 @@ public class PlatformService {
         languageResponse.setOffset(0);
         languageResponse.setPerPage(20);
         HashMap<Integer, String> dataObject = new HashMap<>();
-        dataObject.put(1, "руссо");
+        dataObject.put(1, "русский");
+        dataObject.put(2, "inglish");
         ArrayList<HashMap> data = new ArrayList<>();
         data.add(dataObject);
         languageResponse.setData(data);
