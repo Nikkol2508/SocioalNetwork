@@ -1,31 +1,29 @@
 package application.service;
 
-import application.responses.LanguageResponse;
-import lombok.RequiredArgsConstructor;
+import application.models.Language;
+import application.responses.GeneralListResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class PlatformService {
 
-    private final LanguageResponse languageResponse;
+    public GeneralListResponse<Language> getLanguage() {
 
-    public LanguageResponse getLanguage() {
-
+        GeneralListResponse<Language> languageResponse = new GeneralListResponse<>();
         languageResponse.setError("");
         languageResponse.setTimestamp(System.currentTimeMillis());
         languageResponse.setTotal(0);
         languageResponse.setOffset(0);
         languageResponse.setPerPage(20);
-        HashMap<Integer, String> dataObject = new HashMap<>();
-        dataObject.put(1, "русский");
-        dataObject.put(2, "inglish");
-        ArrayList<HashMap> data = new ArrayList<>();
-        data.add(dataObject);
-        languageResponse.setData(data);
+        List<Language> languageList = new ArrayList<>();
+        languageList.add(new Language(1, "Русский"));
+        languageList.add(new Language(2, "English"));
+        languageResponse.setData(languageList);
 
         return languageResponse;
     }
