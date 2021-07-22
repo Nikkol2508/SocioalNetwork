@@ -7,10 +7,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class ProfileService {
 
-    public GeneralResponse<Person> getAuth() {
-
+    public GeneralResponse<Person> getPerson(){
         GeneralResponse<Person> response = new GeneralResponse<>();
         response.setError("");
         response.setTimestamp(System.currentTimeMillis());
@@ -30,7 +29,6 @@ public class AuthService {
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
         person.isBlocked();
-        person.setToken("kjhfgkfkjh");
         response.setData(person);
         return response;
     }
