@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class MeService {
 
     private final AuthResponse authResponse;
 

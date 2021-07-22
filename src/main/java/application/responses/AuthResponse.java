@@ -1,16 +1,15 @@
 package application.responses;
 
 import application.models.Person;
-import lombok.Getter;
-import lombok.Setter;
+import liquibase.pro.packaged.T;
+import lombok.Data;
 import org.springframework.stereotype.Component;
 
-@Getter
-@Setter
+@Data
 @Component
-public class AuthResponse {
+public class AuthResponse<T> {
 
     private String error;
     private long timestamp;
-    private Person person;
+    private T data;
 }
