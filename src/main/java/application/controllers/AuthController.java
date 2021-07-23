@@ -15,7 +15,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<Person>> getLanguages() {
+    private ResponseEntity<GeneralResponse<Person>> getLogin() {
         return ResponseEntity.ok(authService.getAuth());
     }
 
