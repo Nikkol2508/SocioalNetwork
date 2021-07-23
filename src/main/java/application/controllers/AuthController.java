@@ -15,12 +15,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<Person>> getLogin() {
+    private ResponseEntity<GeneralResponse<Person>> login() {
         return ResponseEntity.ok(authService.getAuth());
     }
 
     @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<Person>> getLogout() {
+    private ResponseEntity<GeneralResponse<Person>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
 }
