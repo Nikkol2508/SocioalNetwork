@@ -34,4 +34,11 @@ public class AuthService {
         response.setData(person);
         return response;
     }
+
+    public GeneralResponse<Person> getLogout() {
+        GeneralResponse<Person> response = new GeneralResponse<>();
+        response.setError("");
+        response.setTimestamp(System.currentTimeMillis());
+        return response;
+    }
 }

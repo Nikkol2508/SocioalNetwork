@@ -8,14 +8,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/v1")
+@RequestMapping("api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     private ResponseEntity<GeneralResponse<Person>> getLanguages() {
         return ResponseEntity.ok(authService.getAuth());
+    }
+
+    @PostMapping("/logout")
+    private ResponseEntity<GeneralResponse<Person>> getLogout() {
+        return ResponseEntity.ok(authService.getLogout());
     }
 }
