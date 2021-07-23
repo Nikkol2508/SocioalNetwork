@@ -1,5 +1,6 @@
 package application.service;
 
+import application.models.LogoutDto;
 import application.models.Person;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,14 @@ public class AuthService {
         person.isBlocked();
         person.setToken("kjhfgkfkjh");
         response.setData(person);
+        return response;
+    }
+
+    public GeneralResponse<LogoutDto> getLogout() {
+        GeneralResponse<LogoutDto> response = new GeneralResponse<>();
+        response.setError("");
+        response.setTimestamp(System.currentTimeMillis());
+        response.setData(new LogoutDto("ok"));
         return response;
     }
 }
