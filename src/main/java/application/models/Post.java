@@ -1,18 +1,31 @@
 package application.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
-@Getter
-@Setter
+@Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Post {
     private int id;
-    private Date time;
-    private int authorId;
+    private long time;
+
+    private Person author;
     private String title;
+
+    @JsonProperty("post_text")
     private String postText;
+
+    @JsonProperty("is_blocked")
     private boolean isBlocked;
+
+    private long likes;
+
+    private List<Comment> comments;
 }
 

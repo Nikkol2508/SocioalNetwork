@@ -1,0 +1,71 @@
+package application.service;
+
+import application.models.Comment;
+import application.models.Person;
+import application.models.Post;
+import application.responses.GeneralListResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class FeedsService {
+    public GeneralListResponse<Post> getFeed(){
+        GeneralListResponse<Post> response = new GeneralListResponse<>();
+        response.setError("");
+        response.setTimestamp(System.currentTimeMillis());
+        response.setTotal(10);
+        response.setOffset(-1);
+        response.setPerPage(20);
+
+
+        List<Post> postList = new ArrayList<>();
+
+        Post post1 = new Post();
+        post1.setId(1);
+        post1.setTime(System.currentTimeMillis() - 1000);
+
+        Person author = new Person();
+        author.setId(2);
+        author.setFirstName("Борис");
+        author.setLastName("Булкин");
+        author.setRegDate(System.currentTimeMillis() - 3000);
+        author.setBirthDate(System.currentTimeMillis() - 9000);
+        author.setEmail("gsdfhgsh@skdjfhskdj.ru");
+        author.setPhone("9163332211");
+        author.setPhoto("");
+        author.setAbout("Немного обо мне");
+        author.setCity("Москва");
+        author.setCountry("Россия");
+        author.setMessagesPermission("All");
+        author.setLastOnlineTime(System.currentTimeMillis() - 40);
+        author.isBlocked();
+        post1.setAuthor(author);
+
+        post1.setTitle("Как написать BACKEND соцсети за одну ночь без кофе и смс");
+        post1.setPostText("Никак");
+        post1.isBlocked();
+        post1.setLikes(50);
+
+        List<Comment> comments = new ArrayList<>();
+        Comment comment = new Comment();
+        comment.setParentId(0);
+        comment.setCommentText("полезно");
+        comment.setId(2);
+        comment.setPostId("");
+        comment.setTime(System.currentTimeMillis()-5);
+        comment.setAuthorId(1);
+        comment.isBlocked();
+
+        comments.add(comment);
+        post1.setComments(comments);
+
+        postList.add(post1);
+        response.setData(postList);
+
+        return response;
+    }
+}
