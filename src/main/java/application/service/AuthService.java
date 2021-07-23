@@ -1,14 +1,9 @@
 package application.service;
 
-import application.models.HTTPMessage;
+import application.models.LogoutDto;
 import application.models.Person;
 import application.responses.GeneralResponse;
-import liquibase.pro.packaged.T;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.bridge.Message;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMessage;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,20 +27,20 @@ public class AuthService {
         person.setAbout("Немного обо мне");
 
         person.setCity("Москва");
-        person.setCountry("Россия");
+        person.setCountry( "Россия");
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
-        person.isBlocked();
+        person.setBlocked(false);
         person.setToken("kjhfgkfkjh");
         response.setData(person);
         return response;
     }
 
-    public GeneralResponse<HTTPMessage> getLogout() {
-        GeneralResponse<HTTPMessage> response = new GeneralResponse<>();
+    public GeneralResponse<LogoutDto> getLogout() {
+        GeneralResponse<LogoutDto> response = new GeneralResponse<>();
         response.setError("");
         response.setTimestamp(System.currentTimeMillis());
-        response.setData(new HTTPMessage("ok"));
+        response.setData(new LogoutDto("ok"));
         return response;
     }
 }

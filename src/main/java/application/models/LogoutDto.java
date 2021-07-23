@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class HTTPMessage {
+public class LogoutDto {
+
     private String message;
 }
