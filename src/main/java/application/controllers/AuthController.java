@@ -1,9 +1,11 @@
 package application.controllers;
 
+import application.models.HTTPMessage;
 import application.models.Person;
 import application.responses.GeneralResponse;
 import application.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<Person>> logout() {
+    private ResponseEntity<GeneralResponse<HTTPMessage>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
 }
