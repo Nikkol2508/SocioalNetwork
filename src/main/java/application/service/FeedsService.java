@@ -1,8 +1,6 @@
 package application.service;
 
-import application.models.Comment;
-import application.models.Person;
-import application.models.Post;
+import application.models.*;
 import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,16 +36,18 @@ public class FeedsService {
         author.setPhone("9163332211");
         author.setPhoto("");
         author.setAbout("Немного обо мне");
-        author.setCity("Москва");
-        author.setCountry("Россия");
+        City city = new City(1, "Москва");
+        author.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        author.setCountry(country.getTitle());
         author.setMessagesPermission("All");
         author.setLastOnlineTime(System.currentTimeMillis() - 40);
-        author.isBlocked();
+        author.setBlocked(false);
         post1.setAuthor(author);
 
         post1.setTitle("Как написать BACKEND соцсети за одну ночь без кофе и смс");
         post1.setPostText("Никак");
-        post1.isBlocked();
+        post1.setBlocked(false);
         post1.setLikes(50);
 
         List<Comment> comments = new ArrayList<>();
@@ -58,7 +58,7 @@ public class FeedsService {
         comment.setPostId("");
         comment.setTime(System.currentTimeMillis()-5);
         comment.setAuthorId(1);
-        comment.isBlocked();
+        comment.setBlocked(false);
 
         comments.add(comment);
         post1.setComments(comments);

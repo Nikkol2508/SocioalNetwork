@@ -12,6 +12,13 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Person {
     private int id;
+    private String email;
+    private String phone;
+    private String photo;
+    private String about;
+    private String city;
+    private String country;
+    private String token;
 
     @JsonProperty("first_name")
     private String firstName;
@@ -25,13 +32,6 @@ public class Person {
     @JsonProperty("birth_date")
     private long birthDate;
 
-    private String email;
-    private String phone;
-    private String photo;
-    private String about;
-    private String city;
-    private String country;
-
     @JsonProperty("messages_permission")
     private String messagesPermission;
 
@@ -40,6 +40,5 @@ public class Person {
 
     @JsonProperty("is_blocked")
     private boolean isBlocked;
-    private String token;
 }
 

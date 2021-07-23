@@ -46,7 +46,7 @@ public class PlatformService {
         return countryResponse;
     }
 
-    public GeneralListResponse<City> getSity(Integer countryId, String country, Integer offset, Integer itemPerPage) {
+    public GeneralListResponse<City> getCity(Integer countryId, String country, Integer offset, Integer itemPerPage) {
 
         GeneralListResponse<City> cityResponse = new GeneralListResponse<>();
         cityResponse.setError("");

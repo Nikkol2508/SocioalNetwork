@@ -31,6 +31,6 @@ public class PlatformController {
 
     @GetMapping("/cities")
     private ResponseEntity<GeneralListResponse<City>> getLCity(@RequestParam Integer countryId, @RequestParam String country, @RequestParam Integer offset, @RequestParam Integer itemPerPage) {
-        return ResponseEntity.ok(platformService.getSity(countryId, country, offset, itemPerPage));
+        return ResponseEntity.ok(platformService.getCity(countryId, country, offset, itemPerPage));
     }
 }

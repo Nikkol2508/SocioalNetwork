@@ -46,7 +46,7 @@ public class PostsService {
         comment.setParentId(0);
         comment.setCommentText("полезно");
         comment.setId(1);
-        comment.setPostId(1);
+        comment.setPostId("");
         comment.setTime(System.currentTimeMillis());
         comment.setAuthorId(1);
         comment.setBlocked(false);
@@ -78,8 +78,10 @@ public class PostsService {
         person.setPhone("9163332211");
         person.setPhoto("");
         person.setAbout("Немного обо мне");
-        person.setCity("Москва");
-        person.setCountry("Россия");
+        City city = new City(1, "Москва");
+        person.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        person.setCountry(country.getTitle());
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
         person.setBlocked(false);
@@ -89,7 +91,7 @@ public class PostsService {
         comment.setParentId(0);
         comment.setCommentText("полезно");
         comment.setId(1);
-        comment.setPostId(1);
+        comment.setPostId("");
         comment.setTime(System.currentTimeMillis());
         comment.setAuthorId(1);
         comment.setBlocked(false);
@@ -112,7 +114,7 @@ public class PostsService {
         comment.setParentId(0);
         comment.setCommentText("полезно");
         comment.setId(1);
-        comment.setPostId(1);
+        comment.setPostId("");
         comment.setTime(System.currentTimeMillis());
         comment.setAuthorId(1);
         comment.setBlocked(false);

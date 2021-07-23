@@ -1,6 +1,7 @@
 package application.service;
 
-import application.models.Language;
+import application.models.City;
+import application.models.Country;
 import application.models.Person;
 import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class FriendsService {
         friend1.setCountry("Россия");
         friend1.setMessagesPermission("All");
         friend1.setLastOnlineTime(System.currentTimeMillis() - 40);
-        friend1.isBlocked();
+        friend1.setBlocked(false);
         friend1.setToken("kjhfgkfkjh");
 
         Person friend2 = new Person();
@@ -53,11 +54,13 @@ public class FriendsService {
         friend2.setPhoto("");
         friend2.setAbout("Немного обо мне");
 
-        friend2.setCity("Москва");
-        friend2.setCountry("Россия");
+        City city = new City(1, "Москва");
+        friend2.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        friend2.setCountry(country.getTitle());
         friend2.setMessagesPermission("All");
         friend2.setLastOnlineTime(System.currentTimeMillis() - 40);
-        friend2.isBlocked();
+        friend2.setBlocked(false);
 
         personList.add(friend1);
         personList.add(friend2);
@@ -91,7 +94,7 @@ public class FriendsService {
         request1.setCountry("Россия");
         request1.setMessagesPermission("All");
         request1.setLastOnlineTime(System.currentTimeMillis() - 40);
-        request1.isBlocked();
+        request1.setBlocked(false);
 
         Person request2 = new Person();
 
@@ -105,11 +108,13 @@ public class FriendsService {
         request2.setPhoto("");
         request2.setAbout("Немного обо мне");
 
-        request2.setCity("Москва");
-        request2.setCountry("Россия");
+        City city = new City(1, "Москва");
+        request2.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        request2.setCountry(country.getTitle());
         request2.setMessagesPermission("All");
         request2.setLastOnlineTime(System.currentTimeMillis() - 40);
-        request2.isBlocked();
+        request2.setBlocked(false);
 
         personList.add(request1);
         personList.add(request2);
@@ -139,11 +144,13 @@ public class FriendsService {
         personForRecommendation.setPhoto("");
         personForRecommendation.setAbout("Немного обо мне");
 
-        personForRecommendation.setCity("Москва");
-        personForRecommendation.setCountry("Россия");
+        City city = new City(1, "Москва");
+        personForRecommendation.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        personForRecommendation.setCountry(country.getTitle());
         personForRecommendation.setMessagesPermission("All");
         personForRecommendation.setLastOnlineTime(System.currentTimeMillis() - 40);
-        personForRecommendation.isBlocked();
+        personForRecommendation.setBlocked(false);
 
         personList.add(personForRecommendation);
         recommendationResponse.setData(personList);

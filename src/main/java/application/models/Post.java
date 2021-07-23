@@ -11,6 +11,8 @@ public class Post {
     private long time;
     private Person author;
     private String title;
+    private int likes;
+    private List<Comment> comments;
 
     @JsonProperty("post_text")
     private String postText;
@@ -18,9 +20,6 @@ public class Post {
     @JsonProperty("is_blocked")
     private boolean isBlocked;
 
-    private int likes;
-
-    private List<Comment> comments;
 
 }
 

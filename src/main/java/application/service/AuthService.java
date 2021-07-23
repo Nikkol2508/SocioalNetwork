@@ -1,5 +1,7 @@
 package application.service;
 
+import application.models.City;
+import application.models.Country;
 import application.models.LogoutDto;
 import application.models.Person;
 import application.responses.GeneralResponse;
@@ -25,9 +27,10 @@ public class AuthService {
         person.setPhone("9163332211");
         person.setPhoto("");
         person.setAbout("Немного обо мне");
-
-        person.setCity("Москва");
-        person.setCountry( "Россия");
+        City city = new City(1, "Москва");
+        person.setCity(city.getTitle());
+        Country country = new Country(1, "Россия");
+        person.setCountry(country.getTitle());
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
         person.setBlocked(false);
