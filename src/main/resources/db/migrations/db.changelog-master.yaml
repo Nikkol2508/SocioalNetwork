@@ -2,5 +2,19 @@ databaseChangeLog:
   - include:
       file: v1.0-creation-tables.sql
       relativeToChangelogFile: true
-  - includeAll:
-      path: db/migrations/data/
+
+  - include:
+      file: person-user-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: post-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: post-comment-like-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: tag-post2tag-data.sql
+      relativeToChangelogFile: true
