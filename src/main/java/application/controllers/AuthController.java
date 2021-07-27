@@ -1,7 +1,7 @@
 package application.controllers;
 
 import application.models.LogoutDto;
-import application.models.Person;
+import application.models.PersonDto;
 import application.responses.GeneralResponse;
 import application.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<Person>> login() {
+    private ResponseEntity<GeneralResponse<PersonDto>> login() {
         return ResponseEntity.ok(authService.getAuth());
     }
 

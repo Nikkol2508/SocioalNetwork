@@ -2,7 +2,7 @@ package application.service;
 
 import application.models.City;
 import application.models.Country;
-import application.models.Person;
+import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,17 +14,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FriendsService {
 
-    public GeneralListResponse<Person> getUserFriends() {
-        GeneralListResponse<Person> friendResponse = new GeneralListResponse<>();
+    public GeneralListResponse<PersonDto> getUserFriends() {
+        GeneralListResponse<PersonDto> friendResponse = new GeneralListResponse<>();
         friendResponse.setError("");
         friendResponse.setTimestamp(System.currentTimeMillis());
         friendResponse.setTotal(0);
         friendResponse.setOffset(0);
         friendResponse.setPerPage(20);
 
-        List<Person> personList = new ArrayList<>();
+        List<PersonDto> personDtoList = new ArrayList<>();
 
-        Person friend1 = new Person();
+        PersonDto friend1 = new PersonDto();
         friend1.setId(3);
         friend1.setFirstName("Света");
         friend1.setLastName("Белкина");
@@ -42,7 +42,7 @@ public class FriendsService {
         friend1.setBlocked(false);
         friend1.setToken("kjhfgkfkjh");
 
-        Person friend2 = new Person();
+        PersonDto friend2 = new PersonDto();
 
         friend2.setId(4);
         friend2.setFirstName("Егор");
@@ -62,23 +62,23 @@ public class FriendsService {
         friend2.setLastOnlineTime(System.currentTimeMillis() - 40);
         friend2.setBlocked(false);
 
-        personList.add(friend1);
-        personList.add(friend2);
-        friendResponse.setData(personList);
+        personDtoList.add(friend1);
+        personDtoList.add(friend2);
+        friendResponse.setData(personDtoList);
         return friendResponse;
     }
 
-    public GeneralListResponse<Person> getUserFriendsRequest() {
-        GeneralListResponse<Person> requestResponse = new GeneralListResponse<>();
+    public GeneralListResponse<PersonDto> getUserFriendsRequest() {
+        GeneralListResponse<PersonDto> requestResponse = new GeneralListResponse<>();
         requestResponse.setError("");
         requestResponse.setTimestamp(System.currentTimeMillis());
         requestResponse.setTotal(0);
         requestResponse.setOffset(0);
         requestResponse.setPerPage(20);
 
-        List<Person> personList = new ArrayList<>();
+        List<PersonDto> personDtoList = new ArrayList<>();
 
-        Person request1 = new Person();
+        PersonDto request1 = new PersonDto();
 
         request1.setId(10);
         request1.setFirstName("Mark");
@@ -96,7 +96,7 @@ public class FriendsService {
         request1.setLastOnlineTime(System.currentTimeMillis() - 40);
         request1.setBlocked(false);
 
-        Person request2 = new Person();
+        PersonDto request2 = new PersonDto();
 
         request2.setId(11);
         request2.setFirstName("Jack");
@@ -116,44 +116,44 @@ public class FriendsService {
         request2.setLastOnlineTime(System.currentTimeMillis() - 40);
         request2.setBlocked(false);
 
-        personList.add(request1);
-        personList.add(request2);
-        requestResponse.setData(personList);
+        personDtoList.add(request1);
+        personDtoList.add(request2);
+        requestResponse.setData(personDtoList);
         return requestResponse;
     }
 
-    public GeneralListResponse<Person> getUserFriendsRecommendations() {
-        GeneralListResponse<Person> recommendationResponse = new GeneralListResponse<>();
+    public GeneralListResponse<PersonDto> getUserFriendsRecommendations() {
+        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>();
         recommendationResponse.setError("");
         recommendationResponse.setTimestamp(System.currentTimeMillis());
         recommendationResponse.setTotal(0);
         recommendationResponse.setOffset(0);
         recommendationResponse.setPerPage(20);
 
-        List<Person> personList = new ArrayList<>();
+        List<PersonDto> personDtoList = new ArrayList<>();
 
-        Person personForRecommendation = new Person();
+        PersonDto personDtoForRecommendation = new PersonDto();
 
-        personForRecommendation.setId(15);
-        personForRecommendation.setFirstName("Gera");
-        personForRecommendation.setLastName("Rog");
-        personForRecommendation.setRegDate(System.currentTimeMillis() - 777);
-        personForRecommendation.setBirthDate(System.currentTimeMillis() - 1994);
-        personForRecommendation.setEmail("gsdfsh@sjfj.ru");
-        personForRecommendation.setPhone("91633322343");
-        personForRecommendation.setPhoto("");
-        personForRecommendation.setAbout("Немного обо мне");
+        personDtoForRecommendation.setId(15);
+        personDtoForRecommendation.setFirstName("Gera");
+        personDtoForRecommendation.setLastName("Rog");
+        personDtoForRecommendation.setRegDate(System.currentTimeMillis() - 777);
+        personDtoForRecommendation.setBirthDate(System.currentTimeMillis() - 1994);
+        personDtoForRecommendation.setEmail("gsdfsh@sjfj.ru");
+        personDtoForRecommendation.setPhone("91633322343");
+        personDtoForRecommendation.setPhoto("");
+        personDtoForRecommendation.setAbout("Немного обо мне");
 
         City city = new City(1, "Москва");
-        personForRecommendation.setCity(city.getTitle());
+        personDtoForRecommendation.setCity(city.getTitle());
         Country country = new Country(1, "Россия");
-        personForRecommendation.setCountry(country.getTitle());
-        personForRecommendation.setMessagesPermission("All");
-        personForRecommendation.setLastOnlineTime(System.currentTimeMillis() - 40);
-        personForRecommendation.setBlocked(false);
+        personDtoForRecommendation.setCountry(country.getTitle());
+        personDtoForRecommendation.setMessagesPermission("All");
+        personDtoForRecommendation.setLastOnlineTime(System.currentTimeMillis() - 40);
+        personDtoForRecommendation.setBlocked(false);
 
-        personList.add(personForRecommendation);
-        recommendationResponse.setData(personList);
+        personDtoList.add(personDtoForRecommendation);
+        recommendationResponse.setData(personDtoList);
 
         return recommendationResponse;
     }

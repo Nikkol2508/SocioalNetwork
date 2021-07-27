@@ -26,7 +26,7 @@ public class FeedsService {
         post1.setId(1);
         post1.setTime(System.currentTimeMillis() - 1000);
 
-        Person author = new Person();
+        PersonDto author = new PersonDto();
         author.setId(2);
         author.setFirstName("Борис");
         author.setLastName("Булкин");
