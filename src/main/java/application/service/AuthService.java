@@ -1,5 +1,6 @@
 package application.service;
 
+import application.models.LogoutDto;
 import application.models.Person;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +27,20 @@ public class AuthService {
         person.setAbout("Немного обо мне");
 
         person.setCity("Москва");
-        person.setCountry("Россия");
+        person.setCountry( "Россия");
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
-        person.isBlocked();
+        person.setBlocked(false);
         person.setToken("kjhfgkfkjh");
         response.setData(person);
+        return response;
+    }
+
+    public GeneralResponse<LogoutDto> getLogout() {
+        GeneralResponse<LogoutDto> response = new GeneralResponse<>();
+        response.setError("");
+        response.setTimestamp(System.currentTimeMillis());
+        response.setData(new LogoutDto("ok"));
         return response;
     }
 }

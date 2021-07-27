@@ -1,18 +1,26 @@
 package application.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
-import java.util.Date;
-
-@Getter
-@Setter
+@Data
 public class Comment {
     private int id;
+
+    @JsonProperty("post_id")
     private int postId;
+
+    @JsonProperty("parent_id")
     private int parentId;
+
+    @JsonProperty("author_id")
     private int authorId;
+
+    @JsonProperty("comment_text")
     private String commentText;
-    private Date time;
+
+    private long time;
+
+    @JsonProperty("is_blocked")
     private boolean isBlocked;
 }

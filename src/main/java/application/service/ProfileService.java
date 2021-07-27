@@ -1,5 +1,7 @@
 package application.service;
 
+import application.models.City;
+import application.models.Country;
 import application.models.Person;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +30,7 @@ public class ProfileService {
         person.setCountry("Россия");
         person.setMessagesPermission("All");
         person.setLastOnlineTime(System.currentTimeMillis() - 40);
-        person.isBlocked();
+        person.setBlocked(false);
         response.setData(person);
         return response;
     }
