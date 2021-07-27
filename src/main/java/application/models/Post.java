@@ -9,8 +9,10 @@ import java.util.List;
 public class Post {
     private int id;
     private long time;
-    private Person author;
+    private PersonDto author;
     private String title;
+    private int likes;
+    private List<Comment> comments;
 
     @JsonProperty("post_text")
     private String postText;
@@ -18,9 +20,6 @@ public class Post {
     @JsonProperty("is_blocked")
     private boolean isBlocked;
 
-    private int likes;
-
-    private List<Comment> comments;
 
 }
 

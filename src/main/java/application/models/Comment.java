@@ -1,14 +1,17 @@
 package application.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class Comment {
     private int id;
+    private long time;
 
     @JsonProperty("post_id")
-    private int postId;
+    private String postId;
 
     @JsonProperty("parent_id")
     private int parentId;
@@ -18,8 +21,6 @@ public class Comment {
 
     @JsonProperty("comment_text")
     private String commentText;
-
-    private long time;
 
     @JsonProperty("is_blocked")
     private boolean isBlocked;

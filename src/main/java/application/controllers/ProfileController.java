@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.Person;
+import application.models.PersonDto;
 import application.responses.GeneralResponse;
 import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping("/me")
-    public ResponseEntity<GeneralResponse<Person>> getProfile() {
+    public ResponseEntity<GeneralResponse<PersonDto>> getProfile() {
         return ResponseEntity.ok(profileService.getPerson());
     }
 }
