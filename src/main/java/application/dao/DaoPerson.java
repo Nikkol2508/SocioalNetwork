@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.models.PermissionType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,8 +15,8 @@ public class DaoPerson implements Dao<Person>{
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String SQL_INSERT_PERSON = "INSERT INTO person (first_name, last_name, password, e_mail, reg_date) " +
-            "VALUES (?, ?, ?, ?, ?)";
+    private final static String SQL_INSERT_PERSON = "INSERT INTO person (first_name, last_name, password, e_mail, reg_date, messages_permission) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
     private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
 
     public Person getByEmail(String email) {
@@ -39,7 +40,8 @@ public class DaoPerson implements Dao<Person>{
                 person.getLastName(),
                 person.getPassword(),
                 person.getEmail(),
-                System.currentTimeMillis());
+                System.currentTimeMillis(),
+                PermissionType.ALL.toString());
     }
 
     @Override

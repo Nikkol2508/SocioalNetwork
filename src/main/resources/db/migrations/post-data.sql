@@ -1,10 +1,6 @@
 --liquibase formatted sql
 --changeset nikolai:data-post-post-comment
 
-ALTER TABLE post DROP COLUMN time;
-
-ALTER TABLE post ADD time BIGINT;
-
 INSERT INTO post ("time",author_id,tittle,post_text,is_blocked)
 	VALUES ('1625735590000',4,'Спор о первом языке програмирования','<p>Много текста про разные языки програмирования<br>Но однозначного ответа нет</p>',false),
 	       ('1625765590000',2,'Язык програмирования "Java"','<p>Много текста про java<br>Надо учить</p>',false),

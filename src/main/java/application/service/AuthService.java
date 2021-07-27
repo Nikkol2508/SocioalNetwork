@@ -1,13 +1,13 @@
 package application.service;
 
 import application.dao.DaoPerson;
-import application.exceptions.ErrorResponse;
 import application.exceptions.PasswordsNotEqualsException;
-import application.models.*;
+import application.models.LogoutDto;
+import application.models.Person;
+import application.models.PersonDto;
 import application.requests.AuthDtoRequest;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,8 +30,8 @@ public class AuthService {
             personDto.setPhone(person.getPhone());
             personDto.setPhoto(person.getPhoto());
             personDto.setAbout(person.getAbout());
-            personDto.setCity(person.getTown());
-            personDto.setCountry(person.getTown());
+            personDto.setCity(person.getCity());
+            personDto.setCountry(person.getCountry());
 //            City city = new City(person.);
 //            personDto.setCity(city.getTitle());
 //            Country country = new Country(1, "Россия");
@@ -40,11 +40,7 @@ public class AuthService {
             personDto.setLastOnlineTime(person.getLastOnlineTime());
             personDto.setBlocked(person.isApproved());
             personDto.setToken("kjhfgkfkjh");
-            GeneralResponse<PersonDto> response = new GeneralResponse<>();
-            response.setData(personDto);
-            response.setError("");
-            response.setTimestamp(System.currentTimeMillis());
-            return response;
+            return new GeneralResponse<>(personDto);
         } else {
             throw new PasswordsNotEqualsException();
         }
@@ -52,10 +48,7 @@ public class AuthService {
 
 
     public GeneralResponse<LogoutDto> getLogout() {
-        GeneralResponse<LogoutDto> response = new GeneralResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setData(new LogoutDto("ok"));
-        return response;
+        return new GeneralResponse<>(new LogoutDto("ok"));
     }
+
 }

@@ -12,9 +12,6 @@ import org.springframework.stereotype.Service;
 public class ProfileService {
 
     public GeneralResponse<PersonDto> getPerson(){
-        GeneralResponse<PersonDto> response = new GeneralResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
         PersonDto personDto = new PersonDto();
         personDto.setId(2);
         personDto.setFirstName("Борис");
@@ -33,7 +30,7 @@ public class ProfileService {
         personDto.setMessagesPermission("All");
         personDto.setLastOnlineTime(System.currentTimeMillis() - 40);
         personDto.setBlocked(false);
-        response.setData(personDto);
+        GeneralResponse<PersonDto> response = new GeneralResponse<>(personDto);
         return response;
     }
 }

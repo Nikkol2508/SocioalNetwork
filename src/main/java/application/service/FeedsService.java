@@ -12,12 +12,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedsService {
     public GeneralListResponse<Post> getFeed(){
-        GeneralListResponse<Post> response = new GeneralListResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setTotal(10);
-        response.setOffset(-1);
-        response.setPerPage(20);
 
 
         List<Post> postList = new ArrayList<>();
@@ -64,7 +58,10 @@ public class FeedsService {
         post1.setComments(comments);
 
         postList.add(post1);
-        response.setData(postList);
+        GeneralListResponse<Post> response = new GeneralListResponse<>(postList);
+        response.setTotal(10);
+        response.setOffset(-1);
+        response.setPerPage(20);
 
         return response;
     }

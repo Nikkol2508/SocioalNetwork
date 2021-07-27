@@ -15,12 +15,6 @@ import java.util.List;
 public class FriendsService {
 
     public GeneralListResponse<PersonDto> getUserFriends() {
-        GeneralListResponse<PersonDto> friendResponse = new GeneralListResponse<>();
-        friendResponse.setError("");
-        friendResponse.setTimestamp(System.currentTimeMillis());
-        friendResponse.setTotal(0);
-        friendResponse.setOffset(0);
-        friendResponse.setPerPage(20);
 
         List<PersonDto> personDtoList = new ArrayList<>();
 
@@ -64,17 +58,14 @@ public class FriendsService {
 
         personDtoList.add(friend1);
         personDtoList.add(friend2);
-        friendResponse.setData(personDtoList);
+        GeneralListResponse<PersonDto> friendResponse = new GeneralListResponse<>(personDtoList);
+        friendResponse.setTotal(0);
+        friendResponse.setOffset(0);
+        friendResponse.setPerPage(20);
         return friendResponse;
     }
 
     public GeneralListResponse<PersonDto> getUserFriendsRequest() {
-        GeneralListResponse<PersonDto> requestResponse = new GeneralListResponse<>();
-        requestResponse.setError("");
-        requestResponse.setTimestamp(System.currentTimeMillis());
-        requestResponse.setTotal(0);
-        requestResponse.setOffset(0);
-        requestResponse.setPerPage(20);
 
         List<PersonDto> personDtoList = new ArrayList<>();
 
@@ -118,17 +109,14 @@ public class FriendsService {
 
         personDtoList.add(request1);
         personDtoList.add(request2);
-        requestResponse.setData(personDtoList);
+        GeneralListResponse<PersonDto> requestResponse = new GeneralListResponse<>(personDtoList);
+        requestResponse.setTotal(0);
+        requestResponse.setOffset(0);
+        requestResponse.setPerPage(20);
         return requestResponse;
     }
 
     public GeneralListResponse<PersonDto> getUserFriendsRecommendations() {
-        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>();
-        recommendationResponse.setError("");
-        recommendationResponse.setTimestamp(System.currentTimeMillis());
-        recommendationResponse.setTotal(0);
-        recommendationResponse.setOffset(0);
-        recommendationResponse.setPerPage(20);
 
         List<PersonDto> personDtoList = new ArrayList<>();
 
@@ -153,7 +141,10 @@ public class FriendsService {
         personDtoForRecommendation.setBlocked(false);
 
         personDtoList.add(personDtoForRecommendation);
-        recommendationResponse.setData(personDtoList);
+        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>(personDtoList);
+        recommendationResponse.setTotal(0);
+        recommendationResponse.setOffset(0);
+        recommendationResponse.setPerPage(20);
 
         return recommendationResponse;
     }

@@ -22,13 +22,12 @@ public class PersonMapper implements RowMapper<Person> {
         person.setPassword(rs.getString("password"));
         person.setPhoto(rs.getString("photo"));
         person.setAbout(rs.getString("about"));
-        person.setTown(rs.getString("town"));
+        person.setCity(rs.getString("city"));
+        person.setCountry(rs.getString("country"));
         person.setConfirmationCode(rs.getString("confirmation_code"));
         person.setApproved(rs.getBoolean("is_approved"));
         person.setLastOnlineTime(rs.getLong("last_online_time"));
-        person.setMessagesPermission(rs.getString("messages_permission") != null
-                ? PermissionType.valueOf(rs.getString("messages_permission"))
-                : null);
+        person.setMessagesPermission(PermissionType.valueOf(rs.getString("messages_permission")));
         return person;
     }
 }

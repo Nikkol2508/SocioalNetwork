@@ -1,45 +1,37 @@
 package application.controllers;
 
-import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.AccountDto;
-import application.models.Person;
+import application.requests.RecoverPassDtoRequest;
 import application.requests.RegistrationDtoRequest;
+import application.requests.SetPasswordDtoRequest;
 import application.responses.GeneralResponse;
+import application.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/account")
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final DaoPerson daoPerson;
+    private final AccountService accountService;
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody RegistrationDtoRequest registration)
+    public ResponseEntity<GeneralResponse<AccountDto>> register(@RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
-        if (!registration.getPasswd1().equals(registration.getPasswd2())) {
-            throw new PasswordsNotEqualsException();
-        }
-        if (daoPerson.getByEmail(registration.getEmail()) != null) {
-            throw new EmailAlreadyExistsException();
-        }
-        Person person = new Person();
-        person.setPassword(registration.getPasswd1());
-        person.setEmail(registration.getEmail());
-        person.setFirstName(registration.getFirstName());
-        person.setLastName(registration.getLastName());
-        daoPerson.save(person);
-        GeneralResponse<AccountDto> response = new GeneralResponse<>();
-        response.setTimestamp(System.currentTimeMillis());
-        response.setError("");
-        response.setData(new AccountDto("ok"));
-        return ResponseEntity.ok(response);
+        return accountService.savePerson(request);
+    }
+
+    @PutMapping("/password/set")
+    public ResponseEntity<GeneralResponse<AccountDto>> setPassword(@RequestBody SetPasswordDtoRequest request) {
+        return ResponseEntity.ok(null);
+    }
+
+    @PutMapping("/password/recovery")
+    public ResponseEntity<GeneralResponse<AccountDto>> recoverPassword(@RequestBody RecoverPassDtoRequest request) {
+        return ResponseEntity.ok(null);
     }
 }

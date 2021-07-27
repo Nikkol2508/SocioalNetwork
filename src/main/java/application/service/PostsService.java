@@ -12,12 +12,6 @@ import java.util.List;
 public class PostsService {
 
     public GeneralListResponse<Post> getPosts() {
-        GeneralListResponse<Post> response = new GeneralListResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
         List<Post> postList = new ArrayList<>();
         Post post = new Post();
         post.setId(1);
@@ -52,16 +46,15 @@ public class PostsService {
         comment.setBlocked(false);
         comments.add(comment);
         post.setComments(comments);
-
         postList.add(post);
-        response.setData(postList);
+        GeneralListResponse<Post> response = new GeneralListResponse<>(postList);
+        response.setTotal(10);
+        response.setOffset(0);
+        response.setPerPage(10);
         return response;
     }
 
     public GeneralResponse<Post> getPost(int id) {
-        GeneralResponse<Post> response = new GeneralResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
         Post post = new Post();
         post.setId(1);
         post.setPostText("Вау! Это текст");
@@ -97,18 +90,10 @@ public class PostsService {
         comment.setBlocked(false);
         comments.add(comment);
         post.setComments(comments);
-
-        response.setData(post);
-        return response;
+        return new GeneralResponse<>(post);
     }
 
     public GeneralListResponse<Comment> getComments(int id) {
-        GeneralListResponse<Comment> response = new GeneralListResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
         List<Comment> comments = new ArrayList<>();
         Comment comment = new Comment();
         comment.setParentId(0);
@@ -119,7 +104,10 @@ public class PostsService {
         comment.setAuthorId(1);
         comment.setBlocked(false);
         comments.add(comment);
-        response.setData(comments);
+        GeneralListResponse<Comment> response = new GeneralListResponse<>(comments);
+        response.setTotal(10);
+        response.setOffset(0);
+        response.setPerPage(10);
         return response;
     }
 

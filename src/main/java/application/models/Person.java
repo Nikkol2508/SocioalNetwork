@@ -13,7 +13,8 @@ public class Person {
     private String password;
     private String photo;
     private String about;
-    private String town;
+    private String city;
+    private String country;
     private String confirmationCode;
     private boolean isApproved;
     private PermissionType messagesPermission;

@@ -1,10 +1,6 @@
 --liquibase formatted sql
 --changeset nikolai:data-post-comment-like
 
-ALTER TABLE post_comment DROP COLUMN time;
-
-ALTER TABLE post_comment ADD time BIGINT;
-
 INSERT INTO post_comment (post_id,parent_id,author_id,comment_text,is_blocked,"time")
     VALUES (3,null,6,'HTML нужно учить вместе с CSS',false,1627290651000),
            	   (1,null,6,'Чтобы выбрать, надо попробовать и понять, что ближе',false,1627290651000),
@@ -16,10 +12,6 @@ INSERT INTO post_comment (post_id,parent_id,author_id,comment_text,is_blocked,"t
            	   (13,null,5,'Idea огонь',false,1627290651000),
            	   (11,null,2,'Полезная вещ',false,1627290651000),
            	   (14,null,9,'Это вообще отдельная профессия',false,1627290651000);
-
-ALTER TABLE post_like DROP COLUMN time;
-
-ALTER TABLE post_like ADD time BIGINT;
 
 INSERT INTO post_like ("time",person_id,post_id)
 	VALUES ('1627290651000',1,4),

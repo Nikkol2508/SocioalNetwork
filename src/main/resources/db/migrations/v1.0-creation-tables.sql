@@ -1,19 +1,13 @@
 --liquibase formatted sql
 --changeset vitaly:create-all-tables
 
-CREATE TYPE user_type as ENUM ('MODERATOR', 'ADMIN');
-CREATE TYPE permission_type as ENUM ('ALL', 'FRIENDS');
-CREATE TYPE status_type as ENUM ('REQUEST', 'FRIEND', 'BLOCKED', 'DECLINED', 'SUBSCRIBED');
-CREATE TYPE action_type as ENUM ('BLOCK', 'UNBLOCK');
-CREATE TYPE message_status_type as ENUM ('SENT', 'READ');
-
 CREATE TABLE IF NOT EXISTS "user"
 (
     id       SERIAL    NOT NULL,
     name     TEXT      NOT NULL,
     e_mail   TEXT      NOT NULL,
     password TEXT      NOT NULL,
-    type     user_type NOT NULL,
+    type     TEXT      NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -22,25 +16,27 @@ CREATE TABLE IF NOT EXISTS person
     Id                  SERIAL    NOT NULL,
     first_name          TEXT      NOT NULL,
     last_name           TEXT      NOT NULL,
-    reg_date            TIMESTAMP NOT NULL,
-    birth_date          DATE,
+    reg_date            BIGINT NOT NULL,
+    birth_date          BIGINT,
     e_mail              TEXT      NOT NULL,
-    phone               TEXT      NOT NULL,
+    phone               TEXT,
     password            TEXT      NOT NULL,
     photo               TEXT,
     about               TEXT,
-    town                TEXT,
+    country             TEXT,
+    city                TEXT,
     confirmation_code   TEXT,
     is_approved         BOOLEAN,
-    messages_permission permission_type,
-    last_online_time    TIMESTAMP,
+    messages_permission TEXT      NOT NULL,
+    last_online_time    BIGINT,
+    is_blocked          BOOLEAN,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS post
 (
     id         SERIAL    NOT NULL,
-    time       TIMESTAMP NOT NULL,
+    time       BIGINT    NOT NULL,
     author_id  INT       NOT NULL,
     tittle     TEXT      NOT NULL,
     post_text  TEXT      NOT NULL,
@@ -52,9 +48,9 @@ CREATE TABLE IF NOT EXISTS post
 CREATE TABLE IF NOT EXISTS friendship_status
 (
     id   SERIAL    NOT NULL,
-    time TIMESTAMP NOT NULL,
+    time BIGINT    NOT NULL,
     name TEXT      NOT NULL,
-    code status_type,
+    code TEXT      NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -76,7 +72,7 @@ CREATE TABLE IF NOT EXISTS tag
 CREATE TABLE IF NOT EXISTS post_comment
 (
     id           SERIAL    NOT NULL,
-    time         TIMESTAMP NOT NULL,
+    time         BIGINT    NOT NULL,
     post_id      INT       NOT NULL,
     parent_id    INT,
     author_id    INT       NOT NULL,
@@ -91,11 +87,11 @@ CREATE TABLE IF NOT EXISTS post_comment
 CREATE TABLE IF NOT EXISTS block_history
 (
     id         SERIAL    NOT NULL,
-    time       TIMESTAMP NOT NULL,
+    time       BIGINT    NOT NULL,
     person_id  INT       NOT NULL,
     post_id    INT       NOT NULL,
     comment_id INT       NOT NULL,
-    action     action_type,
+    action     TEXT      NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
@@ -105,11 +101,11 @@ CREATE TABLE IF NOT EXISTS block_history
 CREATE TABLE IF NOT EXISTS message
 (
     id           SERIAL    NOT NULL,
-    time         TIMESTAMP NOT NULL,
+    time         BIGINT    NOT NULL,
     author_id    INT       NOT NULL,
     recipient_id INT       NOT NULL,
     message_text TEXT,
-    read_status  message_status_type,
+    read_status  TEXT      NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (recipient_id) REFERENCES person (id) ON DELETE RESTRICT
@@ -130,7 +126,7 @@ CREATE TABLE IF NOT EXISTS friendship
 CREATE TABLE IF NOT EXISTS post_like
 (
     id        SERIAL    NOT NULL,
-    time      TIMESTAMP NOT NULL,
+    time      BIGINT NOT NULL,
     person_id INT       NOT NULL,
     post_id   INT       NOT NULL,
     PRIMARY KEY (id),
@@ -162,7 +158,7 @@ CREATE TABLE IF NOT EXISTS notification
 (
     id        SERIAL    NOT NULL,
     type_id   INT       NOT NULL,
-    send_time TIMESTAMP NOT NULL,
+    send_time BIGINT    NOT NULL,
     person_id INT       NOT NULL,
     entity_id INT       NOT NULL,
     contact   TEXT      NOT NULL,

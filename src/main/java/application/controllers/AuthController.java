@@ -21,8 +21,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest authDtoRequest) throws PasswordsNotEqualsException {
-        return ResponseEntity.ok(authService.getAuth(authDtoRequest));
+    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request) throws PasswordsNotEqualsException {
+        return ResponseEntity.ok(authService.getAuth(request));
     }
 
     @PostMapping("/logout")
