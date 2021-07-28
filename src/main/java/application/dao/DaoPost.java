@@ -1,11 +1,14 @@
 package application.dao;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class DaoPost {
+
+    private final JdbcTemplate jdbcTemplate;
 
 //
 //    public Optional<Post> get(int id) {

@@ -1,7 +1,7 @@
 package application.service;
 
-import application.models.City;
-import application.models.Country;
+import application.dao.DaoPerson;
+import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,26 +11,26 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProfileService {
 
-    public GeneralResponse<PersonDto> getPerson(){
-        PersonDto personDto = new PersonDto();
-        personDto.setId(2);
-        personDto.setFirstName("Борис");
-        personDto.setLastName("Булкин");
-        personDto.setRegDate(System.currentTimeMillis() - 567);
-        personDto.setBirthDate(System.currentTimeMillis() - 1997);
-        personDto.setEmail("gsdfhgsh@skdjfhskdj.ru");
-        personDto.setPhone("9163332211");
-        personDto.setPhoto("");
-        personDto.setAbout("Немного обо мне");
+    private final DaoPerson daoPerson;
 
-        City city = new City(1, "Москва");
-        personDto.setCity(city.getTitle());
-        Country country = new Country(1, "Россия");
-        personDto.setCountry(country.getTitle());
-        personDto.setMessagesPermission("All");
-        personDto.setLastOnlineTime(System.currentTimeMillis() - 40);
-        personDto.setBlocked(false);
-        GeneralResponse<PersonDto> response = new GeneralResponse<>(personDto);
-        return response;
+    public GeneralResponse<PersonDto> getPerson(){
+        Person person = daoPerson.getByEmail("nik@yandex.ru");
+            PersonDto personDto = new PersonDto();
+            personDto.setId(person.getId());
+            personDto.setFirstName(person.getFirstName());
+            personDto.setLastName(person.getLastName());
+            personDto.setRegDate(person.getRegDate());
+            personDto.setBirthDate(person.getBirthDate());
+            personDto.setEmail(person.getEmail());
+            personDto.setPhone(person.getPhone());
+            personDto.setPhoto(person.getPhoto());
+            personDto.setAbout(person.getAbout());
+            personDto.setCity(person.getCity());
+            personDto.setCountry(person.getCountry());
+            personDto.setMessagesPermission("ALL");
+            personDto.setLastOnlineTime(person.getLastOnlineTime());
+            personDto.setBlocked(person.isApproved());
+            personDto.setToken("kjhfgkfkjh");
+            return new GeneralResponse<>(personDto);
     }
 }
