@@ -20,5 +20,6 @@ public class Person {
     private PermissionType messagesPermission;
     private long regDate;
     private long birthDate;
+    private boolean isBlocked;
     private long lastOnlineTime;
 }

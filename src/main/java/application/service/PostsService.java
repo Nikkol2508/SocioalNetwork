@@ -11,9 +11,10 @@ import java.util.List;
 @Service
 public class PostsService {
 
-    public GeneralListResponse<Post> getPosts() {
-        List<Post> postList = new ArrayList<>();
-        Post post = new Post();
+    public GeneralListResponse<PostDto> getPosts() {
+
+        List<PostDto> postList = new ArrayList<>();
+        PostDto post = new PostDto();
         post.setId(1);
         post.setPostText("Вау! Это текст");
         post.setTitle("Это заголовок, Вау!");
@@ -46,16 +47,13 @@ public class PostsService {
         comment.setBlocked(false);
         comments.add(comment);
         post.setComments(comments);
+
         postList.add(post);
-        GeneralListResponse<Post> response = new GeneralListResponse<>(postList);
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
-        return response;
+        return new GeneralListResponse<>(postList);
     }
 
-    public GeneralResponse<Post> getPost(int id) {
-        Post post = new Post();
+    public GeneralResponse<PostDto> getPost(int id) {
+        PostDto post = new PostDto();
         post.setId(1);
         post.setPostText("Вау! Это текст");
         post.setTitle("Это заголовок, Вау!");
@@ -90,10 +88,13 @@ public class PostsService {
         comment.setBlocked(false);
         comments.add(comment);
         post.setComments(comments);
+
+
         return new GeneralResponse<>(post);
     }
 
     public GeneralListResponse<Comment> getComments(int id) {
+
         List<Comment> comments = new ArrayList<>();
         Comment comment = new Comment();
         comment.setParentId(0);
@@ -104,11 +105,8 @@ public class PostsService {
         comment.setAuthorId(1);
         comment.setBlocked(false);
         comments.add(comment);
-        GeneralListResponse<Comment> response = new GeneralListResponse<>(comments);
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
-        return response;
+
+        return new GeneralListResponse<>(comments);
     }
 
 }
