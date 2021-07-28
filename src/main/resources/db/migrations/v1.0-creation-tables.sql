@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS post
     id         SERIAL    NOT NULL,
     time       BIGINT    NOT NULL,
     author_id  INT       NOT NULL,
-    tittle     TEXT      NOT NULL,
+    title     TEXT       NOT NULL,
     post_text  TEXT      NOT NULL,
     is_blocked BOOLEAN   NOT NULL,
     PRIMARY KEY (id),

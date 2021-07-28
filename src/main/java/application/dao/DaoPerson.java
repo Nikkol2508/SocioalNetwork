@@ -18,6 +18,7 @@ public class DaoPerson implements Dao<Person>{
     private final static String SQL_INSERT_PERSON = "INSERT INTO person (first_name, last_name, password, e_mail, reg_date, messages_permission) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
     private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
+    private final static String SQL_FIND_PERSON_BY_ID = "SELECT * FROM person WHERE id = ?";
 
     public Person getByEmail(String email) {
         return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
@@ -25,8 +26,8 @@ public class DaoPerson implements Dao<Person>{
     }
 
     @Override
-    public Optional<Person> get(int id) {
-        return Optional.empty();
+    public Person get(int id) {
+        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id},new PersonMapper()).stream().findAny().orElse(null);
     }
 
     @Override
