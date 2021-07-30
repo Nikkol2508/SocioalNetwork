@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("api/v1/platform")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class PlatformController {
 
     private final PlatformService platformService;
