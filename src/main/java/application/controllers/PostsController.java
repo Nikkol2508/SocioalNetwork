@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class PostsController {
 
     private final PostsService postsService;
