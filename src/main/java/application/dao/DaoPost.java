@@ -26,6 +26,10 @@ public class DaoPost {
         return jdbcTemplate.query(SQL_GET_ALL_POSTS, new PostMapper());
     }
 
+    public List<Post> getUserPost(int id) {
+        return jdbcTemplate.query("SELECT * FROM post WHERE author_id=" + id, new PostMapper());
+    }
+
     public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
 //        post.setTitle(title);
 //        post.setPostText(text);
