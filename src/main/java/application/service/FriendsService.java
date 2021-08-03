@@ -1,7 +1,10 @@
 package application.service;
 
+import application.dao.Dao;
+import application.dao.DaoPerson;
 import application.models.City;
 import application.models.Country;
+import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FriendsService {
+    private final DaoPerson personDtoDao;
 
     public GeneralListResponse<PersonDto> getUserFriends() {
 
@@ -117,31 +121,28 @@ public class FriendsService {
     }
 
     public GeneralListResponse<PersonDto> getUserFriendsRecommendations() {
+        List<Person> personList = personDtoDao.getRecommendations();
+        List<PersonDto> personDtos = new ArrayList<>();
+        for (Person person : personList) {
+            PersonDto personDto = new PersonDto();
+            personDto.setId(person.getId());
+            personDto.setEmail(person.getEmail());
+            personDto.setPhone(person.getPhone());
+            personDto.setPhoto(person.getPhoto());
+            personDto.setAbout(person.getAbout());
+            personDto.setCity(person.getCity());
+            personDto.setCountry(person.getCountry());
+            personDto.setFirstName(person.getFirstName());
+            personDto.setLastName(person.getLastName());
+            personDto.setRegDate(person.getRegDate());
+            personDto.setBirthDate(person.getBirthDate());
+            personDto.setMessagesPermission("ALL");
+            personDto.setLastOnlineTime(person.getLastOnlineTime());
+            personDto.setBlocked(person.isBlocked());
+            personDtos.add(personDto);
+        }
 
-        List<PersonDto> personDtoList = new ArrayList<>();
-
-        PersonDto personDtoForRecommendation = new PersonDto();
-
-        personDtoForRecommendation.setId(15);
-        personDtoForRecommendation.setFirstName("Gera");
-        personDtoForRecommendation.setLastName("Rog");
-        personDtoForRecommendation.setRegDate(System.currentTimeMillis() - 777);
-        personDtoForRecommendation.setBirthDate(System.currentTimeMillis() - 1994);
-        personDtoForRecommendation.setEmail("gsdfsh@sjfj.ru");
-        personDtoForRecommendation.setPhone("91633322343");
-        personDtoForRecommendation.setPhoto("");
-        personDtoForRecommendation.setAbout("Немного обо мне");
-
-        City city = new City(1, "Москва");
-        personDtoForRecommendation.setCity(city.getTitle());
-        Country country = new Country(1, "Россия");
-        personDtoForRecommendation.setCountry(country.getTitle());
-        personDtoForRecommendation.setMessagesPermission("All");
-        personDtoForRecommendation.setLastOnlineTime(System.currentTimeMillis() - 40);
-        personDtoForRecommendation.setBlocked(false);
-
-        personDtoList.add(personDtoForRecommendation);
-        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>(personDtoList);
+        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>(personDtos);
         recommendationResponse.setTotal(0);
         recommendationResponse.setOffset(0);
         recommendationResponse.setPerPage(20);

@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import application.service.FriendsService;
