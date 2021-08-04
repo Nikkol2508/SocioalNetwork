@@ -22,7 +22,7 @@ public class AccountController {
     @PostMapping("/register")
     public ResponseEntity<GeneralResponse<AccountDto>> register(@RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
-        return accountService.savePerson(request);
+        return accountService.register(request);
     }
 
     @PutMapping("/password/set")
