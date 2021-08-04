@@ -24,7 +24,7 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}/wall")
-    public ResponseEntity<GeneralListResponse<PostDto>> getUserPosts(@RequestParam int id) {
+    public ResponseEntity<GeneralListResponse<PostDto>> getUserPosts(@PathVariable int id) {
         return ResponseEntity.ok(profileService.getUserPosts(id));
     }
 }
