@@ -2,9 +2,19 @@ databaseChangeLog:
   - include:
       file: v1.0-creation-tables.sql
       relativeToChangelogFile: true
+
   - include:
-      file: created_test_tag.sql
+      file: person-user-data.sql
       relativeToChangelogFile: true
+
   - include:
-      file: created_test_user.sql
+      file: post-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: post-comment-like-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: tag-post2tag-data.sql
       relativeToChangelogFile: true
