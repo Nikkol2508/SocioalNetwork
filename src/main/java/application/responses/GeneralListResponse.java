@@ -13,5 +13,11 @@ public class GeneralListResponse<T> {
     private int offset;
     private int perPage;
     private List<T> data;
+
+    public GeneralListResponse(List<T> data) {
+        error = "";
+        timestamp = System.currentTimeMillis();
+        this.data = data;
+    }
 }
 

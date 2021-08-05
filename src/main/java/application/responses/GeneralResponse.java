@@ -8,4 +8,10 @@ public class GeneralResponse<T> {
     private String error;
     private long timestamp;
     private T data;
+
+    public GeneralResponse(T data) {
+        error = "";
+        timestamp = System.currentTimeMillis();
+        this.data = data;
+    }
 }

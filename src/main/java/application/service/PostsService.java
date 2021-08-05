@@ -11,36 +11,31 @@ import java.util.List;
 @Service
 public class PostsService {
 
-    public GeneralListResponse<Post> getPosts() {
-        GeneralListResponse<Post> response = new GeneralListResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
-        List<Post> postList = new ArrayList<>();
-        Post post = new Post();
+    public GeneralListResponse<PostDto> getPosts() {
+
+        List<PostDto> postList = new ArrayList<>();
+        PostDto post = new PostDto();
         post.setId(1);
         post.setPostText("Вау! Это текст");
         post.setTitle("Это заголовок, Вау!");
         post.setBlocked(false);
         post.setLikes(20);
-        Person person = new Person();
-        person.setId(2);
-        person.setFirstName("Борис");
-        person.setLastName("Булкин");
-        person.setRegDate(System.currentTimeMillis() - 567);
-        person.setBirthDate(System.currentTimeMillis() - 1997);
-        person.setEmail("gsdfhgsh@skdjfhskdj.ru");
-        person.setPhone("9163332211");
-        person.setPhoto("");
-        person.setAbout("Немного обо мне");
-        person.setCity("Москва");
-        person.setCountry("Россия");
-        person.setMessagesPermission("All");
-        person.setLastOnlineTime(System.currentTimeMillis() - 40);
-        person.setBlocked(false);
-        post.setAuthor(person);
+        PersonDto personDto = new PersonDto();
+        personDto.setId(2);
+        personDto.setFirstName("Борис");
+        personDto.setLastName("Булкин");
+        personDto.setRegDate(System.currentTimeMillis() - 567);
+        personDto.setBirthDate(System.currentTimeMillis() - 1997);
+        personDto.setEmail("gsdfhgsh@skdjfhskdj.ru");
+        personDto.setPhone("9163332211");
+        personDto.setPhoto("");
+        personDto.setAbout("Немного обо мне");
+        personDto.setCity("Москва");
+        personDto.setCountry("Россия");
+        personDto.setMessagesPermission("All");
+        personDto.setLastOnlineTime(System.currentTimeMillis() - 40);
+        personDto.setBlocked(false);
+        post.setAuthor(personDto);
         List<Comment> comments = new ArrayList<>();
         Comment comment = new Comment();
         comment.setParentId(0);
@@ -54,38 +49,34 @@ public class PostsService {
         post.setComments(comments);
 
         postList.add(post);
-        response.setData(postList);
-        return response;
+        return new GeneralListResponse<>(postList);
     }
 
-    public GeneralResponse<Post> getPost(int id) {
-        GeneralResponse<Post> response = new GeneralResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        Post post = new Post();
+    public GeneralResponse<PostDto> getPost(int id) {
+        PostDto post = new PostDto();
         post.setId(1);
         post.setPostText("Вау! Это текст");
         post.setTitle("Это заголовок, Вау!");
         post.setBlocked(false);
         post.setLikes(20);
-        Person person = new Person();
-        person.setId(2);
-        person.setFirstName("Борис");
-        person.setLastName("Булкин");
-        person.setRegDate(System.currentTimeMillis() - 567);
-        person.setBirthDate(System.currentTimeMillis() - 1997);
-        person.setEmail("gsdfhgsh@skdjfhskdj.ru");
-        person.setPhone("9163332211");
-        person.setPhoto("");
-        person.setAbout("Немного обо мне");
+        PersonDto personDto = new PersonDto();
+        personDto.setId(2);
+        personDto.setFirstName("Борис");
+        personDto.setLastName("Булкин");
+        personDto.setRegDate(System.currentTimeMillis() - 567);
+        personDto.setBirthDate(System.currentTimeMillis() - 1997);
+        personDto.setEmail("gsdfhgsh@skdjfhskdj.ru");
+        personDto.setPhone("9163332211");
+        personDto.setPhoto("");
+        personDto.setAbout("Немного обо мне");
         City city = new City(1, "Москва");
-        person.setCity(city.getTitle());
+        personDto.setCity(city.getTitle());
         Country country = new Country(1, "Россия");
-        person.setCountry(country.getTitle());
-        person.setMessagesPermission("All");
-        person.setLastOnlineTime(System.currentTimeMillis() - 40);
-        person.setBlocked(false);
-        post.setAuthor(person);
+        personDto.setCountry(country.getTitle());
+        personDto.setMessagesPermission("All");
+        personDto.setLastOnlineTime(System.currentTimeMillis() - 40);
+        personDto.setBlocked(false);
+        post.setAuthor(personDto);
         List<Comment> comments = new ArrayList<>();
         Comment comment = new Comment();
         comment.setParentId(0);
@@ -98,17 +89,12 @@ public class PostsService {
         comments.add(comment);
         post.setComments(comments);
 
-        response.setData(post);
-        return response;
+
+        return new GeneralResponse<>(post);
     }
 
     public GeneralListResponse<Comment> getComments(int id) {
-        GeneralListResponse<Comment> response = new GeneralListResponse<>();
-        response.setError("");
-        response.setTimestamp(System.currentTimeMillis());
-        response.setTotal(10);
-        response.setOffset(0);
-        response.setPerPage(10);
+
         List<Comment> comments = new ArrayList<>();
         Comment comment = new Comment();
         comment.setParentId(0);
@@ -119,8 +105,8 @@ public class PostsService {
         comment.setAuthorId(1);
         comment.setBlocked(false);
         comments.add(comment);
-        response.setData(comments);
-        return response;
+
+        return new GeneralListResponse<>(comments);
     }
 
 }

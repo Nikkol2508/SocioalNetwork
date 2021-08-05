@@ -1,14 +1,14 @@
 package application.controllers;
 
+import application.exceptions.PasswordsNotEqualsException;
 import application.models.LogoutDto;
-import application.models.Person;
+import application.models.PersonDto;
+import application.requests.AuthDtoRequest;
 import application.responses.GeneralResponse;
 import application.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -18,8 +18,8 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<Person>> login() {
-        return ResponseEntity.ok(authService.getAuth());
+    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request) throws PasswordsNotEqualsException {
+        return ResponseEntity.ok(authService.getAuth(request));
     }
 
     @PostMapping("/logout")

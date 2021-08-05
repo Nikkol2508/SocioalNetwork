@@ -1,10 +1,11 @@
 package application.controllers;
 
-import application.models.Person;
+import application.models.PersonDto;
 import application.responses.GeneralResponse;
 import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,7 @@ public class ProfileController {
     private final ProfileService profileService;
 
     @GetMapping("/me")
-    public ResponseEntity<GeneralResponse<Person>> getProfile() {
+    public ResponseEntity<GeneralResponse<PersonDto>> getProfile() {
         return ResponseEntity.ok(profileService.getPerson());
     }
 }
