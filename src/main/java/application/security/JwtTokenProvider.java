@@ -3,15 +3,18 @@ package application.security;
 import application.exceptions.JwtAuthenticationException;
 import application.models.Role;
 import io.jsonwebtoken.*;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -24,21 +27,24 @@ import java.util.Date;
 @Slf4j
 public class JwtTokenProvider {
 
-    @Value("${jwt.token.secret}")
     private String secret;
 
-    @Value("${jwt.token.expired}")
     private long validityInMilliseconds;
 
     private JwtUserDetailsService userDetailsService;
 
-    public JwtTokenProvider(JwtUserDetailsService userDetailsService) {
+    @Autowired
+    public JwtTokenProvider(@Value("${jwt.token.secret}") String secret,
+                            @Value("${jwt.token.expired}") long validityInMilliseconds,
+                            JwtUserDetailsService userDetailsService) {
+        this.secret = secret;
+        this.validityInMilliseconds = validityInMilliseconds;
         this.userDetailsService = userDetailsService;
     }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
 
     @PostConstruct
@@ -73,19 +79,27 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest req) {
         String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer_")) {
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
         return null;
     }
 
-    public boolean validateToken(String token) throws JwtAuthenticationException {
+    public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            log.info("IN validateToken - expirationTime: " + claims.getBody().getExpiration());
-            return claims.getBody().getExpiration().after(new Date());
-        } catch (JwtException | IllegalArgumentException e) {
-            throw new JwtAuthenticationException("JWT token is expired or invalid");
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            return true;
+        } catch (SignatureException e) {
+            log.info("Invalid JWT signature.");
+        } catch (MalformedJwtException e) {
+            log.info("Invalid JWT token.");
+        } catch (ExpiredJwtException e) {
+            log.info("Expired JWT token.");
+        } catch (UnsupportedJwtException e) {
+            log.info("Unsupported JWT token.");
+        } catch (IllegalArgumentException e) {
+            log.info("JWT token compact of handler are invalid.");
         }
+        return false;
     }
 }

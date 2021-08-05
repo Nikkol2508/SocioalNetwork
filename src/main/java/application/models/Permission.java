@@ -1,9 +1,9 @@
 package application.models;
 
 public enum Permission {
-    CRUD_POST("posts:crud"),
-    POST_AND_USER_BLOCKING("user:blocking, post:blocking"),
-    MANAGE_ADMINS_AND_MODERATORS("admins:manage, moderators:manage");
+    USER("user_permissions"),
+    MODERATOR("moderator_permissions"),
+    ADMIN("admin_permissions");
 
     private final String permission;
 
