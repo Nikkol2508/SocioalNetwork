@@ -1,19 +1,23 @@
 package application.configurations;
 
 import application.exceptions.CustomAccessDeniedHandler;
+import application.models.Permission;
 import application.security.JwtConfigurer;
 import application.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -32,17 +36,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*").permitAll()
-//                .and()
-//                .authorizeRequests()
-//                    .antMatchers("/api/v1/users/me", "/api/v1/feeds").hasRole("USER")
-                .anyRequest().authenticated()
+                    .antMatchers("/", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
+                    .antMatchers("/api/v1/**").hasAuthority(Permission.USER.getPermission())
+                    .anyRequest().authenticated()
                 .and()
                 .exceptionHandling()
-                .accessDeniedHandler(accessDeniedHandler())
+                    .accessDeniedHandler(accessDeniedHandler())
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
-
     }
 
     @Bean

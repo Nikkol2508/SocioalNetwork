@@ -1,6 +1,7 @@
 package application.security;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import java.io.IOException;
 
 @AllArgsConstructor
 @Component
+@Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private JwtTokenProvider jwtTokenProvider;
@@ -23,9 +25,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String token = jwtTokenProvider.resolveToken(request);
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            log.info("IN doFilterInternal - authentication: {}", authentication);
             if (authentication != null) {
+                log.info("IN doFilterInternal - principal of authentication: {}", authentication.getPrincipal());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.info("IN doFilterInternal - JwtTokenFilter in using.");
             }
+        }  else {
+            SecurityContextHolder.getContext().setAuthentication(null);
         }
         chain.doFilter(request, response);
     }

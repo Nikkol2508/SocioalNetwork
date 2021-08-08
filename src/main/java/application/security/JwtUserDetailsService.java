@@ -23,6 +23,8 @@ public class JwtUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User with email: " +  email + "doesn't exists");
         }
         log.info("IN loadUserByUsername - user with email: {} successfully loaded", person.getEmail());
-        return JwtUser.fromPerson(person);
+        JwtUser jwtUser = JwtUser.fromPerson(person);
+        log.info("IN loadUserByUsername - created jwtUser: {}", jwtUser);
+        return jwtUser;
     }
 }

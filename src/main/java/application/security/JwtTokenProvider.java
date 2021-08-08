@@ -1,20 +1,16 @@
 package application.security;
 
-import application.exceptions.JwtAuthenticationException;
-import application.models.Role;
 import io.jsonwebtoken.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -55,51 +51,47 @@ public class JwtTokenProvider {
     public String createToken(String email) {
 
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("roles", Role.USER);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
+        log.info("IN createToken - claims: {}", claims);
+        log.info("IN createToken - new token: {}", token);
+        return token;
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
+        UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
+        log.info("IN getAuthentication - userDetails: {}", userDetails);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public String getUsername(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        String email = Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        log.info("IN getUsername - got email: {}", email);
+        return email;
     }
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        log.info("IN resolveToken - token in header: {}", req.getHeader("Authorization"));
+        return req.getHeader("Authorization");
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            return true;
-        } catch (SignatureException e) {
-            log.info("Invalid JWT signature.");
-        } catch (MalformedJwtException e) {
-            log.info("Invalid JWT token.");
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token.");
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT token compact of handler are invalid.");
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            log.info("IN validateToken - our claims: {}", claimsJws.getBody());
+            return claimsJws.getBody().getExpiration().after(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            log.error("IN validateToken - Exception {}", e.getMessage());
+//            throw new AccessDeniedException("JWT token is expired");
+            return false;
         }
-        return false;
     }
 }

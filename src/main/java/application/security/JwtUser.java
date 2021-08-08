@@ -4,25 +4,28 @@ import application.models.Person;
 import application.models.Role;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
+@Slf4j
 public class JwtUser implements UserDetails {
 
     private final String email;
     private final String password;
-    private final List<SimpleGrantedAuthority> authorities;
+    private final Role role;
+    private final Set<SimpleGrantedAuthority> authorities;
     private final boolean isBlocked;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        log.info("IN getAuthorities - getting authorities: {}", authorities);
         return authorities;
     }
 
@@ -56,15 +59,13 @@ public class JwtUser implements UserDetails {
         return !isBlocked;
     }
 
-    public static UserDetails fromPerson(Person person) {
-        return new User(
+    public static JwtUser fromPerson(Person person) {
+        return new JwtUser(
                 person.getEmail(),
                 person.getPassword(),
-                !person.isBlocked(),
-                !person.isBlocked(),
-                !person.isBlocked(),
-                !person.isBlocked(),
-                Role.USER.getAuthorities()
+                Role.MODERATOR,
+                Role.MODERATOR.getAuthorities(),
+                person.isBlocked()
         );
     }
 }
