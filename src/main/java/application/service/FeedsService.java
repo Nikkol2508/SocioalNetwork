@@ -2,7 +2,10 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
-import application.models.*;
+import application.models.Person;
+import application.models.PersonDto;
+import application.models.Post;
+import application.models.PostDto;
 import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
