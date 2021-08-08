@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
 
 import javax.servlet.ServletException;
@@ -19,7 +20,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
                        HttpServletResponse httpServletResponse,
                        AccessDeniedException e) throws IOException, ServletException {
         ErrorResponse error = new ErrorResponse("Unauthorized", e.getMessage());
-        httpServletResponse.setStatus(401);
+        httpServletResponse.setStatus(403);
         httpServletResponse.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(error));
         httpServletResponse.getWriter().flush();

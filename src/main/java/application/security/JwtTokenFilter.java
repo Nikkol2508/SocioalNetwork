@@ -18,21 +18,26 @@ import java.io.IOException;
 @Slf4j
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Override
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String token = jwtTokenProvider.resolveToken(request);
+//        if (token != null) {
+//            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+//            SecurityContextHolder.getContext().setAuthentication(authentication);
+//        }
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             log.info("IN doFilterInternal - authentication: {}", authentication);
             if (authentication != null) {
                 log.info("IN doFilterInternal - principal of authentication: {}", authentication.getPrincipal());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                log.info("IN doFilterInternal - JwtTokenFilter in using.");
+                log.info("IN doFilterInternal - JwtTokenFilter in using, authentication: {}", SecurityContextHolder.getContext().getAuthentication());
             }
         }  else {
-            SecurityContextHolder.getContext().setAuthentication(null);
+//            SecurityContextHolder.getContext().setAuthentication(null);
+//            log.info("IN doFilterInternal - authentication in ContextHolder: {}", SecurityContextHolder.getContext().getAuthentication());
         }
         chain.doFilter(request, response);
     }

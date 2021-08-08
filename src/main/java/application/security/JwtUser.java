@@ -9,8 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Data
 @RequiredArgsConstructor
@@ -19,8 +18,7 @@ public class JwtUser implements UserDetails {
 
     private final String email;
     private final String password;
-    private final Role role;
-    private final Set<SimpleGrantedAuthority> authorities;
+    private final List<SimpleGrantedAuthority> authorities;
     private final boolean isBlocked;
 
     @Override
@@ -63,8 +61,7 @@ public class JwtUser implements UserDetails {
         return new JwtUser(
                 person.getEmail(),
                 person.getPassword(),
-                Role.MODERATOR,
-                Role.MODERATOR.getAuthorities(),
+                new ArrayList<>(Role.USER.getAuthorities()),
                 person.isBlocked()
         );
     }

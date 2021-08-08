@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -27,7 +25,7 @@ public class JwtTokenProvider {
 
     private long validityInMilliseconds;
 
-    private JwtUserDetailsService userDetailsService;
+    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     public JwtTokenProvider(@Value("${jwt.token.secret}") String secret,
@@ -35,7 +33,7 @@ public class JwtTokenProvider {
                             JwtUserDetailsService userDetailsService) {
         this.secret = secret;
         this.validityInMilliseconds = validityInMilliseconds;
-        this.userDetailsService = userDetailsService;
+        this.jwtUserDetailsService = userDetailsService;
     }
 
     @Bean
@@ -67,7 +65,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(getUsername(token));
+        JwtUser userDetails = jwtUserDetailsService.loadUserByUsername(getUsername(token));
         log.info("IN getAuthentication - userDetails: {}", userDetails);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
