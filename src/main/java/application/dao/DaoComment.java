@@ -1,45 +1,31 @@
 package application.dao;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
+import application.models.Comment;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
 @RequiredArgsConstructor
 public class DaoComment {
-//
-//    public Optional<Comment> get(int id) {
-//        Optional<Comment> commentOptional = null;
-//        return commentOptional;
-//    }
-//
-//    public List<Comment> getAll() {
-//        Iterable<Comment> commentIterable = null;
-//        ArrayList<Comment> commentList = new ArrayList<>();
-//        commentIterable.forEach(commentList::add);
-//        return commentList;
-//    }
-//
-//    public int save(Comment comment, String text, Date date) {
-//        comment.setCommentText(text);
-//        comment.setTime(date);
-//        Comment newComment = null;
-//        return newComment.getId();
-//    }
-//
-//    public void update(@PathVariable int id, String text,Date date) {
-//        Optional<Comment> commentOptional = null;
-//        Comment changedComment = commentOptional.get();
-//        if (!commentOptional.isPresent()) {
-//            System.out.println("not found");
-//        } else {
-//            changedComment.setCommentText(text);
-//            changedComment.setTime(date);
-////            commentRepository.save(changedComment);
-//        }
-//    }
-//
-//    public void delete(int id) {
-//    }
-//
-//    public void deleteGoalList() {
-//    }
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public List<Comment> getCommentsByPostId(Integer post_id) {
+        return jdbcTemplate.query("SELECT * FROM post_comment WHERE post_id = ?", new Object[]{post_id}, new PostCommentMapper());
+    }
+
+    public void save(Comment comment) {
+        jdbcTemplate.update("INSERT INTO post_comment (time, post_id, parent_id, author_id, comment_text, is_blocked) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                comment.getTime(),
+                comment.getPostId(),
+                comment.getParentId(),
+                comment.getAuthorId(),
+                comment.getCommentText(),
+                comment.isBlocked());
+    }
+
 }

@@ -8,7 +8,6 @@ import application.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -39,8 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                     .antMatchers("/", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
-                    .antMatchers("/api/v1/friends/*").hasAuthority(Permission.USER.getPermission())
-                    .anyRequest().authenticated()
+                    .anyRequest().hasAuthority(Permission.USER.getPermission())
                 .and()
                 .exceptionHandling()
                     .accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(authenticationEntryPoint())
