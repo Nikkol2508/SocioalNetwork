@@ -62,4 +62,12 @@ public class DaoPerson implements Dao<Person> {
     public void delete(Person person) {
 
     }
+
+    public List<Person> getFriends(int id) {
+        String selectFriends = "SELECT * FROM person JOIN friendship ON person.id = friendship.dst_person_id" +
+                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id +
+                " UNION SELECT * FROM person JOIN friendship ON person.id = friendship.src_person_id" +
+                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id;
+        return jdbcTemplate.query(selectFriends, new PersonMapper());
+    }
 }
