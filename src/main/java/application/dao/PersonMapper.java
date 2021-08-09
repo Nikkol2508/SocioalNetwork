@@ -1,6 +1,6 @@
 package application.dao;
 
-import application.models.PermissionType;
+import application.models.PermissionMessagesType;
 import application.models.Person;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -27,7 +27,7 @@ public class PersonMapper implements RowMapper<Person> {
         person.setConfirmationCode(rs.getString("confirmation_code"));
         person.setApproved(rs.getBoolean("is_approved"));
         person.setLastOnlineTime(rs.getLong("last_online_time"));
-        person.setMessagesPermission(PermissionType.valueOf(rs.getString("messages_permission")));
+        person.setMessagesPermission(PermissionMessagesType.valueOf(rs.getString("messages_permission")));
         return person;
     }
 }
