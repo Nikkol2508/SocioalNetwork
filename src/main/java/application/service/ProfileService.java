@@ -2,7 +2,6 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
-import application.exceptions.PersonNotFindException;
 import application.models.Person;
 import application.models.PersonDto;
 import application.models.Post;
@@ -15,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,13 +55,10 @@ public class ProfileService {
         return new GeneralListResponse<>(postDtoList);
     }
 
-    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws PersonNotFindException {
+    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws EntityNotFoundException {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
 
-        if (listPersons.isEmpty()) {
-            throw new PersonNotFindException();
-        }
         return new GeneralListResponse<>(listPersons
                 .stream()
                 .map(PersonDto::fromPerson)

@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -24,14 +26,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
-    private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
-        ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(), exception.getMessage());
-        return ResponseEntity.status(httpStatus).body(errorResponse);
-    }
-
-    @ExceptionHandler(PersonNotFindException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlePersonNotFindException(PersonNotFindException exception) {
+    public ResponseEntity<ErrorResponse> handleEntityNotFindException(EntityNotFoundException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
@@ -45,5 +42,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
+        ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(), exception.getMessage());
+        return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 }

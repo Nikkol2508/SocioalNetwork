@@ -1,6 +1,5 @@
 package application.controllers;
 
-import application.exceptions.PersonNotFindException;
 import application.models.PersonDto;
 import application.models.PostDto;
 import application.responses.GeneralListResponse;
@@ -40,8 +39,7 @@ public class ProfileController {
             @RequestParam(value = "age_to", required = false) Long ageTo,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "city", required = false) String city
-    ) throws PersonNotFindException {
-
+    ) {
         return ResponseEntity.ok(profileService.getPersons(firstName, lastName, ageFrom, ageTo, country, city));
     }
 
