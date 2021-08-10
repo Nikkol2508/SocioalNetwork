@@ -17,7 +17,9 @@ public class AuthService {
 
     public GeneralResponse<PersonDto> getAuth(AuthDtoRequest authDtoRequest, String token) {
             Person person = daoPerson.getByEmail(authDtoRequest.getEmail());
-            return new GeneralResponse<>(PersonDto.fromPerson(person, token));
+            PersonDto personDto = PersonDto.fromPerson(person);
+            personDto.setToken(token);
+            return new GeneralResponse<>(personDto);
     }
 
 

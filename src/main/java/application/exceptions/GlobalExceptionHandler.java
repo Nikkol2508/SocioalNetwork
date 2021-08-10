@@ -24,6 +24,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
+    private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
+        ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(), exception.getMessage());
+        return ResponseEntity.status(httpStatus).body(errorResponse);
+    }
+
+    @ExceptionHandler(PersonNotFindException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handlePersonNotFindException(PersonNotFindException exception) {
+        return buildError(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException exception) {
@@ -34,10 +45,5 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
-
-    private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
-        ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(), exception.getMessage());
-        return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 }
