@@ -30,14 +30,14 @@ public class ProfileService {
     public GeneralResponse<PersonDto> getPerson(int id) {
 
         Person person = daoPerson.get(id);
-        return new GeneralResponse<>(PersonDto.convert(person));
+        return new GeneralResponse<>(PersonDto.fromPerson(person));
     }
 
     public GeneralResponse<PersonDto> getProfile() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
-        PersonDto personDto = PersonDto.convert(person);
+        PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
 
         return new GeneralResponse<>(personDto);
@@ -64,7 +64,7 @@ public class ProfileService {
         }
         return new GeneralListResponse<>(listPersons
                 .stream()
-                .map(PersonDto::convert)
+                .map(PersonDto::fromPerson)
                 .collect(Collectors.toList()));
     }
 }
