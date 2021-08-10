@@ -37,8 +37,10 @@ public class ProfileService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
+        PersonDto personDto = convert(person);
+        personDto.setToken(personDto.getToken());
 
-        return new GeneralResponse<>(convert(person));
+        return new GeneralResponse<>(personDto);
     }
 
     public GeneralListResponse<PostDto> getWall(int id) {
@@ -70,7 +72,6 @@ public class ProfileService {
         personDto.setMessagesPermission(person.getMessagesPermission().toString());
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
-        personDto.setToken("kjhfgkfkjh");
 
         return personDto;
     }
@@ -79,7 +80,7 @@ public class ProfileService {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
 
-        if (listPersons.isEmpty()){
+        if (listPersons.isEmpty()) {
             throw new PersonNotFindException();
         }
         return new GeneralListResponse<>(listPersons
