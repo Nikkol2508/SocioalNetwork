@@ -4,16 +4,16 @@ import application.models.Person;
 import application.models.Role;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Data
 @RequiredArgsConstructor
-@Slf4j
 public class JwtUser implements UserDetails {
 
     private final String email;
@@ -23,7 +23,6 @@ public class JwtUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        log.info("IN getAuthorities - getting authorities: {}", authorities);
         return authorities;
     }
 

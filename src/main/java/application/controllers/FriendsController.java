@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import application.service.FriendsService;
@@ -17,7 +18,7 @@ public class FriendsController {
 
     @GetMapping("/friends")
     public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends() {
-        return ResponseEntity.ok(friendService.getUserFriends());
+        return ResponseEntity.ok(friendService.getUserFriends(2));
     }
 
     @GetMapping("/friends/request")
