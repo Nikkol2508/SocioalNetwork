@@ -1,11 +1,11 @@
 package application.controllers;
 
+import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import application.service.FriendsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +18,7 @@ public class FriendsController {
 
     @GetMapping("/friends")
     public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends() {
-        return ResponseEntity.ok(friendService.getUserFriends());
+        return ResponseEntity.ok(friendService.getUserFriends(2));
     }
 
     @GetMapping("/friends/request")

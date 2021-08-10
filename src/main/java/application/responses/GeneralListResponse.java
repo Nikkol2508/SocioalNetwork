@@ -15,7 +15,7 @@ public class GeneralListResponse<T> {
     private List<T> data;
 
     public GeneralListResponse(List<T> data) {
-        error = "";
+        error = "Error";
         timestamp = System.currentTimeMillis();
         this.data = data;
     }
