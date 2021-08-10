@@ -40,8 +40,6 @@ public class ProfileService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         PersonDto personDto = PersonDto.fromPerson(person);
-        String token = jwtTokenProvider.createToken(authentication.getName());
-        personDto.setToken(token);
 
         return new GeneralResponse<>(personDto);
     }
