@@ -27,7 +27,6 @@ public class ProfileService {
     private final DaoPerson daoPerson;
     private final PostsService postsService;
     private final DaoPost daoPost;
-    private final JwtTokenProvider jwtTokenProvider;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
