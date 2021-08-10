@@ -9,12 +9,15 @@ import application.models.PostDto;
 import application.responses.GeneralListResponse;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,48 +27,19 @@ public class ProfileService {
     private final PostsService postsService;
     private final DaoPost daoPost;
 
-    public GeneralResponse<PersonDto> getPerson(int id){
+    public GeneralResponse<PersonDto> getPerson(int id) {
 
         Person person = daoPerson.get(id);
-            PersonDto personDto = new PersonDto();
-            personDto.setId(id);
-            personDto.setFirstName(person.getFirstName());
-            personDto.setLastName(person.getLastName());
-            personDto.setRegDate(person.getRegDate());
-            personDto.setBirthDate(person.getBirthDate());
-            personDto.setEmail(person.getEmail());
-            personDto.setPhone(person.getPhone());
-            personDto.setPhoto(person.getPhoto());
-            personDto.setAbout(person.getAbout());
-            personDto.setCity(person.getCity());
-            personDto.setCountry(person.getCountry());
-            personDto.setMessagesPermission("ALL");
-            personDto.setLastOnlineTime(person.getLastOnlineTime());
-            personDto.setBlocked(person.isBlocked());
-            personDto.setToken("kjhfgkfkjh");
-            return new GeneralResponse<>(personDto);
+        return new GeneralResponse<>(PersonDto.fromPerson(person));
     }
 
     public GeneralResponse<PersonDto> getProfile() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
-        PersonDto personDto = new PersonDto();
-        personDto.setId(person.getId());
-        personDto.setFirstName(person.getFirstName());
-        personDto.setLastName(person.getLastName());
-        personDto.setRegDate(person.getRegDate());
-        personDto.setBirthDate(person.getBirthDate());
-        personDto.setEmail(person.getEmail());
-        personDto.setPhone(person.getPhone());
-        personDto.setPhoto(person.getPhoto());
-        personDto.setAbout(person.getAbout());
-        personDto.setCity(person.getCity());
-        personDto.setCountry(person.getCountry());
-        personDto.setMessagesPermission("ALL");
-        personDto.setLastOnlineTime(person.getLastOnlineTime());
-        personDto.setBlocked(person.isBlocked());
-        personDto.setToken("kjhfgkfkjh");
+        PersonDto personDto = PersonDto.fromPerson(person);
+        personDto.setToken(personDto.getToken());
+
         return new GeneralResponse<>(personDto);
     }
 
@@ -79,5 +53,15 @@ public class ProfileService {
             postDtoList.add(postDto);
         }
         return new GeneralListResponse<>(postDtoList);
+    }
+
+    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws EntityNotFoundException {
+
+        val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
+
+        return new GeneralListResponse<>(listPersons
+                .stream()
+                .map(PersonDto::fromPerson)
+                .collect(Collectors.toList()));
     }
 }
