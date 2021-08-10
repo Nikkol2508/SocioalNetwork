@@ -1,6 +1,6 @@
 package application.dao;
 
-import application.models.PermissionType;
+import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.PersonDto;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class DaoPerson implements Dao<Person> {
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionType.ALL.toString());
+                PermissionMessagesType.ALL.toString());
     }
 
     @Override

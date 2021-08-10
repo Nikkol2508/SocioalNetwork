@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.util.List;
 
+
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,12 +17,17 @@ public class PostDto {
     private PersonDto author;
     private String title;
     private int likes;
-    private List<Comment> comments;
+    private List<CommentDto> comments;
 
     @JsonProperty("post_text")
     private String postText;
 
     @JsonProperty("is_blocked")
     private boolean isBlocked;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String type;
+
+    private List<String> tags;
 }
 
