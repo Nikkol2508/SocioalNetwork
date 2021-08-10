@@ -30,14 +30,14 @@ public class ProfileService {
     public GeneralResponse<PersonDto> getPerson(int id) {
 
         Person person = daoPerson.get(id);
-        return new GeneralResponse<>(convert(person));
+        return new GeneralResponse<>(PersonDto.convert(person));
     }
 
     public GeneralResponse<PersonDto> getProfile() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
-        PersonDto personDto = convert(person);
+        PersonDto personDto = PersonDto.convert(person);
         personDto.setToken(personDto.getToken());
 
         return new GeneralResponse<>(personDto);
@@ -55,27 +55,6 @@ public class ProfileService {
         return new GeneralListResponse<>(postDtoList);
     }
 
-    private PersonDto convert(Person person) {
-
-        PersonDto personDto = new PersonDto();
-        personDto.setId(person.getId());
-        personDto.setFirstName(person.getFirstName());
-        personDto.setLastName(person.getLastName());
-        personDto.setRegDate(person.getRegDate());
-        personDto.setBirthDate(person.getBirthDate());
-        personDto.setEmail(person.getEmail());
-        personDto.setPhone(person.getPhone());
-        personDto.setPhoto(person.getPhoto());
-        personDto.setAbout(person.getAbout());
-        personDto.setCity(person.getCity());
-        personDto.setCountry(person.getCountry());
-        personDto.setMessagesPermission(person.getMessagesPermission().toString());
-        personDto.setLastOnlineTime(person.getLastOnlineTime());
-        personDto.setBlocked(person.isBlocked());
-
-        return personDto;
-    }
-
     public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws PersonNotFindException {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
@@ -85,7 +64,7 @@ public class ProfileService {
         }
         return new GeneralListResponse<>(listPersons
                 .stream()
-                .map(this::convert)
+                .map(PersonDto::convert)
                 .collect(Collectors.toList()));
     }
 }
