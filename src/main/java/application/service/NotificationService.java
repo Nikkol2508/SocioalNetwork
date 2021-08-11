@@ -1,7 +1,7 @@
 package application.service;
 
 import application.models.NotificationDTO;
-import application.responses.GeneralListResponse;
+import application.models.responses.GeneralListResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

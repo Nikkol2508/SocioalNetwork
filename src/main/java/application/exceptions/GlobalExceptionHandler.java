@@ -16,7 +16,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PasswordsNotEqualsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlePasswordsNotEqual(PasswordsNotEqualsException exception) {
+    public ResponseEntity<ErrorResponse> handlePasswordsNotEqualsException(PasswordsNotEqualsException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
@@ -26,21 +26,27 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleEntityNotFindException(EntityNotFoundException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
-
     @ExceptionHandler(UsernameNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
+        return buildError(exception, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException exception) {
+        return buildError(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(PasswordNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handlePasswordNotValidException(PasswordNotValidException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 

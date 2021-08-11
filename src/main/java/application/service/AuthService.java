@@ -4,8 +4,8 @@ import application.dao.DaoPerson;
 import application.models.LogoutDto;
 import application.models.Person;
 import application.models.PersonDto;
-import application.requests.AuthDtoRequest;
-import application.responses.GeneralResponse;
+import application.models.requests.AuthDtoRequest;
+import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,36 +1,45 @@
 package application.dao;
 
-import application.models.PermissionMessagesType;
 import application.models.Person;
-import application.models.PersonDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String SQL_INSERT_PERSON = "INSERT INTO person (first_name, last_name, password, e_mail, reg_date, messages_permission) " +
+    private final static String SQL_INSERT_PERSON = "INSERT INTO person (" +
+            "first_name, last_name, password, e_mail, reg_date, messages_permission) " +
             "VALUES (?, ?, ?, ?, ?, ?)";
     private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
     private final static String SQL_FIND_PERSON_BY_ID = "SELECT * FROM person WHERE id = ?";
     private final static String SQL_SELECT_RECOMMENDATIONS = "SELECT * FROM person";
+    private final static String SQL_FIND_PERSON_BY_CONFIRMATION_CODE = "SELECT * FROM person WHERE confirmation_code = ?";
+    private final static String SQL_UPDATE_CONFIRMATION_CODE = "UPDATE person SET confirmation_code = ? WHERE id = ?";
+    private final static String SQL_UPDATE_PASSWORD = "UPDATE person SET password = ? WHERE id = ?";
 
     public Person getByEmail(String email) {
         return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
     }
 
+    public Person getByConfirmationCode(String code) {
+        return jdbcTemplate.query(SQL_FIND_PERSON_BY_CONFIRMATION_CODE, new Object[]{code}, new PersonMapper())
+                .stream().findAny().orElse(null);
+    }
+
     @Override
     public Person get(int id) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id}, new PersonMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id}, new PersonMapper())
+                .stream().findAny().orElse(null);
     }
 
     @Override
@@ -51,12 +60,20 @@ public class DaoPerson implements Dao<Person> {
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString());
+                person.getMessagesPermission().toString());
     }
 
     @Override
-    public void update(Person person, String... params) {
+    public void update(Person person) {
 
+    }
+
+    public void updateConfirmationCode(int id, String code) {
+        jdbcTemplate.update(SQL_UPDATE_CONFIRMATION_CODE, code, id);
+    }
+
+    public void updatePassword(int id, String password) {
+        jdbcTemplate.update(SQL_UPDATE_PASSWORD, password, id);
     }
 
     @Override
@@ -90,5 +107,6 @@ public class DaoPerson implements Dao<Person> {
                         country, country,
                         city, city},
                 new PersonMapper()));
+
     }
 }

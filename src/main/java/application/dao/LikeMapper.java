@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class LikeMapper implements RowMapper {
+public class LikeMapper implements RowMapper<Like> {
 
     @Override
     public Like mapRow(ResultSet rs, int rowNum) throws SQLException {
