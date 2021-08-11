@@ -57,7 +57,6 @@ public class PersonDto {
         personDto.setMessagesPermission(person.getMessagesPermission().toString());
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isApproved());
-
         return personDto;
     }
 }

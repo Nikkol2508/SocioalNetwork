@@ -1,7 +1,7 @@
 package application.controllers;
 
 import application.models.PersonDto;
-import application.responses.GeneralListResponse;
+import application.models.responses.GeneralListResponse;
 import application.service.FriendsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

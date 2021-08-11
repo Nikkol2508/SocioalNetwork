@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -44,14 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(PasswordNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlePasswordNotValidException(
-            PasswordNotValidException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(SetPasswordException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleSetPasswordException(SetPasswordException exception) {
+    public ResponseEntity<ErrorResponse> handlePasswordNotValidException(PasswordNotValidException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
     }
 

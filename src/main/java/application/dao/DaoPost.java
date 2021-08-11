@@ -24,7 +24,7 @@ public class DaoPost implements Dao<Post> {
 //    }
     @Override
     public Post get(int id) {
-        return (Post) jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class DaoPost implements Dao<Post> {
     }
 
     @Override
-    public void update(Post post, String... params) {
+    public void update(Post post) {
 
     }
 

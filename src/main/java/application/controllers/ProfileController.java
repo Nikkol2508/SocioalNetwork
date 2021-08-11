@@ -2,8 +2,8 @@ package application.controllers;
 
 import application.models.PersonDto;
 import application.models.PostDto;
-import application.responses.GeneralListResponse;
-import application.responses.GeneralResponse;
+import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
 import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +38,7 @@ public class ProfileController {
             @RequestParam(value = "age_from", required = false) Long ageFrom,
             @RequestParam(value = "age_to", required = false) Long ageTo,
             @RequestParam(value = "country", required = false) String country,
-            @RequestParam(value = "city", required = false) String city
-    ) {
+            @RequestParam(value = "city", required = false) String city) {
         return ResponseEntity.ok(profileService.getPersons(firstName, lastName, ageFrom, ageTo, country, city));
     }
 

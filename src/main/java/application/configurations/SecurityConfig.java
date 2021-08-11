@@ -20,41 +20,40 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final JwtTokenProvider jwtTokenProvider;
 
-  private final JwtTokenProvider jwtTokenProvider;
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
-  @Bean
-  @Override
-  public AuthenticationManager authenticationManagerBean() throws Exception {
-    return super.authenticationManagerBean();
-  }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
+                    .antMatchers("/*", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
+                    .antMatchers("/api/v1/account/password/**").permitAll()
+                    .anyRequest().hasAuthority(Permission.USER.getPermission())
+                .and()
+                .exceptionHandling()
+                    .accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(authenticationEntryPoint())
+                .and()
+                .apply(new JwtConfigurer(jwtTokenProvider));
+    }
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    http
-        .httpBasic().disable()
-        .csrf().disable()
-        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        .and()
-        .authorizeRequests()
-        .antMatchers("/", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*",
-            "/api/v1/account/register", "/api/v1/account/password/set").permitAll()
-        .anyRequest().hasAuthority(Permission.USER.getPermission())
-        .and()
-        .exceptionHandling()
-        .accessDeniedHandler(accessDeniedHandler())
-        .authenticationEntryPoint(authenticationEntryPoint())
-        .and()
-        .apply(new JwtConfigurer(jwtTokenProvider));
-  }
 
-  @Bean
-  public AccessDeniedHandler accessDeniedHandler() {
-    return new CustomAccessDeniedHandler();
-  }
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
+    }
 
-  @Bean
-  public AuthenticationEntryPoint authenticationEntryPoint() {
-    return new RestAuthenticationEntryPoint();
-  }
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new RestAuthenticationEntryPoint();
+    }
 }

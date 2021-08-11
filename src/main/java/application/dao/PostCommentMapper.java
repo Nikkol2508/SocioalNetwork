@@ -6,9 +6,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PostCommentMapper implements RowMapper {
+public class PostCommentMapper implements RowMapper<Comment> {
     @Override
-    public Object mapRow(ResultSet rs, int rowNum) throws SQLException {
+    public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
 
         Comment comment = new Comment();
         comment.setParentId(rs.getInt("parent_id"));

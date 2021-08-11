@@ -1,9 +1,9 @@
 package application.controllers;
 
 import application.models.Tag;
-import application.requests.TagRequest;
-import application.responses.GeneralListResponse;
-import application.responses.GeneralResponse;
+import application.models.requests.TagRequest;
+import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
 import application.service.PostsService;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;

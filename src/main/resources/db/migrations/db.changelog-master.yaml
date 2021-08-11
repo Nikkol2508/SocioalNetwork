@@ -22,3 +22,7 @@ databaseChangeLog:
   - include:
       file: friendship-data.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: person-email-unique.sql
+      relativeToChangelogFile: true

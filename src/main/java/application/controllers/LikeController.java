@@ -1,8 +1,8 @@
 package application.controllers;
 
 import application.models.LikeResponseDto;
-import application.requests.LikeRequest;
-import application.responses.GeneralResponse;
+import application.models.requests.LikeRequest;
+import application.models.responses.GeneralResponse;
 import application.service.PostsService;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

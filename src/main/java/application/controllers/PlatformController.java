@@ -3,7 +3,7 @@ package application.controllers;
 import application.models.City;
 import application.models.Country;
 import application.models.Language;
-import application.responses.GeneralListResponse;
+import application.models.responses.GeneralListResponse;
 import application.service.PlatformService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

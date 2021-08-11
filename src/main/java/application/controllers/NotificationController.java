@@ -1,7 +1,7 @@
 package application.controllers;
 
 import application.models.NotificationDTO;
-import application.responses.GeneralListResponse;
+import application.models.responses.GeneralListResponse;
 import application.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
