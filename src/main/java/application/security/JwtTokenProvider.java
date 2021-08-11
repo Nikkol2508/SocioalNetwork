@@ -1,20 +1,13 @@
 package application.security;
 
-import application.exceptions.JwtAuthenticationException;
-import application.models.Role;
 import io.jsonwebtoken.*;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -24,14 +17,13 @@ import java.util.Date;
 
 @Component
 @NoArgsConstructor
-@Slf4j
 public class JwtTokenProvider {
 
     private String secret;
 
     private long validityInMilliseconds;
 
-    private JwtUserDetailsService userDetailsService;
+    private JwtUserDetailsService jwtUserDetailsService;
 
     @Autowired
     public JwtTokenProvider(@Value("${jwt.token.secret}") String secret,
@@ -39,7 +31,7 @@ public class JwtTokenProvider {
                             JwtUserDetailsService userDetailsService) {
         this.secret = secret;
         this.validityInMilliseconds = validityInMilliseconds;
-        this.userDetailsService = userDetailsService;
+        this.jwtUserDetailsService = userDetailsService;
     }
 
     @Bean
@@ -55,7 +47,6 @@ public class JwtTokenProvider {
     public String createToken(String email) {
 
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put("roles", Role.USER);
 
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -69,7 +60,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        UserDetails userDetails = this.userDetailsService.loadUserByUsername(getUsername(token));
+        JwtUser userDetails = jwtUserDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
@@ -78,28 +69,15 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        return req.getHeader("Authorization");
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            return true;
-        } catch (SignatureException e) {
-            log.info("Invalid JWT signature.");
-        } catch (MalformedJwtException e) {
-            log.info("Invalid JWT token.");
-        } catch (ExpiredJwtException e) {
-            log.info("Expired JWT token.");
-        } catch (UnsupportedJwtException e) {
-            log.info("Unsupported JWT token.");
-        } catch (IllegalArgumentException e) {
-            log.info("JWT token compact of handler are invalid.");
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
+            return claimsJws.getBody().getExpiration().after(new Date());
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
         }
-        return false;
     }
 }

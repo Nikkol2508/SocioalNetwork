@@ -11,3 +11,4 @@ public class Post {
     private String postText;
     private boolean isBlocked;
 }
+
