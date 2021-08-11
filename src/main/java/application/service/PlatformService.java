@@ -3,7 +3,7 @@ package application.service;
 import application.models.City;
 import application.models.Country;
 import application.models.Language;
-import application.responses.GeneralListResponse;
+import application.models.responses.GeneralListResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

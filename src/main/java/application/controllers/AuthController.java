@@ -4,8 +4,8 @@ import application.dao.DaoPerson;
 import application.models.LogoutDto;
 import application.models.Person;
 import application.models.PersonDto;
-import application.requests.AuthDtoRequest;
-import application.responses.GeneralResponse;
+import application.models.requests.AuthDtoRequest;
+import application.models.responses.GeneralResponse;
 import application.security.JwtTokenProvider;
 import application.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +15,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -29,9 +29,11 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final DaoPerson daoPerson;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request) throws UsernameNotFoundException {
+    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
+            throws UsernameNotFoundException, BadCredentialsException {
         try {
             String email = request.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
@@ -50,4 +52,18 @@ public class AuthController {
     private ResponseEntity<GeneralResponse<LogoutDto>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
+
+//    @PostMapping("/change-password")
+//    public String processResetPassword(@RequestParam("code") String code, HttpServletRequest request) {
+//        String code = request.getParameter("code");
+//        String password = request.getParameter("password");
+//        Person person = daoPerson.getByConfirmationCode(code);
+//        if (person == null) {
+//
+//        } else {
+//            person.setPassword(passwordEncoder.encode(password));
+//            daoPerson.updatePassword(person);
+//        }
+//        return "index";
+//    }
 }

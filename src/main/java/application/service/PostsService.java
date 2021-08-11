@@ -2,11 +2,11 @@ package application.service;
 
 import application.dao.*;
 import application.models.*;
-import application.requests.CommentRequest;
-import application.requests.LikeRequest;
-import application.requests.TagRequest;
-import application.responses.GeneralListResponse;
-import application.responses.GeneralResponse;
+import application.models.requests.CommentRequest;
+import application.models.requests.LikeRequest;
+import application.models.requests.TagRequest;
+import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
