@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NotificationController {
 
-    private final NotificationService notificationService;
+  private final NotificationService notificationService;
 
-    @GetMapping("/api/v1/notifications")
-    private ResponseEntity<GeneralListResponse<NotificationDTO>> getNotifications() {
-        return ResponseEntity.ok(notificationService.getNotifications());
-    }
+  @GetMapping("/api/v1/notifications")
+  private ResponseEntity<GeneralListResponse<NotificationDTO>> getNotifications() {
+    return ResponseEntity.ok(notificationService.getNotifications());
+  }
 }

@@ -12,38 +12,57 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(PasswordsNotEqualsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlePasswordsNotEqual(PasswordsNotEqualsException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(PasswordsNotEqualsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handlePasswordsNotEqual(
+      PasswordsNotEqualsException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(EmailAlreadyExistsException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(EmailAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
+      EmailAlreadyExistsException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
 
-    private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
-        ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(), exception.getMessage());
-        return ResponseEntity.status(httpStatus).body(errorResponse);
-    }
+  private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
+    ErrorResponse errorResponse = new ErrorResponse(httpStatus.getReasonPhrase(),
+        exception.getMessage());
+    return ResponseEntity.status(httpStatus).body(errorResponse);
+  }
 
-    @ExceptionHandler(PersonNotFindException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handlePersonNotFindException(PersonNotFindException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(PersonNotFindException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handlePersonNotFindException(
+      PersonNotFindException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(UsernameNotFoundException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
+      UsernameNotFoundException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleBadCredentialsException(BadCredentialsException exception) {
-        return buildError(exception, HttpStatus.BAD_REQUEST);
-    }
+  @ExceptionHandler(BadCredentialsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleBadCredentialsException(
+      BadCredentialsException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(PasswordNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handlePasswordNotValidException(
+      PasswordNotValidException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
+
+  @ExceptionHandler(SetPasswordException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<ErrorResponse> handleSetPasswordException(SetPasswordException exception) {
+    return buildError(exception, HttpStatus.BAD_REQUEST);
+  }
 }

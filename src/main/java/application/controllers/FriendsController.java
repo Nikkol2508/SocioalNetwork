@@ -1,6 +1,5 @@
 package application.controllers;
 
-import application.models.Person;
 import application.models.PersonDto;
 import application.responses.GeneralListResponse;
 import application.service.FriendsService;
@@ -14,20 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class FriendsController {
-    private final FriendsService friendService;
 
-    @GetMapping("/friends")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends() {
-        return ResponseEntity.ok(friendService.getUserFriends(2));
-    }
+  private final FriendsService friendService;
 
-    @GetMapping("/friends/request")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRequest() {
-        return ResponseEntity.ok(friendService.getUserFriendsRequest());
-    }
+  @GetMapping("/friends")
+  public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends() {
+    return ResponseEntity.ok(friendService.getUserFriends(2));
+  }
 
-    @GetMapping("/friends/recommendations")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations() {
-        return ResponseEntity.ok(friendService.getUserFriendsRecommendations());
-    }
+  @GetMapping("/friends/request")
+  public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRequest() {
+    return ResponseEntity.ok(friendService.getUserFriendsRequest());
+  }
+
+  @GetMapping("/friends/recommendations")
+  public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations() {
+    return ResponseEntity.ok(friendService.getUserFriendsRecommendations());
+  }
 }
