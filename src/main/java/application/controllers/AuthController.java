@@ -25,29 +25,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final DaoPerson daoPerson;
+  private final AuthService authService;
+  private final AuthenticationManager authenticationManager;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final DaoPerson daoPerson;
 
-    @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request) throws UsernameNotFoundException {
-        try {
-            String email = request.getEmail();
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
-            Person person = daoPerson.getByEmail(email);
-            if (person == null) {
-                throw new UsernameNotFoundException("User with email: " + email + " not found");
-            }
-            String token = jwtTokenProvider.createToken(email);
-            return ResponseEntity.ok(authService.getAuth(request, token));
-        } catch (AuthenticationException ex) {
-            throw new BadCredentialsException("Invalid username or password");
-        }
+  @PostMapping("/login")
+  private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
+      throws UsernameNotFoundException {
+    try {
+      String email = request.getEmail();
+      authenticationManager
+          .authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
+      Person person = daoPerson.getByEmail(email);
+      if (person == null) {
+        throw new UsernameNotFoundException("User with email: " + email + " not found");
+      }
+      String token = jwtTokenProvider.createToken(email);
+      return ResponseEntity.ok(authService.getAuth(request, token));
+    } catch (AuthenticationException ex) {
+      throw new BadCredentialsException("Invalid username or password");
     }
+  }
 
-    @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<LogoutDto>> logout() {
-        return ResponseEntity.ok(authService.getLogout());
-    }
+  @PostMapping("/logout")
+  private ResponseEntity<GeneralResponse<LogoutDto>> logout() {
+    return ResponseEntity.ok(authService.getLogout());
+  }
 }
