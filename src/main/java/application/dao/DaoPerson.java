@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -99,14 +98,26 @@ public class DaoPerson implements Dao<Person> {
                 "and (country = ? or ?::text is null) " +
                 "and (city = ? or ?::text is null)";
 
-        return new ArrayList<>(jdbcTemplate.query(query,
+        return jdbcTemplate.query(query,
                 new Object[]{firstName, firstName,
                         lastName, lastName,
                         ageFrom, ageFrom,
                         ageTo, ageTo,
                         country, country,
                         city, city},
-                new PersonMapper()));
+                new PersonMapper());
 
+    }
+
+    public List<Person> getPersonsByFirstNameSurname(String author) {
+
+        String query = "select * from person where " +
+                "(first_name = ? or ?::text IS NULL) " +
+                "and (last_name  = ? or ?::text is null)";
+
+        return jdbcTemplate.query(query,
+                new Object[]{author, author,
+                        author, author},
+                new PersonMapper());
     }
 }
