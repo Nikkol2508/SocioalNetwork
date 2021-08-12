@@ -17,7 +17,7 @@ public class Person {
     private String country;
     private String confirmationCode;
     private boolean isApproved;
-    private PermissionType messagesPermission;
+    private PermissionMessagesType messagesPermission;
     private long regDate;
     private long birthDate;
     private boolean isBlocked;

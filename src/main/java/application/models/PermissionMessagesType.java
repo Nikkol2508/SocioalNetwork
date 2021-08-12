@@ -1,6 +1,6 @@
 package application.models;
 
-public enum PermissionType {
+public enum PermissionMessagesType {
     ALL,
     FRIENDS
 }

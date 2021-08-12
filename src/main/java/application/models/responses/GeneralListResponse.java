@@ -1,4 +1,4 @@
-package application.responses;
+package application.models.responses;
 
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class GeneralListResponse<T> {
     private List<T> data;
 
     public GeneralListResponse(List<T> data) {
-        error = "";
+        error = "Error";
         timestamp = System.currentTimeMillis();
         this.data = data;
     }

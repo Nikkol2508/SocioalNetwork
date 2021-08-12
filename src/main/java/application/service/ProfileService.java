@@ -1,61 +1,67 @@
 package application.service;
 
+import application.dao.DaoPerson;
 import application.dao.DaoPost;
-import application.models.*;
-import application.responses.GeneralListResponse;
-import application.responses.GeneralResponse;
+import application.models.Person;
+import application.models.PersonDto;
+import application.models.Post;
+import application.models.PostDto;
+import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ProfileService {
 
+    private final DaoPerson daoPerson;
+    private final PostsService postsService;
     private final DaoPost daoPost;
 
-    public GeneralResponse<PersonDto> getPerson(){
-        PersonDto personDto = new PersonDto();
-        personDto.setId(2);
-        personDto.setFirstName("Борис");
-        personDto.setLastName("Булкин");
-        personDto.setRegDate(System.currentTimeMillis() - 567);
-        personDto.setBirthDate(System.currentTimeMillis() - 1997);
-        personDto.setEmail("gsdfhgsh@skdjfhskdj.ru");
-        personDto.setPhone("9163332211");
-        personDto.setPhoto("");
-        personDto.setAbout("Немного обо мне");
+    public GeneralResponse<PersonDto> getPerson(int id) {
 
-        City city = new City(1, "Москва");
-        personDto.setCity(city.getTitle());
-        Country country = new Country(1, "Россия");
-        personDto.setCountry(country.getTitle());
-        personDto.setMessagesPermission("All");
-        personDto.setLastOnlineTime(System.currentTimeMillis() - 40);
-        personDto.setBlocked(false);
-        GeneralResponse<PersonDto> response = new GeneralResponse<>(personDto);
-        return response;
+        Person person = daoPerson.get(id);
+        return new GeneralResponse<>(PersonDto.fromPerson(person));
     }
 
-    public GeneralListResponse<PostDto> getUserPosts(int id) {
-        List <Post> postList = daoPost.getUserPost(id);
-        List <PostDto> postDtoList = new ArrayList<>();
-        for (Post post : postList) {
-            PostDto postDto = new PostDto();
-            postDto.setId(post.getId());
-            postDto.setTitle(post.getTitle());
-            postDto.setTime(post.getTime());
-            postDto.setPostText(post.getPostText());
+    public GeneralResponse<PersonDto> getProfile() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
+        PersonDto personDto = PersonDto.fromPerson(person);
+        personDto.setToken(personDto.getToken());
+
+        return new GeneralResponse<>(personDto);
+    }
+
+    public GeneralListResponse<PostDto> getWall(int id) {
+
+        List<PostDto> postDtoList = new ArrayList<>();
+
+        for (Post post : daoPost.getAll()) {
+            PostDto postDto = postsService.getPostDto(post.getId());
+            postDto.setType("POSTED");
             postDtoList.add(postDto);
         }
+        return new GeneralListResponse<>(postDtoList);
+    }
 
-        GeneralListResponse<PostDto> userPostResponse = new GeneralListResponse<>(postDtoList);
-        userPostResponse.setTotal(0);
-        userPostResponse.setOffset(0);
-        userPostResponse.setPerPage(20);
+    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws EntityNotFoundException {
 
-        return userPostResponse;
+        val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
+
+        return new GeneralListResponse<>(listPersons
+                .stream()
+                .map(PersonDto::fromPerson)
+                .collect(Collectors.toList()));
     }
 }

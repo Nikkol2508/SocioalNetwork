@@ -18,3 +18,11 @@ databaseChangeLog:
   - include:
       file: tag-post2tag-data.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: friendship-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: person-email-unique.sql
+      relativeToChangelogFile: true
