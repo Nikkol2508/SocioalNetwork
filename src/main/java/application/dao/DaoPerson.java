@@ -1,11 +1,13 @@
 package application.dao;
 
+import application.models.FriendshipStatus;
 import application.models.PermissionMessagesType;
 import application.models.Person;
-import application.models.PersonDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -64,10 +66,67 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public List<Person> getFriends(int id) {
-        String selectFriends = "SELECT * FROM person JOIN friendship ON person.id = friendship.dst_person_id" +
-                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id +
-                " UNION SELECT * FROM person JOIN friendship ON person.id = friendship.src_person_id" +
-                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id;
-        return jdbcTemplate.query(selectFriends, new PersonMapper());
+
+        String select = "SELECT * FROM person WHERE id IN (SELECT src_person_id FROM friendship" +
+                " JOIN friendship_status fs on fs.id = friendship.status_id " +
+                "WHERE code = '" + FriendshipStatus.FRIEND + "' AND dst_person_id = " + id + " union SELECT dst_person_id" +
+                " FROM friendship JOIN friendship_status fs " +
+                "on fs.id = friendship.status_id WHERE code = '" + FriendshipStatus.FRIEND + "' AND src_person_id = " + id + ")";
+
+        return jdbcTemplate.query(select, new PersonMapper());
+    }
+
+    public void addFriendForId(int srcId, int dtsId) {
+
+        String insertIntoFriendshipStatus = "INSERT INTO friendship_status (time, name, code) VALUES (?, ?, ?)";
+        String insetIntoFriendship = "INSERT INTO friendship (status_id, src_person_id, dst_person_id) " +
+                "VALUES ((SELECT max(friendship_status.id) from friendship_status), ?, ?)";
+
+        jdbcTemplate.update(insertIntoFriendshipStatus, System.currentTimeMillis(),
+                "Запрос на добавление в друзья",
+                FriendshipStatus.REQUEST.toString());
+
+        jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
+    }
+
+    public void addFriendRequest(int srcId, int dtsId) {
+
+        String update = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id FROM friendship" +
+                " WHERE src_person_id = ? AND dst_person_id = ?)";
+
+        jdbcTemplate.update(update, FriendshipStatus.FRIEND.toString(), srcId, dtsId);
+    }
+
+    public List<Person> getFriendsRequest(int id) {
+
+        String selectRequests = "SELECT * FROM  person WHERE id IN (SELECT src_person_id FROM friendship " +
+                "JOIN friendship_status fs on fs.id = friendship.status_id WHERE code = ? AND dst_person_id = ?)";
+
+        return jdbcTemplate.query(selectRequests, new Object[]{FriendshipStatus.REQUEST.toString(),
+                id}, new PersonMapper());
+    }
+
+    public String getFriendStatus(int srcId, int dtsId) {
+
+        try {
+            String select = "select code from friendship f join friendship_status fs2 on f.status_id = fs2.id " +
+                    "where src_person_id IN (?, ?)" +
+                    " and dst_person_id IN (?, ?)";
+
+            return jdbcTemplate.queryForObject(select, new Object[]{srcId, dtsId, dtsId, srcId}, String.class);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    public void deleteFriendForID(int srcId, int dtcId) {
+        String deleteFriend = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id FROM friendship" +
+                " WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?))";
+        jdbcTemplate.update(deleteFriend, FriendshipStatus.DECLINED, srcId, dtcId, dtcId, srcId);
+    }
+
+    public Person getAuthPerson() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return getByEmail(authentication.getName());
     }
 }

@@ -1,7 +1,7 @@
 package application.service;
 
 import application.dao.DaoPerson;
-import application.models.LogoutDto;
+import application.models.MessageRequestDto;
 import application.models.Person;
 import application.models.PersonDto;
 import application.requests.AuthDtoRequest;
@@ -21,8 +21,8 @@ public class AuthService {
     }
 
 
-    public GeneralResponse<LogoutDto> getLogout() {
-        return new GeneralResponse<>(new LogoutDto("ok"));
+    public GeneralResponse<MessageRequestDto> getLogout() {
+        return new GeneralResponse<>(new MessageRequestDto("ok"));
     }
 
 }
