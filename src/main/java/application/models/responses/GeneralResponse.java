@@ -1,4 +1,4 @@
-package application.responses;
+package application.models.responses;
 
 import lombok.Data;
 

@@ -20,7 +20,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
     private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
@@ -37,7 +36,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
+                    .antMatchers("/*", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
+                    .antMatchers("/api/v1/account/password/**").permitAll()
                     .anyRequest().hasAuthority(Permission.USER.getPermission())
                 .and()
                 .exceptionHandling()
@@ -46,8 +46,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }
 
+
     @Bean
-    public AccessDeniedHandler accessDeniedHandler(){
+    public AccessDeniedHandler accessDeniedHandler() {
         return new CustomAccessDeniedHandler();
     }
 

@@ -14,7 +14,7 @@ public class DaoTag {
     private final JdbcTemplate jdbcTemplate;
 
     public Tag findByID(int id) {
-        return (Tag) jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper()).stream().findAny().orElse(null);
     }
 
     public List<String> getTagsByPostId(Integer id) {
