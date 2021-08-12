@@ -18,7 +18,7 @@ public class DaoPost implements Dao<Post> {
 //            "VALUES (?, ?, ?, ?, ?)";
 //    private final static String SQL_GET_ALL_POSTS = "SELECT * FROM post ORDER BY time desc";
 
-//    @Override
+    //    @Override
 //    public Person get(int id) {
 //        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id},new PersonMapper()).stream().findAny().orElse(null);
 //    }
@@ -76,5 +76,21 @@ public class DaoPost implements Dao<Post> {
 
     public void deleteGoalList() {
 //        postRepository.deleteAll();
+    }
+
+    public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
+
+        String query = "select * from post where " +
+                "post_text LIKE concat(concat('%',?), '%')" +
+                "and (author_id  = ? or ?::int is null) " +
+                "and (time >= ? or ?::bigint is null) " +
+                "and (time <= ? or ?::bigint is null)";
+
+        return jdbcTemplate.query(query,
+                new Object[]{text,
+                        authorId, authorId,
+                        dateFrom, dateFrom,
+                        dateTo, dateTo},
+                new PostMapper());
     }
 }

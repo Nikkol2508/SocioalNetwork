@@ -8,6 +8,7 @@ import application.models.requests.TagRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -135,7 +137,7 @@ public class PostsService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person currentPerson = daoPerson.getByEmail(authentication.getName());
-        if(getLiked(currentPerson.getId(), request.getItem_id(), "Post").getData().get("likes")) {
+        if (getLiked(currentPerson.getId(), request.getItem_id(), "Post").getData().get("likes")) {
 
             Like like = new Like();
             like.setPostId(request.getItem_id());
@@ -168,5 +170,26 @@ public class PostsService {
         HashMap<String, String> response = new HashMap<>();
         response.put("message", "ok");
         return new GeneralResponse<>(response);
+    }
+
+    public GeneralListResponse<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo) {
+
+        val listPersonsId = daoPerson.getPersonsByFirstNameSurname(author)
+                .stream()
+                .map(Person::getId)
+                .collect(Collectors.toList());
+
+        val posts = listPersonsId.stream()
+                .map(item -> getPosts(text, item, dateFrom, dateTo))
+                .flatMap(List::stream).collect(Collectors.toList());
+
+        return new GeneralListResponse<>(posts
+                .stream()
+                .map(item -> getPostDto(item.getId()))
+                .collect(Collectors.toList()));
+    }
+
+    private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
+        return daoPost.getPosts(text, authorId, dateFrom, dateTo);
     }
 }
