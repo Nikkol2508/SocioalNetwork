@@ -15,29 +15,25 @@ public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String SQL_INSERT_PERSON = "INSERT INTO person (" +
-            "first_name, last_name, password, e_mail, reg_date, messages_permission) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-    private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
-    private final static String SQL_FIND_PERSON_BY_ID = "SELECT * FROM person WHERE id = ?";
-    private final static String SQL_SELECT_RECOMMENDATIONS = "SELECT * FROM person";
-    private final static String SQL_FIND_PERSON_BY_CONFIRMATION_CODE = "SELECT * FROM person WHERE confirmation_code = ?";
-    private final static String SQL_UPDATE_CONFIRMATION_CODE = "UPDATE person SET confirmation_code = ? WHERE id = ?";
-    private final static String SQL_UPDATE_PASSWORD = "UPDATE person SET password = ? WHERE id = ?";
-
     public Person getByEmail(String email) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
+
+        String query = "SELECT * FROM person WHERE e_mail = ?";
+        return jdbcTemplate.query(query, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
     }
 
     public Person getByConfirmationCode(String code) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_CONFIRMATION_CODE, new Object[]{code}, new PersonMapper())
+
+        String query = "SELECT * FROM person WHERE confirmation_code = ?";
+        return jdbcTemplate.query(query, new Object[]{code}, new PersonMapper())
                 .stream().findAny().orElse(null);
     }
 
     @Override
     public Person get(int id) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id}, new PersonMapper())
+
+        String query = "SELECT * FROM person WHERE id = ?";
+        return jdbcTemplate.query(query, new Object[]{id}, new PersonMapper())
                 .stream().findAny().orElse(null);
     }
 
@@ -48,12 +44,17 @@ public class DaoPerson implements Dao<Person> {
 
     public List<Person> getRecommendations() {
 
-        return jdbcTemplate.query(SQL_SELECT_RECOMMENDATIONS,
+        String query = "SELECT * FROM person";
+        return jdbcTemplate.query(query,
                 new PersonMapper());
     }
 
     public void save(Person person) {
-        jdbcTemplate.update(SQL_INSERT_PERSON,
+
+        String query = "INSERT INTO person (" +
+                "first_name, last_name, password, e_mail, reg_date, messages_permission) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(query,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
@@ -68,11 +69,15 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void updateConfirmationCode(int id, String code) {
-        jdbcTemplate.update(SQL_UPDATE_CONFIRMATION_CODE, code, id);
+
+        String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
+        jdbcTemplate.update(query, code, id);
     }
 
     public void updatePassword(int id, String password) {
-        jdbcTemplate.update(SQL_UPDATE_PASSWORD, password, id);
+
+        String query = "UPDATE person SET password = ? WHERE id = ?";
+        jdbcTemplate.update(query, password, id);
     }
 
     @Override
@@ -81,6 +86,7 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public List<Person> getFriends(int id) {
+
         String selectFriends = "SELECT * FROM person JOIN friendship ON person.id = friendship.dst_person_id" +
                 " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id +
                 " UNION SELECT * FROM person JOIN friendship ON person.id = friendship.src_person_id" +
