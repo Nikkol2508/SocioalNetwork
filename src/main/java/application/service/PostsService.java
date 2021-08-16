@@ -2,6 +2,10 @@ package application.service;
 
 import application.dao.*;
 import application.models.*;
+import application.models.dto.CommentDto;
+import application.models.dto.LikeResponseDto;
+import application.models.dto.PersonDto;
+import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
 import application.models.requests.LikeRequest;
 import application.models.requests.TagRequest;

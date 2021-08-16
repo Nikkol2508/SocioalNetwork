@@ -1,5 +1,7 @@
-package application.models;
+package application.models.dto;
 
+import application.models.Comment;
+import application.models.Person;
 import lombok.Data;
 
 import java.util.List;

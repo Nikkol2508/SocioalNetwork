@@ -1,4 +1,4 @@
-package application.dao;
+package application.dao.mappers;
 
 import application.models.Comment;
 import org.springframework.jdbc.core.RowMapper;

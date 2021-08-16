@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.dao.mappers.PostCommentMapper;
 import application.models.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

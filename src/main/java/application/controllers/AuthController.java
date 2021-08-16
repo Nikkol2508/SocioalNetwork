@@ -1,9 +1,9 @@
 package application.controllers;
 
 import application.dao.DaoPerson;
-import application.models.MessageRequestDto;
+import application.models.dto.MessageRequestDto;
 import application.models.Person;
-import application.models.PersonDto;
+import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.models.responses.GeneralResponse;
 import application.security.JwtTokenProvider;

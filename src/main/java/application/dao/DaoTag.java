@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.dao.mappers.TagMapper;
 import application.models.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;

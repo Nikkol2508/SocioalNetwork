@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.LikeResponseDto;
+import application.models.dto.LikeResponseDto;
 import application.models.responses.GeneralResponse;
 import application.models.requests.LikeRequest;
 import application.service.PostsService;

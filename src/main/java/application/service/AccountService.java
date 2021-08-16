@@ -5,6 +5,7 @@ import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.*;
+import application.models.dto.MessageRequestDto;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
@@ -25,7 +26,7 @@ public class AccountService {
     private final DaoPerson daoPerson;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public ResponseEntity<GeneralResponse<AccountDto>> register(RegistrationDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> register(RegistrationDtoRequest request)
             throws PasswordsNotEqualsException, EmailAlreadyExistsException {
         if (!request.getPasswd1().equals(request.getPasswd2())) {
             throw new PasswordsNotEqualsException();
@@ -42,11 +43,11 @@ public class AccountService {
         person.setApproved(false);
         daoPerson.save(person);
         log.info("IN register - user: {} successfully registered", person.getEmail());
-        GeneralResponse<AccountDto> response = new GeneralResponse<>(new AccountDto("ok"));
+        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<GeneralResponse<SetPasswordDto>> setPassword(SetPasswordDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> setPassword(SetPasswordDtoRequest request)
             throws PasswordNotValidException {
         //проверка валидности пароля (не короче 8 символов)
         if (request.getPassword().length() < 8) {
@@ -57,18 +58,18 @@ public class AccountService {
                 throw new EntityNotFoundException("Person with this confirmation code is not found.");
             }
             updatePassword(person, request.getPassword());
-            return ResponseEntity.ok(new GeneralResponse<>(new SetPasswordDto("ok")));
+            return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
         }
     }
 
-    public ResponseEntity<GeneralResponse<SetEmailDto>> setEmail(ShiftEmailDtoRequest request, String code) {
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> setEmail(ShiftEmailDtoRequest request, String code) {
         // Здесь можно добавить проверку на валидность email (request.getEmail())
         Person person = getByConfirmationCode(code);
         if (person == null) {
             throw new EntityNotFoundException("Person with this confirmation code is not found.");
         }
         updateEmail(person, request.getEmail());
-        return ResponseEntity.ok(new GeneralResponse<>(new SetEmailDto("ok")));
+        return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
     }
 
     public void updateConfirmationCode(String code, String email) {

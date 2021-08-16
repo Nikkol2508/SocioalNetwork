@@ -1,7 +1,7 @@
 package application.controllers;
 
-import application.models.PersonDto;
-import application.models.PostDto;
+import application.models.dto.PersonDto;
+import application.models.dto.PostDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.ProfileService;

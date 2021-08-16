@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.PostDto;
+import application.models.dto.PostDto;
 import application.models.responses.GeneralListResponse;
 import application.service.FeedsService;
 import lombok.RequiredArgsConstructor;

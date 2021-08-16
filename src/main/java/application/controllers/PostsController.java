@@ -1,8 +1,8 @@
 package application.controllers;
 
 import application.models.Comment;
-import application.models.CommentDto;
-import application.models.PostDto;
+import application.models.dto.CommentDto;
+import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;

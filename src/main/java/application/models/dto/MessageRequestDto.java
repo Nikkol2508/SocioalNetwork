@@ -1,13 +1,13 @@
-package application.models;
+package application.models.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class SetPasswordDto {
+@NoArgsConstructor
+public class MessageRequestDto {
 
-  private String message;
+    private String message;
 }

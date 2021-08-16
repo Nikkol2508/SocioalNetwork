@@ -3,10 +3,7 @@ package application.controllers;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
-import application.models.AccountDto;
-import application.models.PasswordRecoveryDto;
-import application.models.SetEmailDto;
-import application.models.SetPasswordDto;
+import application.models.dto.MessageRequestDto;
 import application.models.requests.RecoverPassDtoRequest;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
@@ -35,28 +32,28 @@ public class AccountController {
     private final AccountService accountService;
 
     @PostMapping("/register")
-    public ResponseEntity<GeneralResponse<AccountDto>> register(@RequestBody RegistrationDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> register(@RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
 
         return accountService.register(request);
     }
 
     @PutMapping("/password/set")
-    public ResponseEntity<GeneralResponse<SetPasswordDto>> setPassword(HttpServletRequest servletRequest,
-                                                                       @RequestBody SetPasswordDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> setPassword(HttpServletRequest servletRequest,
+                                                                          @RequestBody SetPasswordDtoRequest request)
             throws PasswordNotValidException {
         request.setToken(getCode(servletRequest));
         return accountService.setPassword(request);
     }
 
     @PutMapping("/email")
-    public ResponseEntity<GeneralResponse<SetEmailDto>> setEmail(HttpServletRequest servletRequest,
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> setEmail(HttpServletRequest servletRequest,
                                                                  @RequestBody ShiftEmailDtoRequest request) {
         return accountService.setEmail(request, getCode(servletRequest));
     }
 
     @PutMapping("/password/recovery")
-    public ResponseEntity<GeneralResponse<PasswordRecoveryDto>> recoverPassword(
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> recoverPassword(
             HttpServletRequest servletRequest, @RequestBody RecoverPassDtoRequest request)
             throws MessagingException, UnsupportedEncodingException {
         String email = request.getEmail();
@@ -69,12 +66,12 @@ public class AccountController {
                 : "/change-password";
         String resetPasswordLink = siteURL + urn + "?code=" + code;
         sendEmailToRecoverPassword(email, resetPasswordLink);
-        GeneralResponse<PasswordRecoveryDto> response = new GeneralResponse<>(new PasswordRecoveryDto("ok"));
+        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/shift-email")
-    public ResponseEntity<GeneralResponse<SetEmailDto>> changeEmail(HttpServletRequest servletRequest)
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> changeEmail(HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         String code = RandomString.make(30);
@@ -84,7 +81,7 @@ public class AccountController {
         String resetPasswordLink = siteURL + "/shift-email?code=" + code;
         sendEmailToChangeEmail(email, resetPasswordLink);
         SecurityContextHolder.getContext().setAuthentication(null);
-        GeneralResponse<SetEmailDto> response = new GeneralResponse<>(new SetEmailDto("ok"));
+        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
         return ResponseEntity.ok(response);
     }
 

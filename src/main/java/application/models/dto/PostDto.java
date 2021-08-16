@@ -1,5 +1,6 @@
-package application.models;
+package application.models.dto;
 
+import application.models.Post;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

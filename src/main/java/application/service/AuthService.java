@@ -1,9 +1,9 @@
 package application.service;
 
 import application.dao.DaoPerson;
-import application.models.LogoutDto;
+import application.models.dto.MessageRequestDto;
 import application.models.Person;
-import application.models.PersonDto;
+import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +23,9 @@ public class AuthService {
             return new GeneralResponse<>(personDto);
     }
 
-    public GeneralResponse<LogoutDto> getLogout() {
+    public GeneralResponse<MessageRequestDto> getLogout() {
         SecurityContextHolder.getContext().setAuthentication(null);
-        return new GeneralResponse<>(new LogoutDto("ok"));
+        return new GeneralResponse<>(new MessageRequestDto("ok"));
     }
 
 }

@@ -1,13 +1,12 @@
 package application.service;
 
-import application.dao.Dao;
 import application.dao.DaoPerson;
-import application.models.City;
-import application.models.Country;
+import application.models.FriendshipStatus;
+import application.models.dto.MessageRequestDto;
 import application.models.Person;
-import application.models.PersonDto;
+import application.models.dto.PersonDto;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
-import application.responses.GeneralListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

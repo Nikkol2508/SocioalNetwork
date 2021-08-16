@@ -1,9 +1,9 @@
 package application.dao;
 
+import application.dao.mappers.PersonMapper;
 import application.models.FriendshipStatus;
 import application.models.PermissionMessagesType;
 import application.models.Person;
-import application.models.PersonDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -205,4 +205,22 @@ public class DaoPerson implements Dao<Person> {
                         author, author},
                 new PersonMapper());
     }
+
+    public void updateConfirmationCode(int id, String code) {
+
+        String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
+        jdbcTemplate.update(query, code, id);
+    }
+
+    public void updatePassword(int id, String password) {
+
+        String query = "UPDATE person SET password = ? WHERE id = ?";
+        jdbcTemplate.update(query, password, id);
+    }
+
+    public void updateEmail(int id, String email) {
+        String query = "UPDATE person SET e_mail = ? WHERE id = ?";
+        jdbcTemplate.update(query, email, id);
+    }
+
 }
