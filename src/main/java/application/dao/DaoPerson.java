@@ -28,18 +28,24 @@ public class DaoPerson implements Dao<Person> {
     private final static String SQL_UPDATE_EMAIL = "UPDATE person SET e_mail = ? WHERE id = ?";
 
     public Person getByEmail(String email) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
+
+        String query = "SELECT * FROM person WHERE e_mail = ?";
+        return jdbcTemplate.query(query, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
     }
 
     public Person getByConfirmationCode(String code) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_CONFIRMATION_CODE, new Object[]{code}, new PersonMapper())
+
+        String query = "SELECT * FROM person WHERE confirmation_code = ?";
+        return jdbcTemplate.query(query, new Object[]{code}, new PersonMapper())
                 .stream().findAny().orElse(null);
     }
 
     @Override
     public Person get(int id) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id}, new PersonMapper())
+
+        String query = "SELECT * FROM person WHERE id = ?";
+        return jdbcTemplate.query(query, new Object[]{id}, new PersonMapper())
                 .stream().findAny().orElse(null);
     }
 
@@ -50,12 +56,17 @@ public class DaoPerson implements Dao<Person> {
 
     public List<Person> getRecommendations() {
 
-        return jdbcTemplate.query(SQL_SELECT_RECOMMENDATIONS,
+        String query = "SELECT * FROM person";
+        return jdbcTemplate.query(query,
                 new PersonMapper());
     }
 
     public void save(Person person) {
-        jdbcTemplate.update(SQL_INSERT_PERSON,
+
+        String query = "INSERT INTO person (" +
+                "first_name, last_name, password, e_mail, reg_date, messages_permission) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(query,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
@@ -70,11 +81,15 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void updateConfirmationCode(int id, String code) {
-        jdbcTemplate.update(SQL_UPDATE_CONFIRMATION_CODE, code, id);
+
+        String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
+        jdbcTemplate.update(query, code, id);
     }
 
     public void updatePassword(int id, String password) {
-        jdbcTemplate.update(SQL_UPDATE_PASSWORD, password, id);
+
+        String query = "UPDATE person SET password = ? WHERE id = ?";
+        jdbcTemplate.update(query, password, id);
     }
 
     public void updateEmail(int id, String email) {
@@ -113,5 +128,15 @@ public class DaoPerson implements Dao<Person> {
                         city, city},
                 new PersonMapper()));
 
+    public List<Person> getPersonsByFirstNameSurname(String author) {
+
+        String query = "select * from person where " +
+                "(first_name = ? or ?::text IS NULL) " +
+                "and (last_name  = ? or ?::text is null)";
+
+        return jdbcTemplate.query(query,
+                new Object[]{author, author,
+                        author, author},
+                new PersonMapper());
     }
 }
