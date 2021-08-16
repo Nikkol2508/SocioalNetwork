@@ -198,10 +198,10 @@ public class DaoPerson implements Dao<Person> {
         jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST, srcId, dtcId);
     }
 
-    public List<Person> getRecommendationsOnRegDate() {
-        String selectRecommendations = "SELECT * FROM person WHERE reg_date > ?";
+    public List<Person> getRecommendationsOnRegDate(int id) {
+        String selectRecommendations = "SELECT * FROM person WHERE reg_date > ? AND id != ?";
         long twoDays = 17280000000L;
-        return jdbcTemplate.query(selectRecommendations, new Object[]{System.currentTimeMillis() - twoDays},
+        return jdbcTemplate.query(selectRecommendations, new Object[]{System.currentTimeMillis() - twoDays, id},
                 new PersonMapper());
     }
 
