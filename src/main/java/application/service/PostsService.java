@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dao.*;
 import application.models.*;
 import application.models.requests.CommentRequest;
 import application.models.requests.LikeRequest;
@@ -13,9 +14,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class PostsService {
 
     private final DaoPost daoPost;
@@ -33,9 +38,8 @@ public class PostsService {
         PersonDto author = PersonDto.fromPerson(person);
         List<CommentDto> comments = getComments(postId);
         List<String> tags = daoTag.getTagsByPostId(postId);
-        PostDto postDto = PostDto.fromPost(post, likes, author, comments, tags);
 
-        return postDto;
+        return PostDto.fromPost(post, likes, author, comments, tags);
     }
 
     public List<CommentDto> getComments(Integer postId) {
@@ -62,6 +66,12 @@ public class PostsService {
             }
         }
         return subCommentsList;
+    }
+
+
+    public GeneralListResponse<CommentDto> getSubCommentsResponse() {
+
+        return new GeneralListResponse<>(getComments(Integer.valueOf(subCommentParentId)));
     }
 
     public GeneralResponse<PostDto> getPostResponse(int postId) {
@@ -148,9 +158,31 @@ public class PostsService {
     }
 
     public GeneralResponse<HashMap<String, String>> deleteTag(int tagId) {
-// Здесь ДАО метод удаления
+        // Здесь ДАО метод удаления
         HashMap<String, String> response = new HashMap<>();
         response.put("message", "ok");
         return new GeneralResponse<>(response);
     }
+
+    public GeneralListResponse<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo) {
+
+        val listPersonsId = daoPerson.getPersonsByFirstNameSurname(author)
+                .stream()
+                .map(Person::getId)
+                .collect(Collectors.toList());
+
+        val posts = listPersonsId.stream()
+                .map(item -> getPosts(text, item, dateFrom, dateTo))
+                .flatMap(List::stream).collect(Collectors.toList());
+
+        return new GeneralListResponse<>(posts
+                .stream()
+                .map(item -> getPostDto(item.getId()))
+                .collect(Collectors.toList()));
+    }
+
+    private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
+        return daoPost.getPosts(text, authorId, dateFrom, dateTo);
+    }
+
 }

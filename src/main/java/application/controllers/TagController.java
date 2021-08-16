@@ -1,15 +1,9 @@
 package application.controllers;
 
 import application.models.Tag;
-<<<<<<< HEAD
 import application.models.requests.TagRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
-=======
-import application.requests.TagRequest;
-import application.responses.GeneralListResponse;
-import application.responses.GeneralResponse;
->>>>>>> origin/NikkolA
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

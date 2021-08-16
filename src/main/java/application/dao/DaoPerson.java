@@ -16,17 +16,6 @@ public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String SQL_INSERT_PERSON = "INSERT INTO person (" +
-            "first_name, last_name, password, e_mail, reg_date, messages_permission) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-    private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
-    private final static String SQL_FIND_PERSON_BY_ID = "SELECT * FROM person WHERE id = ?";
-    private final static String SQL_SELECT_RECOMMENDATIONS = "SELECT * FROM person";
-    private final static String SQL_FIND_PERSON_BY_CONFIRMATION_CODE = "SELECT * FROM person WHERE confirmation_code = ?";
-    private final static String SQL_UPDATE_CONFIRMATION_CODE = "UPDATE person SET confirmation_code = ? WHERE id = ?";
-    private final static String SQL_UPDATE_PASSWORD = "UPDATE person SET password = ? WHERE id = ?";
-    private final static String SQL_UPDATE_EMAIL = "UPDATE person SET e_mail = ? WHERE id = ?";
-
     public Person getByEmail(String email) {
 
         String query = "SELECT * FROM person WHERE e_mail = ?";
@@ -93,7 +82,8 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void updateEmail(int id, String email) {
-        jdbcTemplate.update(SQL_UPDATE_EMAIL, email, id);
+        String query = "UPDATE person SET e_mail = ? WHERE id = ?";
+        jdbcTemplate.update(query, email, id);
     }
 
     @Override
@@ -103,13 +93,16 @@ public class DaoPerson implements Dao<Person> {
 
     public List<Person> getFriends(int id) {
         String selectFriends = "SELECT * FROM person JOIN friendship ON person.id = friendship.dst_person_id" +
-                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id +
+                " JOIN friendship_status ON friendship_status.id = friendship.status_id " +
+                "WHERE code = 'FRIEND' AND person.id !=" + id +
                 " UNION SELECT * FROM person JOIN friendship ON person.id = friendship.src_person_id" +
-                " JOIN friendship_status ON friendship_status.id = friendship.status_id WHERE code = 'FRIEND' AND person.id !=" + id;
+                " JOIN friendship_status ON friendship_status.id = friendship.status_id " +
+                "WHERE code = 'FRIEND' AND person.id !=" + id;
         return jdbcTemplate.query(selectFriends, new PersonMapper());
     }
 
-    public List<Person> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) {
+    public List<Person> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country,
+                                   String city) {
 
         String query = "select * from person where " +
                 "(first_name = ? or ?::text IS NULL) " +
@@ -127,6 +120,7 @@ public class DaoPerson implements Dao<Person> {
                         country, country,
                         city, city},
                 new PersonMapper()));
+    }
 
     public List<Person> getPersonsByFirstNameSurname(String author) {
 

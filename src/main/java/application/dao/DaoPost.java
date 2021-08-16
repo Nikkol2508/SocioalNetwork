@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class DaoPost implements Dao<Post> {
+public class DaoPost {
     private final JdbcTemplate jdbcTemplate;
     private final static String SQL_INSERT_POST = "INSERT INTO post (title, text, author_id, time) " +
             "VALUES (?, ?, ?, ?, ?)";

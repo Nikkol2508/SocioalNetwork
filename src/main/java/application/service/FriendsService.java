@@ -18,7 +18,7 @@ public class FriendsService {
     private final DaoPerson personDao;
 
     public GeneralListResponse<PersonDto> getUserFriends(int id) {
-        List<PersonDto> personDtoList = getPersonDtoOnPerson(personDtoDao.getFriends(id));
+        List<PersonDto> personDtoList = getPersonDtoOnPerson(personDao.getFriends(id));
         GeneralListResponse<PersonDto> friendResponse = new GeneralListResponse<>(personDtoList);
         friendResponse.setTotal(0);
         friendResponse.setOffset(0);
@@ -78,7 +78,7 @@ public class FriendsService {
     }
 
     public GeneralListResponse<PersonDto> getUserFriendsRecommendations() {
-        List<Person> personList = personDtoDao.getRecommendations();
+        List<Person> personList = personDao.getRecommendations();
         List<PersonDto> personDtos = new ArrayList<>();
         for (Person person : personList) {
             PersonDto personDto = new PersonDto();

@@ -6,6 +6,7 @@ import application.models.PostDto;
 import application.models.requests.CommentRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
+import application.service.FeedsService;
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
