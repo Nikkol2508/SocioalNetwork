@@ -41,7 +41,7 @@ public class PersonDto {
     @JsonProperty("is_blocked")
     private boolean isBlocked;
 
-    public static PersonDto fromPerson(Person person, String token) {
+    public static PersonDto fromPerson(Person person) {
         PersonDto personDto = new PersonDto();
         personDto.setId(person.getId());
         personDto.setFirstName(person.getFirstName());
@@ -57,7 +57,6 @@ public class PersonDto {
         personDto.setMessagesPermission("ALL");
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isApproved());
-        personDto.setToken(token);
         return personDto;
     }
 }

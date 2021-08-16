@@ -4,6 +4,7 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.AccountDto;
+import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.requests.RegistrationDtoRequest;
 import application.responses.GeneralResponse;
@@ -34,6 +35,7 @@ public class AccountService {
         person.setEmail(request.getEmail());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
+        person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         daoPerson.save(person);
         log.info("IN register - user: {} successfully registered", person.getEmail());
         GeneralResponse<AccountDto> response = new GeneralResponse<>(new AccountDto("ok"));

@@ -1,10 +1,7 @@
 package application.dao;
 
-import application.models.PermissionMessagesType;
 import application.models.Person;
-import application.models.PersonDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +47,7 @@ public class DaoPerson implements Dao<Person> {
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString());
+                person.getMessagesPermission());
     }
 
     @Override

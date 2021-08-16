@@ -20,7 +20,7 @@ public class Comment {
     private int id;
 
     @JsonProperty("post_id")
-    private int postId;
+    private Integer postId;
 
     private long time;
 

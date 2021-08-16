@@ -35,5 +35,9 @@ public class LikeController {
         return ResponseEntity.ok(postsService.setLikes(request));
     }
 
-
+    @DeleteMapping("/likes")
+    public ResponseEntity<GeneralResponse<Map<String, String>>> deleteLike(@RequestParam(value = "item_id") int itemId,
+                                                               @RequestParam(value = "type") String type) {
+        return ResponseEntity.ok(postsService.deleteLike(itemId, type));
+    }
 }

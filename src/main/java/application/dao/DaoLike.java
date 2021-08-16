@@ -14,11 +14,13 @@ public class DaoLike {
     private final JdbcTemplate jdbcTemplate;
 
     public Integer getCountLike(Integer id) {
-        return jdbcTemplate.queryForObject("SELECT COUNT(id) FROM post_like WHERE post_id = ?", new Object[]{id}, Integer.class);
+        return jdbcTemplate.queryForObject("SELECT COUNT(id) FROM post_like WHERE post_id = ?",
+                new Object[]{id}, Integer.class);
     }
 
     public List<String> getUsersLike(Integer id) {
-        return jdbcTemplate.queryForList("SELECT person_id FROM post_like WHERE post_id = ?", new Object[]{id}, String.class);
+        return jdbcTemplate.queryForList("SELECT person_id FROM post_like WHERE post_id = ?",
+                new Object[]{id}, String.class);
     }
 
     public void save(Like like) {
@@ -28,5 +30,7 @@ public class DaoLike {
                 like.getPostId());
     }
 
-   // public void delete(int)
+    public void delete(int post_id, int person_id ) {
+        jdbcTemplate.update("DELETE FROM post_like WHERE post_id = ? AND person_id = ?", new Object[]{post_id, person_id});
+    }
 }

@@ -2,10 +2,7 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
-import application.models.Person;
-import application.models.PersonDto;
-import application.models.Post;
-import application.models.PostDto;
+import application.models.*;
 import application.responses.GeneralListResponse;
 import application.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,10 +36,10 @@ public class ProfileService {
             personDto.setAbout(person.getAbout());
             personDto.setCity(person.getCity());
             personDto.setCountry(person.getCountry());
-            personDto.setMessagesPermission("ALL");
+            personDto.setMessagesPermission(PermissionMessagesType.ALL.toString());
             personDto.setLastOnlineTime(person.getLastOnlineTime());
             personDto.setBlocked(person.isBlocked());
-            personDto.setToken("kjhfgkfkjh");
+            //personDto.setToken("kjhfgkfkjh");
             return new GeneralResponse<>(personDto);
     }
 
@@ -51,6 +48,7 @@ public class ProfileService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         PersonDto personDto = new PersonDto();
+
         personDto.setId(person.getId());
         personDto.setFirstName(person.getFirstName());
         personDto.setLastName(person.getLastName());
