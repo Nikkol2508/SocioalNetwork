@@ -1,25 +1,27 @@
 package application.dao;
 
 import application.dao.mappers.PostMapper;
+import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class DaoPost {
+public class DaoPost implements Dao<Post> {
     private final JdbcTemplate jdbcTemplate;
-    private final static String SQL_INSERT_POST = "INSERT INTO post (title, text, author_id, time) " +
-            "VALUES (?, ?, ?, ?, ?)";
 
+    @Override
     public Post get(int id) {
         return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
     }
 
+    @Override
     public List<Post> getAll() {
         return jdbcTemplate.query("SELECT * FROM post ORDER BY time desc", new PostMapper());
     }
@@ -34,6 +36,22 @@ public class DaoPost {
        return post.getId();
     }
 
+    @Override
+    public void delete(Post post) {
+
+    }
+
+
+//    public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
+////        post.setTitle(title);
+////        post.setPostText(text);
+////        post.setTime(time);
+////        post.setAuthor(authorId);
+////        post.setBlocked(isBlocked);
+////        Post newPost = null;
+//       return post.getId();
+//    }
+
     public void update(@PathVariable int id, String text, String title, long time) {
 //        Optional<Post> postOptional = null;
 //        Post changedPost = postOptional.get();
@@ -46,12 +64,16 @@ public class DaoPost {
 //        }
     }
 
-    public void delete(int id) {
+    public void delete(Person person) {
 //        postRepository.deleteById(id);
     }
 
     public void deleteGoalList() {
 //        postRepository.deleteAll();
+    }
+
+    public void deleteByAuthorId(int id){
+        jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
     public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {

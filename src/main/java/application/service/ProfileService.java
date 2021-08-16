@@ -1,8 +1,11 @@
 package application.service;
 
+import application.dao.DaoComment;
+import application.dao.DaoLike;
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
 import application.models.Person;
+import application.models.dto.MessageRequestDto;
 import application.models.dto.PersonDto;
 import application.models.Post;
 import application.models.dto.PostDto;
@@ -10,6 +13,7 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +30,8 @@ public class ProfileService {
     private final DaoPerson daoPerson;
     private final PostsService postsService;
     private final DaoPost daoPost;
+    private final DaoLike daoLike;
+    private final DaoComment daoComment;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
@@ -63,5 +69,34 @@ public class ProfileService {
                 .stream()
                 .map(PersonDto::fromPerson)
                 .collect(Collectors.toList()));
+    }
+
+    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
+        if (person == null) {
+            throw new EntityNotFoundException("Person with this token is not found.");
+        }
+
+        daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(), request.getBirthDate(),
+                request.getPhone(), request.getPhoto(), request.getCity(), request.getCountry(), request.getAbout());
+
+        PersonDto personDto = PersonDto.fromPerson(person);
+
+        return ResponseEntity.ok(new GeneralResponse<>(personDto));
+    }
+
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
+        if (person == null) {
+            throw new EntityNotFoundException("Person with this token is not found.");
+        }
+        daoPerson.deleteFriendshipByPersonId(person.getId());
+        daoLike.deleteByPersonId(person.getId());
+        daoComment.deleteByAuthorId(person.getId());
+        daoPost.deleteByAuthorId(person.getId());
+        daoPerson.delete(person);
+        return ResponseEntity.ok(new GeneralResponse<MessageRequestDto>(new MessageRequestDto("ok")));
     }
 }

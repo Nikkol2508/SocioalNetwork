@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.models.dto.MessageRequestDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.responses.GeneralListResponse;
@@ -42,4 +43,14 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getPersons(firstName, lastName, ageFrom, ageTo, country, city));
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(HttpServletRequest servletRequest,
+                                                                       @RequestBody PersonSettingsDtoRequest request){
+        return profileService.changeProfile(request);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile(){
+        return profileService.deleteProfile();
+    }
 }

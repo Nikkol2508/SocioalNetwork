@@ -10,12 +10,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
@@ -72,14 +74,41 @@ public class DaoPerson implements Dao<Person> {
 
     @Override
     public void update(Person person) {
+    }
 
+    public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
+                                 String city, String country, String about){
+        jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
+        "birth_date = ?, phone = ?, photo = ?, city = ? country = ? about = ? WHERE id = ?",
+                firstName, lastName, birthDate, phone, photo,
+                city, country, about, id);
+    }
+
+    public void updateConfirmationCode(int id, String code) {
+
+        String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
+        jdbcTemplate.update(query, code, id);
+    }
+
+    public void updatePassword(int id, String password) {
+
+        String query = "UPDATE person SET password = ? WHERE id = ?";
+        jdbcTemplate.update(query, password, id);
     }
 
     @Override
     public void delete(Person person) {
-
+        jdbcTemplate.update("DELETE FROM person where id = ?", person.getId());
     }
 
+    public void deleteFriendshipByPersonId(int id){
+        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
+                "WHERE src_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
+                "WHERE dst_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ?", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
+    }
     public List<Person> getFriends(int id) {
 
         String select = "SELECT * FROM person WHERE id IN (SELECT src_person_id FROM friendship" +
@@ -204,18 +233,6 @@ public class DaoPerson implements Dao<Person> {
                 new Object[]{author, author,
                         author, author},
                 new PersonMapper());
-    }
-
-    public void updateConfirmationCode(int id, String code) {
-
-        String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
-        jdbcTemplate.update(query, code, id);
-    }
-
-    public void updatePassword(int id, String password) {
-
-        String query = "UPDATE person SET password = ? WHERE id = ?";
-        jdbcTemplate.update(query, password, id);
     }
 
     public void updateEmail(int id, String email) {
