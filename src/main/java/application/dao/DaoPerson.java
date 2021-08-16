@@ -18,20 +18,17 @@ public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    private final static String SQL_INSERT_PERSON = "INSERT INTO person (first_name, last_name, password, e_mail, reg_date, messages_permission) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-    private final static String SQL_FIND_PERSON_BY_EMAIL = "SELECT * FROM person WHERE e_mail = ?";
-    private final static String SQL_FIND_PERSON_BY_ID = "SELECT * FROM person WHERE id = ?";
-    private final static String SQL_SELECT_RECOMMENDATIONS = "SELECT * FROM person";
-
     public Person getByEmail(String email) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
+        String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
+        return jdbcTemplate.query(selectPersonByEmail, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
     }
 
     @Override
     public Person get(int id) {
-        return jdbcTemplate.query(SQL_FIND_PERSON_BY_ID, new Object[]{id}, new PersonMapper()).stream().findAny().orElse(null);
+        String selectPersonForId = "SELECT * FROM person WHERE id = ?";
+        return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
+                .findAny().orElse(null);
     }
 
     @Override
@@ -39,14 +36,23 @@ public class DaoPerson implements Dao<Person> {
         return null;
     }
 
-    public List<Person> getRecommendations() {
-
-        return jdbcTemplate.query(SQL_SELECT_RECOMMENDATIONS,
+    public List<Person> getRecommendations(int id) {
+        String selectRecommendations = "SELECT * FROM person WHERE id IN (SELECT src_person_id from friendship " +
+                "JOIN friendship_status fs on fs.id = friendship.status_id WHERE code = ? AND dst_person_id " +
+                "IN (SELECT src_person_id FROM friendship WHERE dst_person_id = ?)) AND person.id != ? " +
+                "UNION SELECT * FROM person WHERE id IN (SELECT dst_person_id from friendship " +
+                "JOIN friendship_status f on f.id = friendship.status_id WHERE code = ? AND src_person_id " +
+                "IN (SELECT dst_person_id FROM friendship WHERE src_person_id = ?)) AND id != ?";
+        return jdbcTemplate.query(selectRecommendations, new Object[]{FriendshipStatus.FRIEND.toString(), id, id,
+                        FriendshipStatus.FRIEND.toString(), id, id},
                 new PersonMapper());
     }
 
     public void save(Person person) {
-        jdbcTemplate.update(SQL_INSERT_PERSON,
+        String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
+                " e_mail, reg_date, messages_permission) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsertPerson,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
@@ -120,13 +126,41 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void deleteFriendForID(int srcId, int dtcId) {
-        String deleteFriend = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id FROM friendship" +
+        String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = (SELECT status_id FROM friendship" +
                 " WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?))";
-        jdbcTemplate.update(deleteFriend, FriendshipStatus.DECLINED, srcId, dtcId, dtcId, srcId);
+
+        String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+
+        jdbcTemplate.update(deleteFriendshipStatus, srcId, dtcId, dtcId, srcId);
+        jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
     }
 
     public Person getAuthPerson() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return getByEmail(authentication.getName());
+    }
+
+    public void unAcceptRequest(int dtsId, int srcId) {
+        String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
+                "FROM friendship WHERE dst_person_id = ? AND src_person_id = ?)";
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(),
+                dtsId, srcId);
+    }
+
+    public void updateDeclined(int srcId, int dtcId) {
+        String updateFriendship = "UPDATE friendship SET src_person_id = ?, dst_person_id = ? " +
+                "WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+
+        String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
+                "FROM friendship WHERE src_person_id = ? AND dst_person_id = ?)";
+        jdbcTemplate.update(updateFriendship, srcId, dtcId, srcId, dtcId, dtcId, srcId);
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST, srcId, dtcId);
+    }
+
+    public List<Person> getRecommendationsOnRegDate() {
+        String selectRecommendations = "SELECT * FROM person WHERE reg_date > ?";
+        long twoDays = 172800000;
+        return jdbcTemplate.query(selectRecommendations, new Object[]{System.currentTimeMillis() - twoDays},
+                new PersonMapper());
     }
 }
