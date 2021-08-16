@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -61,8 +62,12 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        JwtUser userDetails = jwtUserDetailsService.loadUserByUsername(getUsername(token));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        try {
+            JwtUser userDetails = jwtUserDetailsService.loadUserByUsername(getUsername(token));
+            return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        } catch (UsernameNotFoundException ex) {
+            return null;
+        }
     }
 
     public String getUsername(String token) {

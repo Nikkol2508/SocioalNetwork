@@ -7,6 +7,7 @@ import application.models.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +25,7 @@ public class AuthService {
 
 
     public GeneralResponse<LogoutDto> getLogout() {
+        SecurityContextHolder.getContext().setAuthentication(null);
         return new GeneralResponse<>(new LogoutDto("ok"));
     }
 

@@ -25,6 +25,7 @@ public class DaoPerson implements Dao<Person> {
     private final static String SQL_FIND_PERSON_BY_CONFIRMATION_CODE = "SELECT * FROM person WHERE confirmation_code = ?";
     private final static String SQL_UPDATE_CONFIRMATION_CODE = "UPDATE person SET confirmation_code = ? WHERE id = ?";
     private final static String SQL_UPDATE_PASSWORD = "UPDATE person SET password = ? WHERE id = ?";
+    private final static String SQL_UPDATE_EMAIL = "UPDATE person SET e_mail = ? WHERE id = ?";
 
     public Person getByEmail(String email) {
         return jdbcTemplate.query(SQL_FIND_PERSON_BY_EMAIL, new Object[]{email}, new PersonMapper()).stream().findAny()
@@ -74,6 +75,10 @@ public class DaoPerson implements Dao<Person> {
 
     public void updatePassword(int id, String password) {
         jdbcTemplate.update(SQL_UPDATE_PASSWORD, password, id);
+    }
+
+    public void updateEmail(int id, String email) {
+        jdbcTemplate.update(SQL_UPDATE_EMAIL, email, id);
     }
 
     @Override

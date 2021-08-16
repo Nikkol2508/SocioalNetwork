@@ -15,10 +15,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/v1/auth")
@@ -29,7 +29,6 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final DaoPerson daoPerson;
-    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
@@ -52,18 +51,4 @@ public class AuthController {
     private ResponseEntity<GeneralResponse<LogoutDto>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
-
-//    @PostMapping("/change-password")
-//    public String processResetPassword(@RequestParam("code") String code, HttpServletRequest request) {
-//        String code = request.getParameter("code");
-//        String password = request.getParameter("password");
-//        Person person = daoPerson.getByConfirmationCode(code);
-//        if (person == null) {
-//
-//        } else {
-//            person.setPassword(passwordEncoder.encode(password));
-//            daoPerson.updatePassword(person);
-//        }
-//        return "index";
-//    }
 }

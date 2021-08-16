@@ -26,7 +26,6 @@ public class PostsService {
     private final DaoComment daoComment;
     private final DaoLike daoLike;
     private final DaoTag daoTag;
-//    private final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
     public PostDto getPostDto(int postId) {
 
