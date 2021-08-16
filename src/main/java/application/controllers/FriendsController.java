@@ -1,13 +1,12 @@
 package application.controllers;
 
+import application.models.Person;
 import application.models.PersonDto;
 import application.models.responses.GeneralListResponse;
 import application.service.FriendsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -28,5 +27,15 @@ public class FriendsController {
     @GetMapping("/friends/recommendations")
     public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations() {
         return ResponseEntity.ok(friendService.getUserFriendsRecommendations());
+    }
+
+    @PostMapping("friends/{id}")
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> addFriendForId(@PathVariable int id) {
+        return ResponseEntity.ok(friendService.addFriendForId(id));
+    }
+
+    @DeleteMapping("friends/{id}")
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteFriendForId(@PathVariable int id) {
+        return ResponseEntity.ok(friendService.deleteFriendForId(id));
     }
 }

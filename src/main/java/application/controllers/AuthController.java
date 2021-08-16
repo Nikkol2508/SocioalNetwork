@@ -1,7 +1,7 @@
 package application.controllers;
 
 import application.dao.DaoPerson;
-import application.models.LogoutDto;
+import application.models.MessageRequestDto;
 import application.models.Person;
 import application.models.PersonDto;
 import application.models.requests.AuthDtoRequest;
@@ -48,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<LogoutDto>> logout() {
+    private ResponseEntity<GeneralResponse<MessageRequestDto>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
 }
