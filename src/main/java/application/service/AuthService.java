@@ -23,7 +23,6 @@ public class AuthService {
             return new GeneralResponse<>(personDto);
     }
 
-
     public GeneralResponse<LogoutDto> getLogout() {
         SecurityContextHolder.getContext().setAuthentication(null);
         return new GeneralResponse<>(new LogoutDto("ok"));

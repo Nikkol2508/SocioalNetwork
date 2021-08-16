@@ -1,14 +1,12 @@
 package application.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-//@JsonPropertyOrder({"parent_id", "comment_text", "id", "postId", "time", "authorId", "isBlocked"})
 public class Comment {
 
     @JsonProperty("parent_id")
@@ -18,11 +16,13 @@ public class Comment {
     private String commentText;
 
     private int id;
+    private long time;
 
     @JsonProperty("post_id")
-    private int postId;
+    private Integer postId;
 
-    private long time;
+    @JsonProperty("parent_id")
+    private int parentId;
 
     @JsonProperty("author_id")
     private int authorId;

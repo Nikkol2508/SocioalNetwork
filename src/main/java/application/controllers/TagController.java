@@ -1,9 +1,15 @@
 package application.controllers;
 
 import application.models.Tag;
+<<<<<<< HEAD
 import application.models.requests.TagRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
+=======
+import application.requests.TagRequest;
+import application.responses.GeneralListResponse;
+import application.responses.GeneralResponse;
+>>>>>>> origin/NikkolA
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +22,23 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class TagController {
 
-  private final PostsService postsService;
+    private final PostsService postsService;
 
-  @GetMapping("/tags")
-  public ResponseEntity<GeneralListResponse<Tag>> getTags(
-      @RequestParam(value = "tag", required = false) String tag,
-      @RequestParam(value = "offset", required = false) Integer offset,
-      @RequestParam(value = "itemPerPage", required = false) Integer itemPerPage) {
-    return ResponseEntity.ok(postsService.getTags());
-  }
+    @GetMapping("/tags")
+    public ResponseEntity<GeneralListResponse<Tag>> getTags(
+            @RequestParam(value = "tag", required = false) String tag,
+            @RequestParam(value = "offset", required = false) Integer offset,
+            @RequestParam(value = "itemPerPage", required = false) Integer itemPerPage) {
+        return ResponseEntity.ok(postsService.getTags());
+    }
 
-  @PostMapping("/tags")
-  public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
-    return ResponseEntity.ok(postsService.setTag(request));
-  }
+    @PostMapping("/tags")
+    public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
+        return ResponseEntity.ok(postsService.setTag(request));
+    }
 
-  @DeleteMapping("/tags")
-  public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
-    return ResponseEntity.ok(postsService.deleteTag(id));
-  }
+    @DeleteMapping("/tags")
+    public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
+        return ResponseEntity.ok(postsService.deleteTag(id));
+    }
 }

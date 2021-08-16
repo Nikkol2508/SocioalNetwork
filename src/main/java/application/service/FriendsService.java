@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FriendsService {
-    private final DaoPerson personDtoDao;
+    private final DaoPerson personDao;
 
     public GeneralListResponse<PersonDto> getUserFriends(int id) {
         List<PersonDto> personDtoList = getPersonDtoOnPerson(personDtoDao.getFriends(id));

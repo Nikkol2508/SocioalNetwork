@@ -11,12 +11,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
 public class PostsController {
 
     private final PostsService postsService;
+    private final FeedsService feedsService;
 
     @GetMapping
     public ResponseEntity<GeneralListResponse<PostDto>> searchPosts(
@@ -37,9 +41,18 @@ public class PostsController {
         return ResponseEntity.ok(postsService.getCommentsResponse(id));
     }
 
+    @GetMapping("/undefined/comments")
+    public ResponseEntity<GeneralListResponse<CommentDto>> getSubComments(HttpServletResponse httpServletResponse)
+            throws IOException {
+
+        httpServletResponse.sendRedirect("/api/v1/feeds");
+        return ResponseEntity.ok(postsService.getSubCommentsResponse());
+    }
+
     @PostMapping("/{id}/comments")
-    public ResponseEntity<GeneralResponse<Comment>> postComment(@PathVariable Integer id,
+    public ResponseEntity<GeneralResponse<Comment>> postComment(@PathVariable String id,
                                                                 @RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(postsService.setComment(id, commentRequest));
     }
+
 }

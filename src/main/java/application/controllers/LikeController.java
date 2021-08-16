@@ -1,8 +1,8 @@
 package application.controllers;
 
 import application.models.LikeResponseDto;
-import application.models.requests.LikeRequest;
-import application.models.responses.GeneralResponse;
+import application.requests.LikeRequest;
+import application.responses.GeneralResponse;
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,28 +15,29 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class LikeController {
 
-  private final PostsService postsService;
+    private final PostsService postsService;
 
-  @GetMapping("/liked")
-  public ResponseEntity<GeneralResponse<Map<String, Boolean>>> getLiked(
-      @RequestParam(value = "user_id", required = false) int user_id,
-      @RequestParam(value = "item_id") int itemId,
-      @RequestParam(value = "type") String type) {
-    return ResponseEntity.ok(postsService.getLiked(user_id, itemId, type));
-  }
+    @GetMapping("/liked")
+    public ResponseEntity<GeneralResponse<Map<String, Boolean>>> getLiked(@RequestParam(value = "user_id", required = false) int user_id,
+                                                                          @RequestParam(value = "item_id") int itemId,
+                                                                          @RequestParam(value = "type") String type) {
+        return ResponseEntity.ok(postsService.getLiked(user_id, itemId, type));
+    }
 
-  @GetMapping("/likes")
-  public ResponseEntity<GeneralResponse<LikeResponseDto>> getLikes(
-      @RequestParam(value = "item_id") int itemId,
-      @RequestParam(value = "type") String type) {
-    return ResponseEntity.ok(postsService.getLikes(itemId, type));
-  }
+    @GetMapping("/likes")
+    public ResponseEntity<GeneralResponse<LikeResponseDto>> getLikes(@RequestParam(value = "item_id") int itemId,
+                                                                     @RequestParam(value = "type") String type) {
+        return ResponseEntity.ok(postsService.getLikes(itemId, type));
+    }
 
-  @PutMapping("/likes")
-  public ResponseEntity<GeneralResponse<LikeResponseDto>> setLike(
-      @RequestBody LikeRequest request) {
-    return ResponseEntity.ok(postsService.setLikes(request));
-  }
+    @PutMapping("/likes")
+    public ResponseEntity<GeneralResponse<LikeResponseDto>> setLike(@RequestBody LikeRequest request) {
+        return ResponseEntity.ok(postsService.setLikes(request));
+    }
 
-
+    @DeleteMapping("/likes")
+    public ResponseEntity<GeneralResponse<Map<String, String>>> deleteLike(@RequestParam(value = "item_id") int itemId,
+                                                               @RequestParam(value = "type") String type) {
+        return ResponseEntity.ok(postsService.deleteLike(itemId, type));
+    }
 }
