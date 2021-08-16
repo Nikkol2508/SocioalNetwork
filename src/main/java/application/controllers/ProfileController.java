@@ -1,13 +1,18 @@
 package application.controllers;
 
-import application.models.PersonDto;
-import application.models.PostDto;
+import application.exceptions.PasswordNotValidException;
+import application.models.*;
+import application.models.requests.PersonSettingsDtoRequest;
+import application.models.requests.SetPasswordDtoRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -42,4 +47,14 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.getPersons(firstName, lastName, ageFrom, ageTo, country, city));
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(HttpServletRequest servletRequest,
+                                                                       @RequestBody PersonSettingsDtoRequest request){
+        return profileService.changeProfile(request);
+    }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<GeneralResponse<LogoutDto>> deleteProfile(){
+        return profileService.deleteProfile();
+    }
 }

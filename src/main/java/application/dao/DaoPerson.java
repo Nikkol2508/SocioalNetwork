@@ -65,8 +65,16 @@ public class DaoPerson implements Dao<Person> {
 
     @Override
     public void update(Person person) {
-
     }
+
+    public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
+                                 String city, String country, String about){
+        jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
+        "birth_date = ?, phone = ?, photo = ?, city = ? country = ? about = ? WHERE id = ?",
+                firstName, lastName, birthDate, phone, photo,
+                city, country, about, id);
+    }
+
 
     public void updateConfirmationCode(int id, String code) {
 
@@ -82,9 +90,17 @@ public class DaoPerson implements Dao<Person> {
 
     @Override
     public void delete(Person person) {
-
+        jdbcTemplate.update("DELETE FROM person where id = ?", person.getId());
     }
 
+    public void deleteFriendshipByPersonId(int id){
+        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
+                "WHERE src_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
+                "WHERE dst_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ?", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
+    }
     public List<Person> getFriends(int id) {
 
         String selectFriends = "SELECT * FROM person JOIN friendship ON person.id = friendship.dst_person_id" +

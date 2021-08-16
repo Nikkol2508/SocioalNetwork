@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -70,12 +71,13 @@ public class DaoPost implements Dao<Post> {
 //        }
     }
 
-    public void delete(int id) {
+    public void delete(Person person) {
 //        postRepository.deleteById(id);
     }
 
-    public void deleteGoalList() {
-//        postRepository.deleteAll();
+
+    public void deleteByAuthorId(int id){
+        jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
     public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {

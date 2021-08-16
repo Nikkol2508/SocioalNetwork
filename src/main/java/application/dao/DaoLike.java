@@ -28,5 +28,8 @@ public class DaoLike {
                 like.getPostId());
     }
 
+    public void deleteByPersonId(int id){
+        jdbcTemplate.update("DELETE FROM post_like WHERE person_id = ?", id);
+    }
    // public void delete(int)
 }

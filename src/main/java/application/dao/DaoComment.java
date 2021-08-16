@@ -28,4 +28,7 @@ public class DaoComment {
                 comment.isBlocked());
     }
 
+    public void deleteByAuthorId(int id){
+        jdbcTemplate.update("DELETE FROM post_comment WHERE author_id = ?", id);
+    }
 }
