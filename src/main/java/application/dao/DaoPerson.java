@@ -230,7 +230,7 @@ public class DaoPerson implements Dao<Person> {
 
         String query = "select * from person where " +
                 "(first_name = ? or ?::text IS NULL) " +
-                "and (last_name  = ? or ?::text is null)";
+                "or (last_name  = ? or ?::text is null)";
 
         return jdbcTemplate.query(query,
                 new Object[]{author, author,
