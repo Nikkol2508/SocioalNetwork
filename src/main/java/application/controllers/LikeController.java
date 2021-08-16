@@ -1,8 +1,8 @@
 package application.controllers;
 
 import application.models.dto.LikeResponseDto;
-import application.models.responses.GeneralResponse;
 import application.models.requests.LikeRequest;
+import application.models.responses.GeneralResponse;
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

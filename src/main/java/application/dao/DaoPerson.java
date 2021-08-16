@@ -22,6 +22,7 @@ public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
+
     public Person getByEmail(String email) {
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
         return jdbcTemplate.query(selectPersonByEmail, new Object[]{email}, new PersonMapper()).stream().findAny()
@@ -79,7 +80,7 @@ public class DaoPerson implements Dao<Person> {
     public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
                                  String city, String country, String about){
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-        "birth_date = ?, phone = ?, photo = ?, city = ? country = ? about = ? WHERE id = ?",
+        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?",
                 firstName, lastName, birthDate, phone, photo,
                 city, country, about, id);
     }
@@ -164,13 +165,15 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void deleteFriendForID(int srcId, int dtcId) {
-        String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = (SELECT status_id FROM friendship" +
-                " WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?))";
+        String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+
+        String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
+        int selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId}, Integer.class);
 
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
 
-        jdbcTemplate.update(deleteFriendshipStatus, srcId, dtcId, dtcId, srcId);
         jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
+        jdbcTemplate.update(deleteFriendshipStatus, selectedId);
     }
 
     public Person getAuthPerson() {
@@ -197,7 +200,7 @@ public class DaoPerson implements Dao<Person> {
 
     public List<Person> getRecommendationsOnRegDate() {
         String selectRecommendations = "SELECT * FROM person WHERE reg_date > ?";
-        long twoDays = 172800000;
+        long twoDays = 17280000000L;
         return jdbcTemplate.query(selectRecommendations, new Object[]{System.currentTimeMillis() - twoDays},
                 new PersonMapper());
     }

@@ -2,8 +2,8 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.models.FriendshipStatus;
-import application.models.dto.MessageRequestDto;
 import application.models.Person;
+import application.models.dto.MessageRequestDto;
 import application.models.dto.PersonDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;

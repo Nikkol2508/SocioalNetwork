@@ -4,14 +4,14 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
-import application.models.*;
+import application.models.PermissionMessagesType;
+import application.models.Person;
 import application.models.dto.MessageRequestDto;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,6 @@ import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class AccountService {
 
     private final DaoPerson daoPerson;
@@ -42,7 +41,6 @@ public class AccountService {
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
-        log.info("IN register - user: {} successfully registered", person.getEmail());
         GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
         return ResponseEntity.ok(response);
     }

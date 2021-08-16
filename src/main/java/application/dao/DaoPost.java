@@ -6,7 +6,6 @@ import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
@@ -24,6 +23,16 @@ public class DaoPost implements Dao<Post> {
     @Override
     public List<Post> getAll() {
         return jdbcTemplate.query("SELECT * FROM post ORDER BY time desc", new PostMapper());
+    }
+
+    @Override
+    public void save(Post post) {
+
+    }
+
+    @Override
+    public void update(Post post) {
+
     }
 
     public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
