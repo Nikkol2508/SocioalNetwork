@@ -28,4 +28,8 @@ public class AuthService {
         return new GeneralResponse<>(new MessageRequestDto("ok"));
     }
 
+    public Person getPerson(String email) {
+        return daoPerson.getByEmail(email);
+    }
+
 }

@@ -28,7 +28,6 @@ public class AuthController {
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final DaoPerson daoPerson;
 
     @PostMapping("/login")
     private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
@@ -36,7 +35,7 @@ public class AuthController {
         try {
             String email = request.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
-            Person person = daoPerson.getByEmail(email);
+            Person person = authService.getPerson(email);
             if (person == null) {
                 throw new UsernameNotFoundException("User with email: " + email + " not found");
             }
