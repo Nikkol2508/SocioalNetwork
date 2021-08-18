@@ -1,6 +1,5 @@
 package application.controllers;
 
-import application.models.Comment;
 import application.models.dto.CommentDto;
 import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
@@ -51,9 +50,16 @@ public class PostsController {
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<GeneralResponse<Comment>> postComment(@PathVariable String id,
+    public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
                                                                 @RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(postsService.setComment(id, commentRequest));
+    }
+
+    @PutMapping("/{id}/comments/{comment_id}")
+    public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
+                                                                @PathVariable int id,
+                                                                @PathVariable int comment_id) {
+        return ResponseEntity.ok(postsService.editComment(request, id, comment_id));
     }
 
 }
