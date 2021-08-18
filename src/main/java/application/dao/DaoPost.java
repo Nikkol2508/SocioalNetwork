@@ -34,7 +34,14 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void save(Post post) {
-
+        jdbcTemplate.update("INSERT INTO post (time, id, author_id, post_text, title, is_blocked) " +
+                        "VALUES (?, ?, ?, ?, ?, ?)",
+                post.getTime(),
+                post.getId(),
+                post.getAuthorId(),
+                post.getPostText(),
+                post.getTitle(),
+                post.isBlocked());
     }
 
     @Override

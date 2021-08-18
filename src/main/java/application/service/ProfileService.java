@@ -2,10 +2,9 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
-import application.models.Person;
-import application.models.PersonDto;
-import application.models.Post;
-import application.models.PostDto;
+import application.models.*;
+import application.models.requests.CommentRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -63,5 +62,16 @@ public class ProfileService {
                 .stream()
                 .map(PersonDto::fromPerson)
                 .collect(Collectors.toList()));
+    }
+
+    public GeneralResponse<Post> setPost(Integer authorId, PostRequest postRequest) {
+        Post addPost = new Post();
+        addPost.setTitle(postRequest.getTitle());
+        addPost.setPostText(postRequest.getPost_text());
+        addPost.setTime(System.currentTimeMillis());
+        addPost.setBlocked(false);
+        addPost.setAuthorId(authorId);
+        daoPost.save(addPost);
+        return  new GeneralResponse<>(addPost);
     }
 }

@@ -1,7 +1,10 @@
 package application.controllers;
 
 import application.models.PersonDto;
+import application.models.Post;
 import application.models.PostDto;
+import application.models.requests.CommentRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.ProfileService;
@@ -40,6 +43,12 @@ public class ProfileController {
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "city", required = false) String city) {
         return ResponseEntity.ok(profileService.getPersons(firstName, lastName, ageFrom, ageTo, country, city));
+    }
+
+    @PostMapping("/{id}/wall")
+    public ResponseEntity<GeneralResponse<Post>> addPost(@PathVariable Integer id,
+                                                         @RequestBody PostRequest postRequest) {
+        return ResponseEntity.ok(profileService.setPost(id, postRequest));
     }
 
 }
