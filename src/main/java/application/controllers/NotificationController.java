@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.NotificationDTO;
+import application.models.dto.NotificationDTO;
 import application.models.responses.GeneralListResponse;
 import application.service.NotificationService;
 import lombok.RequiredArgsConstructor;

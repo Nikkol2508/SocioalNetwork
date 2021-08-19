@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.dao.mappers.TagMapper;
 import application.models.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -14,6 +15,7 @@ public class DaoTag {
     private final JdbcTemplate jdbcTemplate;
 
     public Tag findByID(int id) {
+
         return jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper()).stream().findAny().orElse(null);
     }
 

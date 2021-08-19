@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-//@JsonPropertyOrder({"parent_id", "comment_text", "id", "postId", "time", "authorId", "isBlocked"})
 public class Comment {
 
     @JsonProperty("parent_id")
@@ -18,11 +17,10 @@ public class Comment {
     private String commentText;
 
     private int id;
+    private long time;
 
     @JsonProperty("post_id")
-    private int postId;
-
-    private long time;
+    private Integer postId;
 
     @JsonProperty("author_id")
     private int authorId;
