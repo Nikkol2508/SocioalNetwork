@@ -57,16 +57,17 @@ public class AccountService {
     }
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> setPassword(SetPasswordDtoRequest request)
-            throws PasswordNotValidException {
+            throws PasswordNotValidException, EntityNotFoundException {
         //проверка валидности пароля (не короче 8 символов)
         if (request.getPassword().length() < 8) {
             throw new PasswordNotValidException();
         } else {
             Person person = getByConfirmationCode(request.getToken());
             if (person == null) {
-                throw new EntityNotFoundException("Person with this confirmation code is not found.");
+                throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
             }
             updatePassword(person, request.getPassword());
+            SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
             return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
         }
     }
@@ -75,7 +76,7 @@ public class AccountService {
         // Здесь можно добавить проверку на валидность email (request.getEmail())
         Person person = getByConfirmationCode(code);
         if (person == null) {
-            throw new EntityNotFoundException("Person with this confirmation code is not found.");
+            throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
         }
         updateEmail(person, request.getEmail());
         return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
@@ -154,7 +155,6 @@ public class AccountService {
                 .replace(servletRequest.getServletPath(), "");
         String resetPasswordLink = siteURL + "/shift-email?code=" + code;
         sendEmailToChangeEmail(email, resetPasswordLink);
-        SecurityContextHolder.getContext().setAuthentication(null);
         GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
         return ResponseEntity.ok(response);
     }

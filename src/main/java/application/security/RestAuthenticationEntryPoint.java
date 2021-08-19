@@ -15,7 +15,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        ErrorResponse error = new ErrorResponse("Unauthorized", e.getMessage());
+        ErrorResponse error = new ErrorResponse("unauthorized", e.getMessage());
         httpServletResponse.setStatus(401);
         httpServletResponse.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(error));
