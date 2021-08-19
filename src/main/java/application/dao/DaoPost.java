@@ -16,7 +16,7 @@ public class DaoPost implements Dao<Post> {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Post get(int id) {
+    public Post getById(int id) {
         return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
     }
 

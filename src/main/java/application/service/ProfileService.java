@@ -28,7 +28,7 @@ public class ProfileService {
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
-        Person person = daoPerson.get(id);
+        Person person = daoPerson.getById(id);
         return new GeneralResponse<>(PersonDto.fromPerson(person));
     }
 
