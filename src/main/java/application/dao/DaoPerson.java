@@ -79,6 +79,7 @@ public class DaoPerson implements Dao<Person> {
 
     public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
                                  String city, String country, String about){
+        System.out.println(firstName + lastName + birthDate + phone + photo + city + country + about);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
         "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?",
                 firstName, lastName, birthDate, phone, photo,
@@ -103,12 +104,9 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void deleteFriendshipByPersonId(int id){
+        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ? OR dst_person_id = ?", id, id);
         jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
-                "WHERE src_person_id = ?)", id);
-        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
-                "WHERE dst_person_id = ?)", id);
-        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ?", id);
-        jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
+                "WHERE src_person_id = ? OR dst_person_id = ?)", id, id);
     }
     public List<Person> getFriends(int id) {
 

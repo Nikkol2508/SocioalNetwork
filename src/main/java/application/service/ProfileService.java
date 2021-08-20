@@ -20,6 +20,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,19 +75,24 @@ public class ProfileService {
                 .collect(Collectors.toList()));
     }
 
-    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
+    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) throws ParseException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
             throw new EntityNotFoundException("Person with this token is not found.");
         }
-
-        daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(), request.getBirthDate(),
-                request.getPhone(), request.getPhoto(), request.getCity(), request.getCountry(), request.getAbout());
-
-        PersonDto personDto = PersonDto.fromPerson(person);
-
-        return ResponseEntity.ok(new GeneralResponse<>(personDto));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Long birthDate = dateFormat.parse(request.getBirth_date()).getTime();
+        if (request.getFirst_name().isBlank() || request.getLast_name().isBlank()) {
+            daoPerson.updatePersonData(person.getId(), person.getFirstName(), person.getLastName(),
+                    birthDate, request.getPhone(), person.getPhoto(), request.getCity(),
+                    request.getCountry(), request.getAbout());
+            return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
+        }
+        else daoPerson.updatePersonData(person.getId(), request.getFirst_name(), request.getLast_name(),
+                birthDate, request.getPhone(), person.getPhoto(), request.getCity(),
+                request.getCountry(), request.getAbout());
+        return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
     }
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -48,7 +49,7 @@ public class ProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(HttpServletRequest servletRequest,
-                                                                    @RequestBody PersonSettingsDtoRequest request){
+                                                                    @RequestBody PersonSettingsDtoRequest request) throws ParseException {
         return profileService.changeProfile(request);
     }
 

@@ -5,12 +5,14 @@ import lombok.Data;
 @Data
 public class PersonSettingsDtoRequest {
 
-    private String firstName;
-    private String lastName;
+    private String first_name;
+    private String last_name;
     private String phone;
-    private String photo;
+    private String photo_id;
     private String about;
     private String city;
     private String country;
-    private long birthDate;
+    private String birth_date;
+
+
 }
