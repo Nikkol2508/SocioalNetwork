@@ -85,6 +85,13 @@ public class DaoPost implements Dao<Post> {
         jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
+    public List<Post> getPostsByTitle(String text) {
+        String query = "select * from post where title LIKE concat(concat('%',?), '%')";
+        return jdbcTemplate.query(query,
+                new Object[]{text},
+                        new PostMapper());
+    }
+
     public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
 
         String query = "select * from post where " +

@@ -43,7 +43,7 @@ public class FriendsService {
                 .getRecommendations(daoPerson.getAuthPerson().getId()));
 
         if (personDtoList.size() == 0) {
-            personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendationsOnRegDate());
+            personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendationsOnRegDate(daoPerson.getAuthPerson().getId()));
         }
 
         GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>(personDtoList);
