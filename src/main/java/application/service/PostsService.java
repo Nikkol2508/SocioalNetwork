@@ -17,10 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,8 +59,8 @@ public class PostsService {
         List<Comment> subComments = daoComment.getSubComment(parentId);
         List<CommentDto> subCommentsList = new ArrayList<>();
 
-        if(subComments.size() > 0) {
-            for(Comment subComment : subComments) {
+        if (subComments.size() > 0) {
+            for (Comment subComment : subComments) {
                 Person person = daoPerson.get(subComment.getAuthorId());
                 CommentDto commentDto = CommentDto.fromComment(subComment, person, null);
                 subCommentsList.add(commentDto);
@@ -91,7 +88,7 @@ public class PostsService {
         Comment postComment = new Comment();
         postComment.setParentId(commentRequest.getParent_id());
         postComment.setCommentText(commentRequest.getComment_text());
-        if(postId.equals("undefined")) {
+        if (postId.equals("undefined")) {
             postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParent_id()));
             subCommentParentId = postId;
         }
@@ -124,7 +121,7 @@ public class PostsService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person currentPerson = daoPerson.getByEmail(authentication.getName());
-        if(!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).getData().get("likes")) {
+        if (!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).getData().get("likes")) {
 
             Like like = new Like();
             like.setPostId(request.getItem_id());
@@ -177,7 +174,7 @@ public class PostsService {
 
         val posts = listPersonsId.stream()
                 .map(item -> getPosts(text, item, dateFrom, dateTo))
-                .flatMap(List::stream).collect(Collectors.toList());
+                .flatMap(Set::stream).collect(Collectors.toSet());
 
         return new GeneralListResponse<>(posts
                 .stream()
@@ -185,8 +182,10 @@ public class PostsService {
                 .collect(Collectors.toList()));
     }
 
-    private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
-        return daoPost.getPosts(text, authorId, dateFrom, dateTo);
+    private Set<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
+        Set<Post> postSet = new HashSet<>();
+        postSet.addAll(daoPost.getPosts(text, authorId, dateFrom, dateTo));
+        postSet.addAll(daoPost.getPostsByTitle(text));
+        return postSet;
     }
-
 }
