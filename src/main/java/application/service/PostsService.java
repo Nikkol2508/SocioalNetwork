@@ -36,9 +36,9 @@ public class PostsService {
 
     public PostDto getPostDto(int postId) {
 
-        Post post = daoPost.get(postId);
+        Post post = daoPost.getById(postId);
         int likes = daoLike.getCountLike(postId);
-        Person person = daoPerson.get(post.getAuthorId());
+        Person person = daoPerson.getById(post.getAuthorId());
         PersonDto author = PersonDto.fromPerson(person);
         List<CommentDto> comments = getComments(postId);
         List<String> tags = daoTag.getTagsByPostId(postId);
@@ -50,7 +50,7 @@ public class PostsService {
         List<CommentDto> commentDtoList = new ArrayList<>();
 
         for (Comment comment : daoComment.getCommentsByPostId(postId)) {
-            Person person = daoPerson.get(comment.getAuthorId());
+            Person person = daoPerson.getById(comment.getAuthorId());
             List<CommentDto> subCommentList = getSubComments(comment.getId());
             CommentDto commentDto = CommentDto.fromComment(comment, person, subCommentList);
             commentDtoList.add(commentDto);
@@ -64,7 +64,7 @@ public class PostsService {
 
         if(subComments.size() > 0) {
             for(Comment subComment : subComments) {
-                Person person = daoPerson.get(subComment.getAuthorId());
+                Person person = daoPerson.getById(subComment.getAuthorId());
                 CommentDto commentDto = CommentDto.fromComment(subComment, person, null);
                 subCommentsList.add(commentDto);
             }

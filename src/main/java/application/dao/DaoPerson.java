@@ -37,7 +37,7 @@ public class DaoPerson implements Dao<Person> {
     }
 
     @Override
-    public Person get(int id) {
+    public Person getById(int id) {
         String selectPersonForId = "SELECT * FROM person WHERE id = ?";
         return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
                 .findAny().orElse(null);
