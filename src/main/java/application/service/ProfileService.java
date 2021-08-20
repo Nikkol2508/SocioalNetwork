@@ -3,7 +3,8 @@ package application.service;
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
 import application.models.*;
-import application.models.requests.CommentRequest;
+import application.models.dto.PersonDto;
+import application.models.dto.PostDto;
 import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -64,11 +65,11 @@ public class ProfileService {
                 .collect(Collectors.toList()));
     }
 
-    public GeneralResponse<Post> setPost(Integer authorId, PostRequest postRequest) {
+    public GeneralResponse<Post> setPost(int authorId, Long publishDate, PostRequest postRequest) {
         Post addPost = new Post();
         addPost.setTitle(postRequest.getTitle());
-        addPost.setPostText(postRequest.getPost_text());
-        addPost.setTime(System.currentTimeMillis());
+        addPost.setPostText(postRequest.getPostText());
+        addPost.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
         addPost.setBlocked(false);
         addPost.setAuthorId(authorId);
         daoPost.save(addPost);

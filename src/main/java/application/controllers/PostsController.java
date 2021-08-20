@@ -3,6 +3,7 @@ package application.controllers;
 import application.models.dto.CommentDto;
 import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.FeedsService;
@@ -60,6 +61,12 @@ public class PostsController {
                                                                 @PathVariable int id,
                                                                 @PathVariable int comment_id) {
         return ResponseEntity.ok(postsService.editComment(request, id, comment_id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity <GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
+                                                              @PathVariable int id) {
+        return ResponseEntity.ok(postsService.editPost(postRequest, id));
     }
 
 }

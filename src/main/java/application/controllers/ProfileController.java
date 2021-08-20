@@ -1,9 +1,8 @@
 package application.controllers;
 
-import application.models.PersonDto;
 import application.models.Post;
-import application.models.PostDto;
-import application.models.requests.CommentRequest;
+import application.models.dto.PersonDto;
+import application.models.dto.PostDto;
 import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -46,9 +45,10 @@ public class ProfileController {
     }
 
     @PostMapping("/{id}/wall")
-    public ResponseEntity<GeneralResponse<Post>> addPost(@PathVariable Integer id,
+    public ResponseEntity<GeneralResponse<Post>> addPost(@PathVariable int id,
+                                                         @RequestParam(value = "publish_date", required = false) Long publishDate,
                                                          @RequestBody PostRequest postRequest) {
-        return ResponseEntity.ok(profileService.setPost(id, postRequest));
+        return ResponseEntity.ok(profileService.setPost(id, publishDate, postRequest));
     }
 
 }

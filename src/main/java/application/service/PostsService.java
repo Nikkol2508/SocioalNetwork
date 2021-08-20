@@ -8,6 +8,7 @@ import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
 import application.models.requests.LikeRequest;
+import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -198,5 +199,12 @@ public class PostsService {
         return daoPost.getPosts(text, authorId, dateFrom, dateTo);
     }
 
+    public GeneralResponse<PostDto> editPost(PostRequest request, int postId) {
+        Post post = daoPost.getById(postId);
+        post.setPostText(request.getPostText());
+        post.setTitle(request.getTitle());
+        daoPost.update(post);
+        return new GeneralResponse<>(getPostDto(postId));
+    }
 
 }
