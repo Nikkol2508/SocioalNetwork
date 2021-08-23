@@ -47,7 +47,7 @@ public class ProfileService {
 
         List<PostDto> postDtoList = new ArrayList<>();
 
-        for (Post post : daoPost.getAll()) {
+        for (Post post : daoPost.getAllUsersPosts(id)) {
             PostDto postDto = postsService.getPostDto(post.getId());
             postDto.setType("POSTED");
             postDtoList.add(postDto);
