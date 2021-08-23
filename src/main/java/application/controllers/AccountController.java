@@ -4,10 +4,12 @@ import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageRequestDto;
+import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.RecoverPassDtoRequest;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -126,5 +128,10 @@ public class AccountController {
     private String getCode(HttpServletRequest request) {
         String url = request.getHeader("Referer");
         return url.substring(url.indexOf("=") + 1);
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications() {
+        return ResponseEntity.ok(accountService.getPersonNotificationsSettings());
     }
 }

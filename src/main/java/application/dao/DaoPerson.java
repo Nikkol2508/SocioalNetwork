@@ -21,6 +21,7 @@ import java.util.List;
 public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
 
 
     public Person getByEmail(String email) {
@@ -132,6 +133,9 @@ public class DaoPerson implements Dao<Person> {
                 FriendshipStatus.REQUEST.toString());
 
         jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
+        int entityId = jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
+                "AND dst_person_id IN (?, ?)", new Object[]{srcId, dtsId, dtsId, srcId}, Integer.class);
+        daoNotification.addNotificationForFriendRequest(dtsId, System.currentTimeMillis(), entityId, getAuthPerson().getEmail());
     }
 
     public void addFriendRequest(int srcId, int dtsId) {

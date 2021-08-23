@@ -2,8 +2,8 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.models.FriendshipStatus;
-import application.models.Person;
 import application.models.dto.MessageRequestDto;
+import application.models.Person;
 import application.models.dto.PersonDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -35,6 +35,7 @@ public class FriendsService {
         requestResponse.setTotal(0);
         requestResponse.setOffset(0);
         requestResponse.setPerPage(20);
+
         return requestResponse;
     }
 
@@ -69,7 +70,7 @@ public class FriendsService {
             personDto.setLastName(person.getLastName());
             personDto.setRegDate(person.getRegDate());
             personDto.setBirthDate(person.getBirthDate());
-            personDto.setMessagesPermission("ALL");
+            personDto.setMessagesPermission(person.getMessagesPermission().toString());
             personDto.setLastOnlineTime(person.getLastOnlineTime());
             personDto.setBlocked(person.isBlocked());
             personDtos.add(personDto);

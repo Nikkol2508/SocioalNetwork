@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.dto.NotificationDTO;
+import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
 import application.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ public class NotificationController {
   private final NotificationService notificationService;
 
   @GetMapping("/api/v1/notifications")
-  private ResponseEntity<GeneralListResponse<NotificationDTO>> getNotifications() {
+  private ResponseEntity<GeneralListResponse<NotificationDto>> getNotifications() {
     return ResponseEntity.ok(notificationService.getNotifications());
   }
 }

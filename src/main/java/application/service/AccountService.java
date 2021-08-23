@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
@@ -7,9 +8,11 @@ import application.exceptions.PasswordsNotEqualsException;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageRequestDto;
+import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,7 @@ public class AccountService {
 
     private final DaoPerson daoPerson;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final DaoNotification daoNotification;
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> register(RegistrationDtoRequest request)
             throws PasswordsNotEqualsException, EmailAlreadyExistsException {
@@ -95,4 +100,8 @@ public class AccountService {
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
 
+    public GeneralListResponse<NotificationsSettingsDto> getPersonNotificationsSettings() {
+        return new GeneralListResponse<NotificationsSettingsDto>
+                (daoNotification.getNotificationsSettings(daoPerson.getAuthPerson().getId()));
+    }
 }
