@@ -6,7 +6,7 @@ import application.dao.DaoPerson;
 import application.dao.DaoPost;
 import application.models.Person;
 import application.models.Post;
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
@@ -87,7 +87,7 @@ public class ProfileService {
         return ResponseEntity.ok(new GeneralResponse<>(personDto));
     }
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
@@ -98,6 +98,6 @@ public class ProfileService {
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person);
-        return ResponseEntity.ok(new GeneralResponse<MessageRequestDto>(new MessageRequestDto("ok")));
+        return ResponseEntity.ok(new GeneralResponse<MessageResponseDto>(new MessageResponseDto("ok")));
     }
 }

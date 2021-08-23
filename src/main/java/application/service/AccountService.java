@@ -6,7 +6,7 @@ import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.PermissionMessagesType;
 import application.models.Person;
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.requests.RecoverPassDtoRequest;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
@@ -36,7 +36,7 @@ public class AccountService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> register(RegistrationDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> register(RegistrationDtoRequest request)
             throws PasswordsNotEqualsException, EmailAlreadyExistsException {
         if (!request.getPasswd1().equals(request.getPasswd2())) {
             throw new PasswordsNotEqualsException();
@@ -52,11 +52,11 @@ public class AccountService {
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
-        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(new MessageResponseDto("ok"));
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> setPassword(SetPasswordDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(SetPasswordDtoRequest request)
             throws PasswordNotValidException, EntityNotFoundException {
         //проверка валидности пароля (не короче 8 символов)
         if (request.getPassword().length() < 8) {
@@ -68,18 +68,18 @@ public class AccountService {
             }
             updatePassword(person, request.getPassword());
             SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
-            return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
+            return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
         }
     }
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> setEmail(ShiftEmailDtoRequest request, String code) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setEmail(ShiftEmailDtoRequest request, String code) {
         // Здесь можно добавить проверку на валидность email (request.getEmail())
         Person person = getByConfirmationCode(code);
         if (person == null) {
             throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
         }
         updateEmail(person, request.getEmail());
-        return ResponseEntity.ok(new GeneralResponse<>(new MessageRequestDto("ok")));
+        return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
     }
 
     public void updateConfirmationCode(String code, String email) {
@@ -129,7 +129,7 @@ public class AccountService {
         mailSender.send(message);
     }
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> recoverPassword(
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> recoverPassword(
             HttpServletRequest servletRequest, @RequestBody RecoverPassDtoRequest request)
             throws MessagingException, UnsupportedEncodingException {
         String email = request.getEmail();
@@ -142,11 +142,11 @@ public class AccountService {
                 : "/change-password";
         String resetPasswordLink = siteURL + urn + "?code=" + code;
         sendEmailToRecoverPassword(email, resetPasswordLink);
-        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(new MessageResponseDto("ok"));
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> changeEmail(HttpServletRequest servletRequest)
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> changeEmail(HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         String code = RandomString.make(30);
@@ -155,7 +155,7 @@ public class AccountService {
                 .replace(servletRequest.getServletPath(), "");
         String resetPasswordLink = siteURL + "/shift-email?code=" + code;
         sendEmailToChangeEmail(email, resetPasswordLink);
-        GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(new MessageResponseDto("ok"));
         return ResponseEntity.ok(response);
     }
 

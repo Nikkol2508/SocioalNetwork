@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
@@ -53,7 +53,7 @@ public class ProfileController {
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile(){
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile(){
         return profileService.deleteProfile();
     }
 }

@@ -19,4 +19,7 @@ public class Message {
 
     @JsonProperty("read_status")
     private ReadStatus readStatus;
+
+    @JsonProperty("dialog_id")
+    private int dialogId;
 }
