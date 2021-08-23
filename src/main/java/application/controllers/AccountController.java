@@ -4,10 +4,12 @@ import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageRequestDto;
+import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.RecoverPassDtoRequest;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +59,10 @@ public class AccountController {
     public ResponseEntity<GeneralResponse<MessageRequestDto>> changeEmail(HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
         return accountService.changeEmail(servletRequest);
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications() {
+        return ResponseEntity.ok(accountService.getPersonNotificationsSettings());
     }
 }

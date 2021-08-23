@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
@@ -8,9 +9,11 @@ import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageRequestDto;
 import application.models.requests.RecoverPassDtoRequest;
+import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
 import application.models.requests.ShiftEmailDtoRequest;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 
@@ -35,6 +39,7 @@ public class AccountService {
     private final DaoPerson daoPerson;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    private final DaoNotification daoNotification;
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> register(RegistrationDtoRequest request)
             throws PasswordsNotEqualsException, EmailAlreadyExistsException {
@@ -180,4 +185,8 @@ public class AccountService {
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
 
+    public GeneralListResponse<NotificationsSettingsDto> getPersonNotificationsSettings() {
+        return new GeneralListResponse<NotificationsSettingsDto>
+                (daoNotification.getNotificationsSettings(daoPerson.getAuthPerson().getId()));
+    }
 }
