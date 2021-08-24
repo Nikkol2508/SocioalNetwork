@@ -36,9 +36,9 @@ public class PostsService {
 
     public PostDto getPostDto(int postId) {
 
-        Post post = daoPost.getById(postId);
+        Post post = daoPost.get(postId);
         int likes = daoLike.getCountLike(postId);
-        Person person = daoPerson.getById(post.getAuthorId());
+        Person person = daoPerson.get(post.getAuthorId());
         PersonDto author = PersonDto.fromPerson(person);
         List<CommentDto> comments = getComments(postId);
         List<String> tags = daoTag.getTagsByPostId(postId);
@@ -50,7 +50,7 @@ public class PostsService {
         List<CommentDto> commentDtoList = new ArrayList<>();
 
         for (Comment comment : daoComment.getCommentsByPostId(postId)) {
-            Person person = daoPerson.getById(comment.getAuthorId());
+            Person person = daoPerson.get(comment.getAuthorId());
             List<CommentDto> subCommentList = getSubComments(comment.getId());
             CommentDto commentDto = CommentDto.fromComment(comment, person, subCommentList);
             commentDtoList.add(commentDto);
@@ -64,7 +64,7 @@ public class PostsService {
 
         if(subComments.size() > 0) {
             for(Comment subComment : subComments) {
-                Person person = daoPerson.getById(subComment.getAuthorId());
+                Person person = daoPerson.get(subComment.getAuthorId());
                 CommentDto commentDto = CommentDto.fromComment(subComment, person, null);
                 subCommentsList.add(commentDto);
             }
@@ -87,7 +87,7 @@ public class PostsService {
         return new GeneralListResponse<>(getComments(postId));
     }
 
-    public GeneralResponse<CommentDto> setComment(String postId, CommentRequest commentRequest) {
+    public GeneralResponse<Comment> setComment(String postId, CommentRequest commentRequest) {
         Comment postComment = new Comment();
         postComment.setParentId(commentRequest.getParent_id());
         postComment.setCommentText(commentRequest.getComment_text());
@@ -97,20 +97,11 @@ public class PostsService {
         }
         postComment.setPostId(Integer.valueOf(postId));
         postComment.setTime(System.currentTimeMillis());
-        Person currentPerson = daoPerson.getAuthPerson();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person currentPerson = daoPerson.getByEmail(authentication.getName());
         postComment.setAuthorId(currentPerson.getId());
         daoComment.save(postComment);
-        CommentDto commentDto = CommentDto.fromComment(postComment, currentPerson, getSubComments(commentRequest.getParent_id()));
-        return new GeneralResponse<>(commentDto);
-    }
-
-    public GeneralResponse<CommentDto> editComment(CommentRequest request, int id, int comment_id) {
-        Comment postComment = daoComment.getById(comment_id);
-        postComment.setCommentText(request.getComment_text());
-        postComment.setParentId(request.getParent_id());
-        daoComment.update(postComment);
-        CommentDto commentDto = CommentDto.fromComment(postComment,daoPerson.getAuthPerson(), getSubComments(request.getParent_id()));
-        return new GeneralResponse<>(commentDto);
+        return new GeneralResponse<>(postComment);
     }
 
     public GeneralResponse<LikeResponseDto> getLikes(int itemId, String type) {
@@ -197,6 +188,5 @@ public class PostsService {
     private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
         return daoPost.getPosts(text, authorId, dateFrom, dateTo);
     }
-
 
 }

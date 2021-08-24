@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.DaoComment;
+import application.dao.DaoFile;
 import application.dao.DaoLike;
 import application.dao.DaoPerson;
 import application.dao.DaoPost;
@@ -10,8 +11,12 @@ import application.models.dto.MessageRequestDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +25,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,10 +38,11 @@ public class ProfileService {
     private final DaoPost daoPost;
     private final DaoLike daoLike;
     private final DaoComment daoComment;
+    private final DaoFile daoFile;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
-        Person person = daoPerson.getById(id);
+        Person person = daoPerson.get(id);
         return new GeneralResponse<>(PersonDto.fromPerson(person));
     }
 
@@ -81,19 +84,23 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException("Person with this token is not found.");
         }
+
+        System.out.println(request.toString());
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Long birthDate = dateFormat.parse(request.getBirth_date()).getTime();
         if (request.getFirst_name().isBlank() || request.getLast_name().isBlank()) {
             daoPerson.updatePersonData(person.getId(), person.getFirstName(), person.getLastName(),
-                    birthDate, request.getPhone(), person.getPhoto(), request.getCity(),
-                    request.getCountry(), request.getAbout());
+                birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhoto_id())), request.getCity(),
+                request.getCountry(), request.getAbout());
             return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
         }
         else daoPerson.updatePersonData(person.getId(), request.getFirst_name(), request.getLast_name(),
-                birthDate, request.getPhone(), person.getPhoto(), request.getCity(),
-                request.getCountry(), request.getAbout());
+            birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhoto_id())), request.getCity(),
+            request.getCountry(), request.getAbout());
         return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
     }
+
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -106,6 +113,18 @@ public class ProfileService {
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person);
-        return ResponseEntity.ok(new GeneralResponse<MessageRequestDto>(new MessageRequestDto("ok")));
+        return ResponseEntity.ok(new GeneralResponse(new MessageRequestDto("ok")));
     }
+
+    public GeneralResponse<Post> setPost(Integer authorId, PostRequest postRequest) {
+        Post addPost = new Post();
+        addPost.setTitle(postRequest.getTitle());
+        addPost.setPostText(postRequest.getPost_text());
+        addPost.setTime(System.currentTimeMillis());
+        addPost.setBlocked(false);
+        addPost.setAuthorId(authorId);
+        daoPost.save(addPost);
+        return  new GeneralResponse<>(addPost);
+    }
+
 }

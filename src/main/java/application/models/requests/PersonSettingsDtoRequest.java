@@ -13,6 +13,4 @@ public class PersonSettingsDtoRequest {
     private String city;
     private String country;
     private String birth_date;
-
-
 }

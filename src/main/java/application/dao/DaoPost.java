@@ -16,7 +16,7 @@ public class DaoPost implements Dao<Post> {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Post getById(int id) {
+    public Post get(int id) {
         return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
     }
 
@@ -27,6 +27,14 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void save(Post post) {
+        jdbcTemplate.update("INSERT INTO post (time, id, author_id, post_text, title, is_blocked) " +
+                "VALUES (?, ?, ?, ?, ?, ?)",
+            post.getTime(),
+            post.getId(),
+            post.getAuthorId(),
+            post.getPostText(),
+            post.getTitle(),
+            post.isBlocked());
 
     }
 
