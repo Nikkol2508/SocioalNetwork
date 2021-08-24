@@ -39,4 +39,12 @@ public class DaoNotification {
                 "on notification_setting_type.id = ns.type_id WHERE person_id = ?";
         return jdbcTemplate.query(select, new Object[]{id}, new NotificationsSettingsMapper());
     }
+
+    public void setDefaultSettings(int id, String code) {
+        String insertSettingsType = "INSERT INTO notification_setting_type (code, status) VALUES (?, DEFAULT)";
+        jdbcTemplate.update(insertSettingsType, code);
+        String insertNotificationsType = "INSERT INTO notification_settings (person_id, type_id) VALUES (?," +
+                " (SELECT max(notification_setting_type.id) FROM notification_setting_type))";
+        jdbcTemplate.update(insertNotificationsType, id);
+    }
 }

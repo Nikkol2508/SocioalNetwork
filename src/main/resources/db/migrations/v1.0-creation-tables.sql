@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS notification_setting_type
 (
     id     SERIAL  NOT NULL,
     code   TEXT    NOT NULL,
-    status BOOLEAN NOT NULL,
+    status BOOLEAN NOT NULL DEFAULT true,
     PRIMARY KEY (id)
 );
 
