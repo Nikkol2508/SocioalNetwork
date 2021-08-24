@@ -5,7 +5,8 @@ public enum NotificationSettingType {
     POST_COMMENT("POST_COMMENT"),
     COMMENT_COMMENT("COMMENT_COMMENT"),
     FRIEND_REQUEST("FRIEND_REQUEST"),
-    MESSAGE("MESSAGE");
+    MESSAGE("MESSAGE"),
+    FRIEND_BIRTHDAY("FRIEND_BIRTHDAY");
 
     private final String value;
 

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class NotificationsSettingsDto {
-    @JsonProperty("notification_type")
+    @JsonProperty("type")
     private String notificationType;
     private Boolean enable;
 }
