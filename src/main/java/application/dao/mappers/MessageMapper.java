@@ -18,6 +18,7 @@ public class MessageMapper implements RowMapper<Message> {
         message.setRecipientId(rs.getInt("recipient_id"));
         message.setMessageText(rs.getString("message_text"));
         message.setReadStatus(ReadStatus.valueOf(rs.getString("read_status")));
+        message.setDialogId(rs.getInt("dialog_id"));
         return message;
     }
 }

@@ -243,4 +243,12 @@ public class DaoPerson implements Dao<Person> {
         jdbcTemplate.update(query, email, id);
     }
 
+    public Long getLastOnlineTime(int id) {
+        String query = "SELECT last_online_time FROM person WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(query, new Object[]{id}, Long.class);
+        } catch (EmptyResultDataAccessException ex) {
+            return null;
+        }
+    }
 }

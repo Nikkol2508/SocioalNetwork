@@ -10,6 +10,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -39,7 +40,12 @@ public class DaoMessage implements Dao<Message> {
 
     }
 
-    public int saveAndReturnMessageId(Message message) {
+    @Override
+    public void update(Message message) {
+
+    }
+
+    public Message saveAndReturnMessage(Message message) {
         String insertMessage = "INSERT INTO message (time, author_id, " +
                 "recipient_id, message_text, read_status, dialog_id) VALUES (?, ?, ?, ?, ?, ?)";
         GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -53,17 +59,29 @@ public class DaoMessage implements Dao<Message> {
             ps.setInt(6, message.getDialogId());
             return ps;
         }, keyHolder);
-        return (int) keyHolder.getKeys().get("id");
+        return getById((int) keyHolder.getKeys().get("id"));
     }
 
-    @Override
-    public void update(Message message) {
+    public Message updateAndReturnMessage(Message message) {
+        // при необходимости изменить время (time)
+        jdbcTemplate.update("UPDATE message SET message_text = ? WHERE id = ? AND dialog_id = ?",
+                message.getMessageText(), message.getId(), message.getDialogId());
+        return getById(message.getId());
+    }
 
+    public void readMessage(int dialogId, int messageId) {
+        jdbcTemplate.update("UPDATE message SET read_status = 'READ' WHERE id = ? AND dialog_id = ?",
+                messageId, dialogId);
     }
 
     @Override
     public void delete(Message message) {
 
+    }
+
+    public void deleteById(int messageId, int dialogId) {
+        String deleteMessage = "DELETE FROM message WHERE id = ? AND dialog_id = ?";
+        jdbcTemplate.update(deleteMessage, messageId, dialogId);
     }
 
     public Dialog getDialogById(int id) {

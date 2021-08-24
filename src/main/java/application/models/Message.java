@@ -1,5 +1,6 @@
 package application.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -20,6 +21,6 @@ public class Message {
     @JsonProperty("read_status")
     private ReadStatus readStatus;
 
-    @JsonProperty("dialog_id")
+    @JsonIgnore
     private int dialogId;
 }
