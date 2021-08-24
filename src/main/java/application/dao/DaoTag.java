@@ -20,7 +20,7 @@ public class DaoTag {
     }
 
     public List<String> getTagsByPostId(Integer id) {
-        return jdbcTemplate.queryForList("SELECT tag.tag FROM tag join post2tag on post2tag.tag_id = tag.id where post2tag.post_id = ?", new Object[]{id}, String.class);
+        return jdbcTemplate.queryForList("SELECT tag.tag FROM tag join post2tag on post2tag.id = tag.id where post2tag.post_id = ?", new Object[]{id}, String.class);
     }
 
     public List<Tag> getAll() {

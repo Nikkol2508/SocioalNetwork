@@ -1,5 +1,6 @@
 package application.dao;
 
+import application.dao.mappers.IdMapper;
 import application.dao.mappers.PersonMapper;
 import application.models.FriendshipStatus;
 import application.models.PermissionMessagesType;
@@ -22,6 +23,12 @@ public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
 
+    public int getPersonIdByEmail(String email) {
+        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
+
+        return jdbcTemplate.query(selectPersonIdByEmail, new Object[]{email}, new IdMapper())
+            .stream().findAny().orElse(null);
+    }
 
     public Person getByEmail(String email) {
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
@@ -37,7 +44,7 @@ public class DaoPerson implements Dao<Person> {
     }
 
     @Override
-    public Person getById(int id) {
+    public Person get(int id) {
         String selectPersonForId = "SELECT * FROM person WHERE id = ?";
         return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
                 .findAny().orElse(null);
@@ -79,7 +86,6 @@ public class DaoPerson implements Dao<Person> {
 
     public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
                                  String city, String country, String about){
-        System.out.println(firstName + lastName + birthDate + phone + photo + city + country + about);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
         "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?",
                 firstName, lastName, birthDate, phone, photo,
@@ -104,9 +110,12 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void deleteFriendshipByPersonId(int id){
-        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ? OR dst_person_id = ?", id, id);
         jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
-                "WHERE src_person_id = ? OR dst_person_id = ?)", id, id);
+                "WHERE src_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
+                "WHERE dst_person_id = ?)", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ?", id);
+        jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
     }
     public List<Person> getFriends(int id) {
 
