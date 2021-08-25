@@ -12,6 +12,8 @@ public class Like {
     @JsonProperty("person_id")
     private int personId;
 
-    @JsonProperty("post_id")
-    private int postId;
+    @JsonProperty("item_id")
+    private int itemId;
+
+    private String type;
 }

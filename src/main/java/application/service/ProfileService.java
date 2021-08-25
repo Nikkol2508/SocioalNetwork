@@ -74,5 +74,32 @@ public class ProfileService {
         addPost.setAuthorId(authorId);
         daoPost.save(addPost);
         return  new GeneralResponse<>(addPost);
+    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
+        if (person == null) {
+            throw new EntityNotFoundException("Person with this token is not found.");
+        }
+
+        daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(), request.getBirthDate(),
+                request.getPhone(), request.getPhoto(), request.getCity(), request.getCountry(), request.getAbout());
+
+        PersonDto personDto = PersonDto.fromPerson(person);
+
+        return ResponseEntity.ok(new GeneralResponse<>(personDto));
+    }
+
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
+        if (person == null) {
+            throw new EntityNotFoundException("Person with this token is not found.");
+        }
+        daoPerson.deleteFriendshipByPersonId(person.getId());
+        daoLike.deleteByPersonId(person.getId());
+        daoComment.deleteByAuthorId(person.getId());
+        daoPost.deleteByAuthorId(person.getId());
+        daoPerson.delete(person.getId());
+        return ResponseEntity.ok(new GeneralResponse<MessageRequestDto>(new MessageRequestDto("ok")));
     }
 }

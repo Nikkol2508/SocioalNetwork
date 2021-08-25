@@ -2,6 +2,7 @@ package application.models.dto;
 
 import application.models.Comment;
 import application.models.Person;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -17,8 +18,12 @@ public class CommentDto {
     private CommentAuthorDto author;
     private boolean isBlocked;
     private List<CommentDto> sub_comments;
+    private int likes;
 
-    public static CommentDto fromComment(Comment comment, Person person, List<CommentDto> subCommentList) {
+    @JsonProperty("my_like")
+    private int myLike;
+
+    public static CommentDto fromComment(Comment comment, Person person, List<CommentDto> subCommentList, int myLike) {
         CommentDto commentDto = new CommentDto();
         commentDto.setParentId(comment.getParentId());
         commentDto.setComment_text(comment.getCommentText());
@@ -28,13 +33,14 @@ public class CommentDto {
 
         CommentAuthorDto author = new CommentAuthorDto();
         author.setId(person.getId());
-        author.setFirst_name(person.getFirstName());
-        author.setLast_name(person.getLastName());
+        author.setFirstName(person.getFirstName());
+        author.setLastName(person.getLastName());
         commentDto.setAuthor(author);
 
         commentDto.setBlocked(comment.isBlocked());
-
         commentDto.setSub_comments(subCommentList);
+        commentDto.setLikes(5);
+        commentDto.setMyLike(myLike);
 
         return commentDto;
     }

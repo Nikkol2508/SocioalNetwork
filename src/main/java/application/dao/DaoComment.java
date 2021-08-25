@@ -63,8 +63,8 @@ public class DaoComment implements Dao<Comment> {
     }
 
     @Override
-    public void delete(Comment comment) {
-
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM post_comment where id = ?", id);
     }
 
     public void deleteByAuthorId(int id){

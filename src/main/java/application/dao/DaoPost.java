@@ -85,9 +85,6 @@ public class DaoPost implements Dao<Post> {
 //        }
     }
 
-    public void delete(Person person) {
-//        postRepository.deleteById(id);
-    }
 
     public void deleteGoalList() {
 //        postRepository.deleteAll();

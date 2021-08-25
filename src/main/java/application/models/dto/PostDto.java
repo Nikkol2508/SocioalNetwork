@@ -17,6 +17,10 @@ public class PostDto {
     private PersonDto author;
     private String title;
     private int likes;
+
+    @JsonProperty("my_like")
+    private int myLike;
+
     private List<CommentDto> comments;
 
     @JsonProperty("post_text")
@@ -30,7 +34,7 @@ public class PostDto {
 
     private List<String> tags;
 
-    public static PostDto fromPost(Post post, int likes, PersonDto author, List<CommentDto> comments, List<String> tags) {
+    public static PostDto fromPost(Post post, int likes, PersonDto author, List<CommentDto> comments, List<String> tags, int myLike) {
 
         PostDto postDto = new PostDto();
         postDto.setId(post.getId());
@@ -42,6 +46,7 @@ public class PostDto {
         postDto.setAuthor(author);
         postDto.setComments(comments);
         postDto.setTags(tags);
+        postDto.setMyLike(myLike);
 
         return postDto;
     }

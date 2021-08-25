@@ -98,8 +98,8 @@ public class DaoPerson implements Dao<Person> {
     }
 
     @Override
-    public void delete(Person person) {
-        jdbcTemplate.update("DELETE FROM person where id = ?", person.getId());
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM person where id = ?", id);
     }
 
     public void deleteFriendshipByPersonId(int id){
