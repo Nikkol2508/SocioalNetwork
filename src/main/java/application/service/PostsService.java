@@ -2,10 +2,7 @@ package application.service;
 
 import application.dao.*;
 import application.models.*;
-import application.models.dto.CommentDto;
-import application.models.dto.LikeResponseDto;
-import application.models.dto.PersonDto;
-import application.models.dto.PostDto;
+import application.models.dto.*;
 import application.models.requests.CommentRequest;
 import application.models.requests.LikeRequest;
 import application.models.requests.PostRequest;
@@ -207,4 +204,8 @@ public class PostsService {
         return new GeneralResponse<>(getPostDto(postId));
     }
 
+    public GeneralResponse<MessageRequestDto> deletePost(int id) {
+        daoPost.deleteByPostId(id);
+        return new GeneralResponse<>(new MessageRequestDto("ok"));
+    }
 }

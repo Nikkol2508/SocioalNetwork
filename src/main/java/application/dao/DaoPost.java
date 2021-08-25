@@ -60,7 +60,6 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void delete(Post post) {
-
     }
 
 
@@ -120,5 +119,9 @@ public class DaoPost implements Dao<Post> {
                 " AND is_blocked = false " +
                 " AND author_id = " + id +
                 " ORDER BY time desc", new PostMapper());
+    }
+
+    public void deleteByPostId (int id) {
+        jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
     }
 }

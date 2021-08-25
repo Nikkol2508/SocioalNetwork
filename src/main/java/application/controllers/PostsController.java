@@ -1,6 +1,7 @@
 package application.controllers;
 
 import application.models.dto.CommentDto;
+import application.models.dto.MessageRequestDto;
 import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
 import application.models.requests.PostRequest;
@@ -69,4 +70,8 @@ public class PostsController {
         return ResponseEntity.ok(postsService.editPost(postRequest, id));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity <GeneralResponse<MessageRequestDto>> deletePost (@PathVariable int id) {
+        return ResponseEntity.ok(postsService.deletePost(id));
+    }
 }
