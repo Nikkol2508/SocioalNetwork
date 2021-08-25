@@ -78,7 +78,7 @@ public class ProfileService {
                 .collect(Collectors.toList()));
     }
 
-    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) throws ParseException {
+    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) throws ParseException, InterruptedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
@@ -95,7 +95,8 @@ public class ProfileService {
                 request.getCountry(), request.getAbout());
             return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
         }
-        else daoPerson.updatePersonData(person.getId(), request.getFirst_name(), request.getLast_name(),
+        else
+            daoPerson.updatePersonData(person.getId(), request.getFirst_name(), request.getLast_name(),
             birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhoto_id())), request.getCity(),
             request.getCountry(), request.getAbout());
         return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));

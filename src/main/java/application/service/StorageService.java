@@ -27,7 +27,7 @@ public class StorageService {
     if (!file.isEmpty()) {
       try {
         byte[] bytes = file.getBytes();
-        String path = "storage/" + file.getOriginalFilename();
+        String path = "src/main/resources/public/storage/" + file.getOriginalFilename();
         BufferedOutputStream stream =
             new BufferedOutputStream(new FileOutputStream(path));
         stream.write(bytes);
@@ -37,7 +37,9 @@ public class StorageService {
         fileDto.setOwnerId(daoPerson.getPersonIdByEmail(
             SecurityContextHolder.getContext().getAuthentication().getName()));
         fileDto.setFileName(file.getOriginalFilename());
-        fileDto.setRelativeFilePath(path);
+
+        String servletPath = "storage/" + file.getOriginalFilename();
+        fileDto.setRelativeFilePath(servletPath);
         fileDto.setRawFileURL("какой то урл");
         fileDto.setFileFormat(file.getContentType());
         fileDto.setBytes(bytes.length);

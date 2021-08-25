@@ -39,4 +39,10 @@ public class DaoNotification {
                 "on notification_setting_type.id = ns.type_id WHERE person_id = ?";
         return jdbcTemplate.query(select, new Object[]{id}, new NotificationsSettingsMapper());
     }
+
+    public List<NotificationsSettingsDto> setNotificationsSettings (int id, String type, boolean status) {
+        String select = "SELECT code, status FROM notification_setting_type JOIN notification_settings ns " +
+                "on notification_setting_type.id = ns.type_id WHERE person_id = ?";
+        return jdbcTemplate.query(select, new Object[]{id}, new NotificationsSettingsMapper());
+    }
 }

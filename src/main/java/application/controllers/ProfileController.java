@@ -9,12 +9,11 @@ import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.ProfileService;
-import java.text.ParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -51,20 +50,18 @@ public class ProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(
-        @RequestBody PersonSettingsDtoRequest request) throws ParseException {
+            @RequestBody PersonSettingsDtoRequest request) throws ParseException, InterruptedException {
+        return profileService.changeProfile(request);
+    }
 
-            return profileService.changeProfile(request);
-        }
-
-
-        @DeleteMapping("/me")
-    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile(){
+    @DeleteMapping("/me")
+    public ResponseEntity<GeneralResponse<MessageRequestDto>> deleteProfile() {
         return profileService.deleteProfile();
     }
 
     @PostMapping("/{id}/wall")
     public ResponseEntity<GeneralResponse<Post>> addPost(@PathVariable Integer id,
-        @RequestBody PostRequest postRequest) {
+                                                         @RequestBody PostRequest postRequest) {
         return ResponseEntity.ok(profileService.setPost(id, postRequest));
     }
 
