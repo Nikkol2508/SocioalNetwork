@@ -1,7 +1,6 @@
 package application.dao;
 
 import application.dao.mappers.PostMapper;
-import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,7 +45,7 @@ public class DaoPost implements Dao<Post> {
     }
 
     @Override
-    public void delete(Post post) {
+    public void delete(int id) {
 
     }
 
@@ -73,9 +72,6 @@ public class DaoPost implements Dao<Post> {
 //        }
     }
 
-    public void delete(Person person) {
-//        postRepository.deleteById(id);
-    }
 
     public void deleteGoalList() {
 //        postRepository.deleteAll();

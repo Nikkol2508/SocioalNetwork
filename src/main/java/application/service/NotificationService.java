@@ -18,8 +18,9 @@ public class NotificationService {
         NotificationDTO notificationDTO = new NotificationDTO();
         notificationDTO.setId(1);
         notificationDTO.setType_id(1);
+        notificationDTO.setNotification_type("POST_COMMENT");
         notificationDTO.setSent_time(System.currentTimeMillis());
-        notificationDTO.setEntity_id(1);
+        notificationDTO.setEntity_id(8);
         notificationDTO.setInfo("Проверка сообщений");
 
         notificationDTOList.add(notificationDTO);

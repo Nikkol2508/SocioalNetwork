@@ -97,7 +97,7 @@ public class ProfileService {
         daoLike.deleteByPersonId(person.getId());
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
-        daoPerson.delete(person);
+        daoPerson.delete(person.getId());
         return ResponseEntity.ok(new GeneralResponse<MessageRequestDto>(new MessageRequestDto("ok")));
     }
 }

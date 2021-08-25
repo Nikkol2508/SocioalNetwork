@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("/api/v1/post")
@@ -37,17 +36,17 @@ public class PostsController {
     }
 
     @GetMapping("/{id}/comments")
-    public ResponseEntity<GeneralListResponse<CommentDto>> getComments(@PathVariable Integer id) {
+    public ResponseEntity<GeneralListResponse<CommentDto>> getComments(@PathVariable String id) {
         return ResponseEntity.ok(postsService.getCommentsResponse(id));
     }
 
-    @GetMapping("/undefined/comments")
-    public ResponseEntity<GeneralListResponse<CommentDto>> getSubComments(HttpServletResponse httpServletResponse)
-            throws IOException {
-
-        httpServletResponse.sendRedirect("/api/v1/feeds");
-        return ResponseEntity.ok(postsService.getSubCommentsResponse());
-    }
+//    @GetMapping("/undefined/comments")
+//    public ResponseEntity<GeneralListResponse<CommentDto>> getSubComments(HttpServletResponse httpServletResponse)
+//            throws IOException {
+//
+//        httpServletResponse.sendRedirect("/api/v1/feeds");
+//        return ResponseEntity.ok(postsService.getSubCommentsResponse());
+//    }
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
@@ -57,9 +56,14 @@ public class PostsController {
 
     @PutMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
-                                                                @PathVariable int id,
+                                                                @PathVariable String id,
                                                                 @PathVariable int comment_id) {
         return ResponseEntity.ok(postsService.editComment(request, id, comment_id));
     }
 
+    @DeleteMapping("/{id}/comments/{comment_id}")
+    public ResponseEntity<GeneralResponse<HashMap<String, Integer>>> deleteComment(@PathVariable String id,
+                                                                                   @PathVariable int comment_id) {
+        return ResponseEntity.ok(postsService.deleteComment(id, comment_id));
+    }
 }

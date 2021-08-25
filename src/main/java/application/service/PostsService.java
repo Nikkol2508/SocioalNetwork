@@ -13,8 +13,6 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,18 +30,20 @@ public class PostsService {
     private final DaoComment daoComment;
     private final DaoLike daoLike;
     private final DaoTag daoTag;
-    private String subCommentParentId;
+    private String undefinedPostId;
+
 
     public PostDto getPostDto(int postId) {
 
         Post post = daoPost.getById(postId);
-        int likes = daoLike.getCountLike(postId);
+        int likes = daoLike.getCountLike(postId, "Post");
         Person person = daoPerson.getById(post.getAuthorId());
         PersonDto author = PersonDto.fromPerson(person);
         List<CommentDto> comments = getComments(postId);
         List<String> tags = daoTag.getTagsByPostId(postId);
+        int myLike = daoLike.getMyLike(postId, "Post", daoPerson.getAuthPerson().getId());
 
-        return PostDto.fromPost(post, likes, author, comments, tags);
+        return PostDto.fromPost(post, likes, author, comments, tags, myLike);
     }
 
     public List<CommentDto> getComments(Integer postId) {
@@ -52,7 +52,8 @@ public class PostsService {
         for (Comment comment : daoComment.getCommentsByPostId(postId)) {
             Person person = daoPerson.getById(comment.getAuthorId());
             List<CommentDto> subCommentList = getSubComments(comment.getId());
-            CommentDto commentDto = CommentDto.fromComment(comment, person, subCommentList);
+            int myLike = daoLike.getMyLike(comment.getId(), "Comment", daoPerson.getAuthPerson().getId());
+            CommentDto commentDto = CommentDto.fromComment(comment, person, subCommentList, myLike);
             commentDtoList.add(commentDto);
         }
         return commentDtoList;
@@ -65,7 +66,8 @@ public class PostsService {
         if(subComments.size() > 0) {
             for(Comment subComment : subComments) {
                 Person person = daoPerson.getById(subComment.getAuthorId());
-                CommentDto commentDto = CommentDto.fromComment(subComment, person, null);
+                int myLike = daoLike.getMyLike(subComment.getId(), "Comment", daoPerson.getAuthPerson().getId());
+                CommentDto commentDto = CommentDto.fromComment(subComment, person, null, myLike);
                 subCommentsList.add(commentDto);
             }
         }
@@ -73,18 +75,22 @@ public class PostsService {
     }
 
 
-    public GeneralListResponse<CommentDto> getSubCommentsResponse() {
-
-        return new GeneralListResponse<>(getComments(Integer.valueOf(subCommentParentId)));
-    }
+//    public GeneralListResponse<CommentDto> getSubCommentsResponse() {
+//
+//        return new GeneralListResponse<>(getComments(Integer.valueOf(undefinedPostId)));
+//    }
 
     public GeneralResponse<PostDto> getPostResponse(int postId) {
         return new GeneralResponse<>(getPostDto(postId));
     }
 
-    public GeneralListResponse<CommentDto> getCommentsResponse(Integer postId) {
+    public GeneralListResponse<CommentDto> getCommentsResponse(String postId) {
 
-        return new GeneralListResponse<>(getComments(postId));
+        if (postId.equals("undefined")) {
+            postId = undefinedPostId;
+            undefinedPostId = null;
+        }
+        return new GeneralListResponse<>(getComments(Integer.valueOf(postId)));
     }
 
     public GeneralResponse<CommentDto> setComment(String postId, CommentRequest commentRequest) {
@@ -93,29 +99,57 @@ public class PostsService {
         postComment.setCommentText(commentRequest.getComment_text());
         if(postId.equals("undefined")) {
             postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParent_id()));
-            subCommentParentId = postId;
+            undefinedPostId = postId;
         }
         postComment.setPostId(Integer.valueOf(postId));
         postComment.setTime(System.currentTimeMillis());
         Person currentPerson = daoPerson.getAuthPerson();
         postComment.setAuthorId(currentPerson.getId());
         daoComment.save(postComment);
-        CommentDto commentDto = CommentDto.fromComment(postComment, currentPerson, getSubComments(commentRequest.getParent_id()));
+        int likes = daoLike.getCountLike(postComment.getId(), "Comment");
+
+        CommentDto commentDto = CommentDto.fromComment(postComment, currentPerson,
+                getSubComments(commentRequest.getParent_id()), likes);
         return new GeneralResponse<>(commentDto);
     }
 
-    public GeneralResponse<CommentDto> editComment(CommentRequest request, int id, int comment_id) {
+    public GeneralResponse<CommentDto> editComment(CommentRequest commentRequest, String postId, int comment_id) {
         Comment postComment = daoComment.getById(comment_id);
-        postComment.setCommentText(request.getComment_text());
-        postComment.setParentId(request.getParent_id());
+        postComment.setCommentText(commentRequest.getComment_text());
+        if(postComment.getParentId() == 0) {
+            postComment.setParentId(null);
+        }
+        if(postId.equals("undefined")) {
+            postId = String.valueOf(daoComment.getPostIdByCommentId(postComment.getId()));
+            undefinedPostId = postId;
+        }
         daoComment.update(postComment);
-        CommentDto commentDto = CommentDto.fromComment(postComment,daoPerson.getAuthPerson(), getSubComments(request.getParent_id()));
+        int likes = daoLike.getCountLike(postComment.getId(), "Comment");
+        CommentDto commentDto = CommentDto.fromComment(postComment,daoPerson.getAuthPerson(),
+                getSubComments(postComment.getParentId()), likes);
         return new GeneralResponse<>(commentDto);
+    }
+
+    public GeneralResponse<HashMap<String, Integer>> deleteComment(String postId, int comment_id) {
+        List<CommentDto> subComments = getSubComments(comment_id);
+        if (subComments.size() != 0) {
+            for (CommentDto subComment : subComments) {
+                daoComment.delete(subComment.getId());
+            }
+        }
+            if (postId.equals("undefined")) {
+                postId = String.valueOf(daoComment.getPostIdByCommentId(comment_id));
+                undefinedPostId = postId;
+            }
+            HashMap<String, Integer> response = new HashMap<>();
+            response.put("id", comment_id);
+            daoComment.delete(comment_id);
+            return new GeneralResponse<>(response);
     }
 
     public GeneralResponse<LikeResponseDto> getLikes(int itemId, String type) {
         LikeResponseDto likeResponseDto = new LikeResponseDto();
-        List<String> userList = daoLike.getUsersLike(itemId);
+        List<String> userList = daoLike.getUsersLike(itemId, type);
         likeResponseDto.setUsers(userList);
         likeResponseDto.setLikes(String.valueOf(userList.size()));
         return new GeneralResponse<>(likeResponseDto);
@@ -123,7 +157,7 @@ public class PostsService {
 
     public GeneralResponse<Map<String, Boolean>> getLiked(int user_id, int itemId, String type) {
         Map<String, Boolean> isLiked = new HashMap<>();
-        List<String> usersList = daoLike.getUsersLike(itemId);
+        List<String> usersList = daoLike.getUsersLike(itemId, type);
         isLiked.put("likes", usersList.contains(String.valueOf(user_id)));
 
         return new GeneralResponse<>(isLiked);
@@ -131,18 +165,25 @@ public class PostsService {
 
     public GeneralResponse<LikeResponseDto> setLikes(LikeRequest request) {
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Person currentPerson = daoPerson.getByEmail(authentication.getName());
+        Person currentPerson = daoPerson.getAuthPerson();
+
         if(!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).getData().get("likes")) {
 
             Like like = new Like();
-            like.setPostId(request.getItem_id());
+            like.setItemId(request.getItem_id());
             like.setTime(System.currentTimeMillis());
             like.setPersonId(currentPerson.getId());
+            like.setType(request.getType());
             daoLike.save(like);
         }
+
+        if(request.getType().equals("Comment")) {
+            undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(request.getItem_id()));
+        }
+        else undefinedPostId = String.valueOf(request.getItem_id());
+
         LikeResponseDto likeResponseDto = new LikeResponseDto();
-        List<String> userList = daoLike.getUsersLike(request.getItem_id());
+        List<String> userList = daoLike.getUsersLike(request.getItem_id(), request.getType());
         likeResponseDto.setUsers(userList);
         likeResponseDto.setLikes(String.valueOf(userList.size()));
 
@@ -150,9 +191,12 @@ public class PostsService {
     }
 
     public GeneralResponse<Map<String, String>> deleteLike(int itemId, String type) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Person currentPerson = daoPerson.getByEmail(authentication.getName());
-        daoLike.delete(itemId, currentPerson.getId());
+        Person currentPerson = daoPerson.getAuthPerson();
+        daoLike.delete(itemId, type, currentPerson.getId());
+        if(type.equals("Comment")) {
+            undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(itemId));
+        }
+        else undefinedPostId = String.valueOf(itemId);
         HashMap<String, String> deleteLikeResponse = new HashMap<>();
         deleteLikeResponse.put("likes", "1");
         return new GeneralResponse<>(deleteLikeResponse);
@@ -197,6 +241,5 @@ public class PostsService {
     private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
         return daoPost.getPosts(text, authorId, dateFrom, dateTo);
     }
-
 
 }
