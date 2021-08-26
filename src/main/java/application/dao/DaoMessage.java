@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -87,5 +86,44 @@ public class DaoMessage implements Dao<Message> {
     public Dialog getDialogById(int id) {
         String selectDialog = "SELECT * FROM dialog WHERE id = ?";
         return jdbcTemplate.query(selectDialog, new Object[]{id}, new DialogMapper()).stream().findAny().orElse(null);
+    }
+
+    public Integer getCountUnreadedMessagesForUser(int id) {
+        String getUnreaded = "SELECT count(*) FROM message WHERE recipient_id = ? AND read_status = 'SENT'";
+        return jdbcTemplate.queryForObject(getUnreaded, new Object[]{id}, Integer.class);
+    }
+
+    public List<Dialog> getDialogListForUser(int id) {
+        String getDialogs = "SELECT * FROM dialog WHERE first_user_id = ? OR second_user_id = ?";
+        return jdbcTemplate.query(getDialogs, new Object[]{id, id}, new DialogMapper());
+    }
+
+    public Integer getCountUnreadedMessagesInDialog(int activeUserId, int dialogId) {
+        String getUnreaded = "SELECT count(*) FROM message WHERE (recipient_id = ? AND dialog_id = ?) " +
+                "AND read_status = 'SENT'";
+        return jdbcTemplate.queryForObject(getUnreaded, new Object[]{activeUserId, dialogId}, Integer.class);
+    }
+
+    public Message getLastMessageInDialog(Dialog dialog) {
+        String getLastMessage = "SELECT * FROM message WHERE ((recipient_id = ? AND author_id = ?) OR " +
+                "(recipient_id = ? AND author_id = ?)) ORDER BY time DESC LIMIT 1";
+        return jdbcTemplate.queryForObject(getLastMessage, new Object[]{
+                dialog.getFirstUserId(),
+                dialog.getSecondUserId(),
+                dialog.getSecondUserId(),
+                dialog.getFirstUserId()},
+                new MessageMapper());
+    }
+
+    public List<Message> getMessagesInDialog(int dialogId) {
+        String getMessages = "SELECT * FROM message WHERE ((recipient_id = ? AND author_id = ?) OR " +
+                "(recipient_id = ? AND author_id = ?)) ORDER BY time";
+        Dialog dialog = getDialogById(dialogId);
+        return jdbcTemplate.query(getMessages, new Object[]{
+                dialog.getFirstUserId(),
+                dialog.getSecondUserId(),
+                dialog.getSecondUserId(),
+                dialog.getFirstUserId()},
+                new MessageMapper());
     }
 }
