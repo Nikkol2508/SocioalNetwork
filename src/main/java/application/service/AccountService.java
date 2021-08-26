@@ -5,6 +5,7 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
+import application.models.NotificationSettingType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageRequestDto;
@@ -28,9 +29,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -59,7 +64,15 @@ public class AccountService {
         person.setApproved(false);
         daoPerson.save(person);
         GeneralResponse<MessageRequestDto> response = new GeneralResponse<>(new MessageRequestDto("ok"));
+        setStartNotificationSettings(request.getEmail());
         return ResponseEntity.ok(response);
+    }
+
+    public void setStartNotificationSettings (String email) {
+        List<NotificationSettingType> codes = Stream.of(NotificationSettingType.values()).collect(Collectors.toList());
+        for (int i = 0; i <= codes.size() - 1; i++) {
+            daoNotification.setDefaultSettings(daoPerson.getByEmail(email).getId(), codes.get(i).toString());
+        }
     }
 
     public ResponseEntity<GeneralResponse<MessageRequestDto>> setPassword(SetPasswordDtoRequest request)
