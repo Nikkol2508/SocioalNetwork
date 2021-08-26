@@ -71,15 +71,16 @@ public class DaoPerson implements Dao<Person> {
 
     public void save(Person person) {
         String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
-                " e_mail, reg_date, messages_permission) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                " e_mail, reg_date, messages_permission, photo) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsertPerson,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString());
+                PermissionMessagesType.ALL.toString(),
+                person.getPhoto());
     }
 
     @Override

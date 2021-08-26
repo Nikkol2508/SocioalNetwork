@@ -5,10 +5,7 @@ import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageRequestDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
@@ -44,7 +41,7 @@ public class AccountController {
 
     @PutMapping("/email")
     public ResponseEntity<GeneralResponse<MessageRequestDto>> setEmail(HttpServletRequest servletRequest,
-                                                                 @RequestBody ShiftEmailDtoRequest request) {
+                                                                       @RequestBody ShiftEmailDtoRequest request) {
         return accountService.setEmail(request, AccountService.getCode(servletRequest));
     }
 
@@ -64,5 +61,11 @@ public class AccountController {
     @GetMapping("/notifications")
     public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications() {
         return ResponseEntity.ok(accountService.getPersonNotificationsSettings());
+    }
+
+    @PutMapping("/notifications")
+    public ResponseEntity<GeneralResponse<MessageRequestDto>>
+    setAccountNotifications(@RequestBody NotificationRequest notificationRequest) {
+        return accountService.setNotificationSettings(notificationRequest);
     }
 }

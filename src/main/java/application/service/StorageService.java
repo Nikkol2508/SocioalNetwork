@@ -46,7 +46,6 @@ public class StorageService {
         fileDto.setFileType(type);
         fileDto.setCreatedAt(System.currentTimeMillis());
         fileDto = daoFile.saveAndReturn(fileDto);
-        System.out.println(fileDto);
         return new GeneralResponse<>(fileDto);
       } catch (Exception e) {
 

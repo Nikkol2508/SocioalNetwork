@@ -19,6 +19,8 @@ public class FileServlet extends HttpServlet {
             throws ServletException, IOException
     {
         String filename = URLDecoder.decode(request.getPathInfo().substring(1), StandardCharsets.UTF_8);
+        request.setAttribute("path","kek");
+        System.out.println(request.toString());
         File file = new File("src/main/resources/public/storage/", filename);
         response.setHeader("Content-Type", getServletContext().getMimeType(filename));
         response.setHeader("Content-Length", String.valueOf(file.length()));
