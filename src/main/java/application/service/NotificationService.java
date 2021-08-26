@@ -5,8 +5,10 @@ import application.dao.DaoPerson;
 import application.models.Notification;
 import application.models.NotificationType;
 import application.models.dto.CommentAuthorDto;
+import application.models.dto.MessageRequestDto;
 import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +36,10 @@ public class NotificationService {
         listResponse.setOffset(0);
         listResponse.setPerPage(20);
         return listResponse;
+    }
+
+    public GeneralResponse<MessageRequestDto> readNotifications() {
+        daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
+        return new GeneralResponse<>(new MessageRequestDto("ok"));
     }
 }

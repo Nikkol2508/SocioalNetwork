@@ -43,9 +43,15 @@ public class DaoNotification {
                                 String type, String... name) {
         String insertIntoNotificationsStatus = "INSERT INTO notification_type (code, name) VALUES (?, ?)";
         jdbcTemplate.update(insertIntoNotificationsStatus, type,
-                name[0]);
+                name);
         String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, contact)" +
                 " VALUES ((SELECT max(notification_type.id) FROM notification_type), ?, ?, ?, ?)";
         jdbcTemplate.update(insertIntoNotifications, sentTime, id, entityId, contact);
+    }
+
+    public void readNotifications(int id) {
+        String update = "UPDATE notification_type SET name = 'READ' WHERE id = (SELECT type_id FROM notification" +
+                " WHERE person_id = ?)";
+        jdbcTemplate.update(update, id);
     }
 }

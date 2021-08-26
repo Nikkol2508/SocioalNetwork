@@ -2,6 +2,8 @@ package application.dao;
 
 import application.dao.mappers.PostCommentMapper;
 import application.models.Comment;
+import application.models.NotificationType;
+import application.models.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,9 @@ import java.util.List;
 public class DaoComment implements Dao<Comment> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
+    private final DaoPost daoPost;
+    private final DaoPerson daoPerson;
 
     public List<Comment> getCommentsByPostId(Integer postId) {
         return jdbcTemplate.query("SELECT * FROM post_comment WHERE post_id = ? AND parent_id isnull ", new Object[]{postId}, new PostCommentMapper());
@@ -47,6 +52,9 @@ public class DaoComment implements Dao<Comment> {
                 comment.getAuthorId(),
                 comment.getCommentText(),
                 comment.isBlocked());
+        Person person = daoPerson.getById(daoPost.getById(comment.getPostId()).getId());
+        daoNotification.addNotification(person.getId(), comment.getTime(), comment.getId(), person.getEmail(),
+                NotificationType.COMMENT_COMMENT.toString(), comment.getCommentText());
     }
 
     @Override
