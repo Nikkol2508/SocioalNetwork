@@ -51,7 +51,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
-        ErrorResponse errorResponse = new ErrorResponse("invalid_request", exception.getMessage());
+        String error = httpStatus.equals(HttpStatus.BAD_REQUEST)
+                ? Error.INVALID_REQUEST.getError()
+                : Error.UNAUTHORIZED.getError();
+        ErrorResponse errorResponse = new ErrorResponse(error, exception.getMessage());
         return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 }

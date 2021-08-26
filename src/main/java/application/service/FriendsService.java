@@ -2,8 +2,8 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.models.FriendshipStatus;
-import application.models.dto.MessageRequestDto;
 import application.models.Person;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -78,7 +78,7 @@ public class FriendsService {
         return personDtos;
     }
 
-    public GeneralResponse<MessageRequestDto> addFriendForId(int id) {
+    public GeneralResponse<MessageResponseDto> addFriendForId(int id) {
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus == null) {
@@ -88,10 +88,10 @@ public class FriendsService {
         } else if (friendStatus.equals(FriendshipStatus.DECLINED.toString())) {
             daoPerson.updateDeclined(currentPerson.getId(), id);
         }
-        return new GeneralResponse<>(new MessageRequestDto("ok"));
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 
-    public GeneralResponse<MessageRequestDto> deleteFriendForId(int id) {
+    public GeneralResponse<MessageResponseDto> deleteFriendForId(int id) {
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus.equals(FriendshipStatus.FRIEND.toString())) {
@@ -99,6 +99,6 @@ public class FriendsService {
         } else if (friendStatus.equals(FriendshipStatus.REQUEST.toString())) {
             daoPerson.unAcceptRequest(currentPerson.getId(), id);
         }
-        return new GeneralResponse<>(new MessageRequestDto("ok"));
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 }

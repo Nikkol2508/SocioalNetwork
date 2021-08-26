@@ -3,7 +3,6 @@ package application.dao;
 import application.dao.mappers.NotificationMapper;
 import application.dao.mappers.NotificationsSettingsMapper;
 import application.models.Notification;
-import application.models.NotificationType;
 import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

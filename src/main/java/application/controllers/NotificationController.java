@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -25,7 +25,7 @@ public class NotificationController {
   }
 
   @PutMapping("/notifications")
-  private ResponseEntity<GeneralResponse<MessageRequestDto>> readNotifications() {
+  private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications() {
     return ResponseEntity.ok(notificationService.readNotifications());
   }
 }

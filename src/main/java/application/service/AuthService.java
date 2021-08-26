@@ -2,7 +2,7 @@ package application.service;
 
 import application.dao.DaoPerson;
 import application.models.Person;
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.models.responses.GeneralResponse;
@@ -42,9 +42,9 @@ public class AuthService {
         }
     }
 
-    public GeneralResponse<MessageRequestDto> getLogout() {
+    public GeneralResponse<MessageResponseDto> getLogout() {
         SecurityContextHolder.getContext().setAuthentication(null);
-        return new GeneralResponse<>(new MessageRequestDto("ok"));
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 
     private GeneralResponse<PersonDto> getAuth(AuthDtoRequest authDtoRequest, String token) {

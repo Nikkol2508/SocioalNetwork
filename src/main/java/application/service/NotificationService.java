@@ -5,7 +5,7 @@ import application.dao.DaoPerson;
 import application.models.Notification;
 import application.models.NotificationType;
 import application.models.dto.CommentAuthorDto;
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -38,8 +38,8 @@ public class NotificationService {
         return listResponse;
     }
 
-    public GeneralResponse<MessageRequestDto> readNotifications() {
+    public GeneralResponse<MessageResponseDto> readNotifications() {
         daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
-        return new GeneralResponse<>(new MessageRequestDto("ok"));
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 }

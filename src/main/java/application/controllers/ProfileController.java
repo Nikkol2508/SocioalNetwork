@@ -1,6 +1,7 @@
 package application.controllers;
 
 import application.models.Post;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PostRequest;
@@ -51,4 +52,8 @@ public class ProfileController {
         return ResponseEntity.ok(profileService.setPost(id, publishDate, postRequest));
     }
 
+    @DeleteMapping("/me")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile(){
+        return profileService.deleteProfile();
+    }
 }

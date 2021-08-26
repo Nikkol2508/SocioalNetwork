@@ -1,6 +1,6 @@
 package application.controllers;
 
-import application.models.dto.MessageRequestDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.models.responses.GeneralResponse;
@@ -28,7 +28,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<MessageRequestDto>> logout() {
+    private ResponseEntity<GeneralResponse<MessageResponseDto>> logout() {
         return ResponseEntity.ok(authService.getLogout());
     }
 }
