@@ -207,15 +207,24 @@ public class PostsService {
     }
 
     public GeneralResponse<Tag> setTag(TagRequest request) {
-        Tag tag = new Tag();
-        tag.setTag(request.getTag());
-        daoTag.save(tag);
-        //надо прикрепить к посту в tag2post
+        Tag tag = daoTag.findTagByName(request.getTag());
+        if(tag.equals(null)) {
+            daoTag.save(request.getTag());
+            tag = daoTag.findTagByName(request.getTag());
+        }
         return new GeneralResponse<>(tag);
     }
 
+    public void attachTag2Post(int tagId, int postId) {
+        daoTag.attachTag2Post(tagId, postId);
+    }
+
+    public void detachTag2Post(int tagId, int postId) {
+        daoTag.detachTag2Post(tagId, postId);
+    }
+
     public GeneralResponse<HashMap<String, String>> deleteTag(int tagId) {
-        // Здесь ДАО метод удаления
+        daoTag.delete(tagId);
         HashMap<String, String> response = new HashMap<>();
         response.put("message", "ok");
         return new GeneralResponse<>(response);
