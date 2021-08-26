@@ -5,9 +5,13 @@ import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Component
@@ -28,13 +32,31 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void save(Post post) {
-        jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
-                        "VALUES (?, ?, ?, ?, ?)",
-                post.getTime(),
-                post.getAuthorId(),
-                post.getPostText(),
-                post.getTitle(),
-                post.isBlocked());
+//        KeyHolder key = new GeneratedKeyHolder();
+//        jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
+//                        "VALUES (?, ?, ?, ?, ?)",
+//                post.getTime(),
+//                post.getAuthorId(),
+//                post.getPostText(),
+//                post.getTitle(),
+//                post.isBlocked(), key);
+//        return key.getKey().intValue();
+    }
+
+    public Post savePost (Post post) {
+        String query = "INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        GeneratedKeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, post.getTime());
+                ps.setInt(2, post.getAuthorId());
+                ps.setString(3, post.getPostText());
+                ps.setString(4, post.getTitle());
+                ps.setBoolean(5, post.isBlocked());
+            return ps;},
+            key);
+        return getById((int) key.getKeys().get("id"));
     }
 
     @Override
@@ -59,7 +81,8 @@ public class DaoPost implements Dao<Post> {
     }
 
     @Override
-    public void delete(Post post) {
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
     }
 
 
@@ -118,7 +141,4 @@ public class DaoPost implements Dao<Post> {
                 " ORDER BY time desc", new PostMapper());
     }
 
-    public void deleteByPostId (int id) {
-        jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
-    }
 }

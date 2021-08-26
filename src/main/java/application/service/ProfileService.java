@@ -1,15 +1,17 @@
 package application.service;
 
-import application.dao.DaoPerson;
-import application.dao.DaoPost;
+import application.dao.*;
 import application.models.*;
+import application.models.dto.MessageRequestDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
+import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,9 @@ public class ProfileService {
     private final DaoPerson daoPerson;
     private final PostsService postsService;
     private final DaoPost daoPost;
+    private final DaoLike daoLike;
+    private final DaoComment daoComment;
+    private final DaoTag daoTag;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
@@ -72,8 +77,14 @@ public class ProfileService {
         addPost.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
         addPost.setBlocked(false);
         addPost.setAuthorId(authorId);
-        daoPost.save(addPost);
-        return  new GeneralResponse<>(addPost);
+        int postId = daoPost.savePost(addPost).getId();
+        for (String tag : postRequest.getTags()){
+            daoTag.save(tag);
+            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
+        return new GeneralResponse<>(addPost);
+    }
+
     public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());

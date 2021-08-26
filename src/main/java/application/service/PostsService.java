@@ -32,7 +32,6 @@ public class PostsService {
     private final DaoTag daoTag;
     private String undefinedPostId;
 
-
     public PostDto getPostDto(int postId) {
 
         Post post = daoPost.getById(postId);
@@ -255,12 +254,21 @@ public class PostsService {
         Post post = daoPost.getById(postId);
         post.setPostText(request.getPostText());
         post.setTitle(request.getTitle());
+        List <String> oldTagList = daoTag.getTagsByPostId(postId);
+        for (String tag : oldTagList) {
+            daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
+        for (String tag : request.getTags()) {
+            daoTag.save(tag);
+            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
         daoPost.update(post);
         return new GeneralResponse<>(getPostDto(postId));
     }
 
     public GeneralResponse<MessageRequestDto> deletePost(int id) {
-        daoPost.deleteByPostId(id);
+
+        daoPost.delete(id);
         return new GeneralResponse<>(new MessageRequestDto("ok"));
     }
 }

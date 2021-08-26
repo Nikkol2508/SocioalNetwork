@@ -36,12 +36,12 @@ public class DaoTag {
     }
 
     public void attachTag2Post (int tagId, int postId) {
-        jdbcTemplate.update(("INSERT INTO post2tag (tagIg, postId) VALUES (?, ?)"), tagId, postId);
+        jdbcTemplate.update(("INSERT INTO post2tag (tag_id, post_id) VALUES (?, ?)"), tagId, postId);
 
     }
 
     public void detachTag2Post (int tagId, int postId) {
-        jdbcTemplate.update(("DELETE post2tag (tagIg, postId) VALUES (?, ?)"), tagId, postId);
+        jdbcTemplate.update("DELETE FROM post2tag WHERE tag_id = " + tagId + " AND post_id = " + postId);
 
     }
 

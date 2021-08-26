@@ -73,6 +73,7 @@ public class PostsController {
     public ResponseEntity <GeneralResponse<MessageRequestDto>> deletePost (@PathVariable int id) {
         return ResponseEntity.ok(postsService.deletePost(id));
     }
+
     @DeleteMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<HashMap<String, Integer>>> deleteComment(@PathVariable String id,
                                                                                    @PathVariable int comment_id) {
