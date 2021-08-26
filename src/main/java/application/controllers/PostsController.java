@@ -1,9 +1,9 @@
 package application.controllers;
 
-import application.models.Comment;
 import application.models.dto.CommentDto;
 import application.models.dto.PostDto;
 import application.models.requests.CommentRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.FeedsService;
@@ -51,9 +51,22 @@ public class PostsController {
     }
 
     @PostMapping("/{id}/comments")
-    public ResponseEntity<GeneralResponse<Comment>> postComment(@PathVariable String id,
+    public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
                                                                 @RequestBody CommentRequest commentRequest) {
         return ResponseEntity.ok(postsService.setComment(id, commentRequest));
+    }
+
+    @PutMapping("/{id}/comments/{comment_id}")
+    public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
+                                                                @PathVariable int id,
+                                                                @PathVariable int comment_id) {
+        return ResponseEntity.ok(postsService.editComment(request, id, comment_id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity <GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
+                                                              @PathVariable int id) {
+        return ResponseEntity.ok(postsService.editPost(postRequest, id));
     }
 
 }
