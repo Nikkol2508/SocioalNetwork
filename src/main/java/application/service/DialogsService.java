@@ -7,6 +7,7 @@ import application.models.Message;
 import application.models.Person;
 import application.models.ReadStatus;
 import application.models.dto.*;
+import application.models.requests.DialogCreateDtoRequest;
 import application.models.requests.MessageSendDtoRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -31,18 +32,18 @@ public class DialogsService {
         return person.getId();
     }
 
-    public ResponseEntity<GeneralResponse<Message>> sendMessage(int id, MessageSendDtoRequest request) {
+    public ResponseEntity<GeneralResponse<Message>> sendMessage(int dialogId, MessageSendDtoRequest request) {
         Message message = new Message();
         message.setMessageText(request.getMessageText());
         message.setAuthorId(getAuthorId());
-        Dialog dialog = daoMessage.getDialogById(id);
+        Dialog dialog = daoMessage.getDialogById(dialogId);
         if (dialog == null) {
-            throw new EntityNotFoundException("Dialog with id = " + id + " is not exist");
+            throw new EntityNotFoundException("Dialog with id = " + dialogId + " is not exist");
         }
         message.setRecipientId(dialog.getFirstUserId() == getAuthorId()
                 ? dialog.getSecondUserId()
                 : dialog.getFirstUserId());
-        message.setDialogId(id);
+        message.setDialogId(dialogId);
         message.setReadStatus(ReadStatus.SENT);
         return ResponseEntity.ok(new GeneralResponse<>(daoMessage.saveAndReturnMessage(message)));
     }
@@ -71,7 +72,7 @@ public class DialogsService {
     }
 
     public ResponseEntity<GeneralResponse<DialogsActivityResponseDto>> getActivity(int dialogId, int userId) {
-        DialogsActivityResponseDto dialogsActivityResponseDto = new DialogsActivityResponseDto(false,
+        DialogsActivityResponseDto dialogsActivityResponseDto = new DialogsActivityResponseDto(true,
                 daoPerson.getLastOnlineTime(userId));
         return ResponseEntity.ok(new GeneralResponse<>(dialogsActivityResponseDto));
     }
@@ -102,6 +103,23 @@ public class DialogsService {
         response.setPerPage(itemPerPage);
         response.setTotal(response.getData().size());
         return ResponseEntity.ok(response);
+    }
+
+    public ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(DialogCreateDtoRequest request) {
+        int activeUserId = daoPerson.getByEmail(SecurityContextHolder.getContext()
+                .getAuthentication().getName()).getId();
+        Dialog foundDialog = daoMessage.getDialogByUsersId(activeUserId, request.getUsersIds().get(0));
+        if (foundDialog == null) {
+            int dialogId = daoMessage.createDialog(
+                    activeUserId, request.getUsersIds().get(0));
+            Person personFromRequest = daoPerson.getById(request.getUsersIds().get(0));
+            sendMessage(dialogId, new MessageSendDtoRequest(String.format("Create new dialog with %s %s",
+                    personFromRequest.getFirstName(),
+                    personFromRequest.getLastName())));
+            return ResponseEntity.ok(new GeneralResponse<>(new DialogIdDto(dialogId)));
+        } else {
+            return ResponseEntity.ok(new GeneralResponse<>(new DialogIdDto(foundDialog.getId())));
+        }
     }
 
     private DialogDto fromDialog(Dialog dialog, int userId) {

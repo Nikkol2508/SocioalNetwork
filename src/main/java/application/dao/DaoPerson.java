@@ -251,4 +251,9 @@ public class DaoPerson implements Dao<Person> {
             return null;
         }
     }
+
+    public void updateLastOnlineTime(int id) {
+        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
+        jdbcTemplate.update(query, System.currentTimeMillis(), id);
+    }
 }

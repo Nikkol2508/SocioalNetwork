@@ -2,6 +2,7 @@ package application.controllers;
 
 import application.models.Message;
 import application.models.dto.*;
+import application.models.requests.DialogCreateDtoRequest;
 import application.models.requests.MessageSendDtoRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
@@ -23,6 +24,11 @@ public class DialogsController {
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
         return dialogsService.getDialogs(offset, itemPerPage);
+    }
+
+    @PostMapping
+    private ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(@RequestBody DialogCreateDtoRequest request) {
+        return dialogsService.createDialog(request);
     }
 
     @GetMapping("{id}/messages")

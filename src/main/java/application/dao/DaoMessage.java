@@ -6,13 +6,13 @@ import application.models.Dialog;
 import application.models.Message;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -45,20 +45,17 @@ public class DaoMessage implements Dao<Message> {
     }
 
     public Message saveAndReturnMessage(Message message) {
-        String insertMessage = "INSERT INTO message (time, author_id, " +
-                "recipient_id, message_text, read_status, dialog_id) VALUES (?, ?, ?, ?, ?, ?)";
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(insertMessage, Statement.RETURN_GENERATED_KEYS);
-            ps.setLong(1, System.currentTimeMillis());
-            ps.setInt(2, message.getAuthorId());
-            ps.setInt(3, message.getRecipientId());
-            ps.setString(4, message.getMessageText());
-            ps.setString(5, message.getReadStatus().toString());
-            ps.setInt(6, message.getDialogId());
-            return ps;
-        }, keyHolder);
-        return getById((int) keyHolder.getKeys().get("id"));
+        SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("message")
+                .usingGeneratedKeyColumns("id");
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("time", System.currentTimeMillis());
+        parameters.put("author_id", message.getAuthorId());
+        parameters.put("recipient_id", message.getRecipientId());
+        parameters.put("message_text", message.getMessageText());
+        parameters.put("read_status", message.getReadStatus().toString());
+        parameters.put("dialog_id", message.getDialogId());
+        return getById(sji.executeAndReturnKey(parameters).intValue());
     }
 
     public Message updateAndReturnMessage(Message message) {
@@ -125,5 +122,22 @@ public class DaoMessage implements Dao<Message> {
                 dialog.getSecondUserId(),
                 dialog.getFirstUserId()},
                 new MessageMapper());
+    }
+
+    public int createDialog(int firstUserId, int secondUserId) {
+        SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("dialog")
+                .usingGeneratedKeyColumns("id");
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("first_user_id", firstUserId);
+        parameters.put("second_user_id", secondUserId);
+        return sji.executeAndReturnKey(parameters).intValue();
+    }
+
+    public Dialog getDialogByUsersId(int firstUserId, int secondUserId) {
+        String getDialog = "SELECT * FROM dialog WHERE (first_user_id = ? AND second_user_id = ?) OR " +
+                "(first_user_id = ? AND second_user_id = ?)";
+        return jdbcTemplate.query(getDialog, new Object[]{firstUserId, secondUserId, secondUserId, firstUserId},
+                new DialogMapper()).stream().findAny().orElse(null);
     }
 }
