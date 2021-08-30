@@ -95,10 +95,15 @@ public class DialogsService {
         return ResponseEntity.ok(response);
     }
 
-    public ResponseEntity<GeneralListResponse<MessageDto>> getMessagesInDialog(int offset, int itemPerPage, int dialogId) {
+    public ResponseEntity<GeneralListResponse<MessageDto>> getMessagesInDialog(int offset,
+                                                                               int itemPerPage,
+                                                                               int dialogId) {
         int userId = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         GeneralListResponse<MessageDto> response = new GeneralListResponse<>(daoMessage.getMessagesInDialog(dialogId)
                 .stream().map(message -> fromMessage(message, userId)).collect(Collectors.toList()));
+        response.getData().stream().filter(messageDto -> messageDto.getReadStatus() == ReadStatus.SENT
+                        && messageDto.getRecipientId().getId() == userId)
+                .forEach(message -> daoMessage.readMessage(dialogId, message.getId()));
         response.setOffset(offset);
         response.setPerPage(itemPerPage);
         response.setTotal(response.getData().size());
