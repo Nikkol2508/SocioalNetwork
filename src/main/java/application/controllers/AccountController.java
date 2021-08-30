@@ -6,11 +6,17 @@ import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.*;
+import application.models.dto.NotificationsSettingsDto;
+import application.models.requests.RecoverPassDtoRequest;
+import application.models.requests.RegistrationDtoRequest;
+import application.models.requests.SetPasswordDtoRequest;
+import application.models.requests.ShiftEmailDtoRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;

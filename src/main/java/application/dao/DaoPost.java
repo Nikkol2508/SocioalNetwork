@@ -1,6 +1,8 @@
 package application.dao;
 
 import application.dao.mappers.PostMapper;
+import application.models.NotificationType;
+import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +18,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DaoPost implements Dao<Post> {
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
+    private final DaoPerson daoPerson;
 
     @Override
     public Post getById(int id) {
@@ -31,7 +35,17 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void save(Post post) {
-
+        jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
+                        "VALUES (?, ?, ?, ?, ?)",
+                post.getTime(),
+                post.getAuthorId(),
+                post.getPostText(),
+                post.getTitle(),
+                post.isBlocked());
+        for (Person person : daoPerson.getFriends(daoPerson.getAuthPerson().getId())) {
+            daoNotification.addNotification(person.getId(), post.getTime(), post.getId(),
+                    daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(), post.getTitle());
+        }
     }
 
     public Post savePost (Post post) {
@@ -39,14 +53,14 @@ public class DaoPost implements Dao<Post> {
                 "VALUES (?, ?, ?, ?, ?)";
         GeneratedKeyHolder key = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
-            PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-                ps.setLong(1, post.getTime());
-                ps.setInt(2, post.getAuthorId());
-                ps.setString(3, post.getPostText());
-                ps.setString(4, post.getTitle());
-                ps.setBoolean(5, post.isBlocked());
-            return ps;},
-            key);
+                    PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                    ps.setLong(1, post.getTime());
+                    ps.setInt(2, post.getAuthorId());
+                    ps.setString(3, post.getPostText());
+                    ps.setString(4, post.getTitle());
+                    ps.setBoolean(5, post.isBlocked());
+                    return ps;},
+                key);
         return getById((int) key.getKeys().get("id"));
     }
 
@@ -100,5 +114,4 @@ public class DaoPost implements Dao<Post> {
                 " AND author_id = " + id +
                 " ORDER BY time desc", new PostMapper());
     }
-
 }

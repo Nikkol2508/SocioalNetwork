@@ -1,29 +1,49 @@
 package application.service;
 
+import application.dao.DaoNotification;
+import application.dao.DaoPerson;
+import application.models.Notification;
+import application.models.Person;
+import application.models.dto.CommentAuthorDto;
+import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
+import application.models.responses.GeneralResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class NotificationService {
-
+    private final DaoNotification daoNotification;
+    private final DaoPerson daoPerson;
 
     public GeneralListResponse<NotificationDto> getNotifications() {
+        return new GeneralListResponse<>(getNotificationsDtoForNotifications
+                (daoNotification.getUserNotifications(daoPerson.getAuthPerson().getId())));
+    }
 
-        List<NotificationDto> notificationDTOList = new ArrayList<>();
+    public GeneralResponse<MessageResponseDto> readNotifications() {
+        daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
+    }
 
-        NotificationDto notificationDto = new NotificationDto();
-        notificationDto.setId(1);
-        notificationDto.setNotificationType("POST_COMMENT");
-        notificationDto.setSentTime(System.currentTimeMillis());
-
-        notificationDto.setInfo("Проверка сообщений");
-
-        notificationDTOList.add(notificationDto);
-
-        return new GeneralListResponse<>(notificationDTOList);
+    private List<NotificationDto> getNotificationsDtoForNotifications(List<Notification> list) {
+        List<NotificationDto> notificationDtoList = new ArrayList<>();
+        for (Notification notification : list) {
+            NotificationDto notificationDto = new NotificationDto();
+            notificationDto.setId(notification.getId());
+            notificationDto.setNotificationType(notification.getType());
+            Person person = daoPerson.getById(notification.getEntityId());
+            notificationDto.setEntityAuthor(new CommentAuthorDto(person.getId(), person.getFirstName(),
+                    person.getLastName()));
+            notificationDto.setSentTime(notification.getSentTime());
+            notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
+            notificationDtoList.add(notificationDto);
+        }
+        return notificationDtoList;
     }
 }

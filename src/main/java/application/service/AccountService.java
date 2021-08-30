@@ -5,12 +5,15 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
-import application.models.NotificationSettingType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
 import application.models.requests.*;
+import application.models.requests.RecoverPassDtoRequest;
+import application.models.requests.RegistrationDtoRequest;
+import application.models.requests.SetPasswordDtoRequest;
+import application.models.requests.ShiftEmailDtoRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -59,24 +62,7 @@ public class AccountService {
         person.setApproved(false);
         daoPerson.save(person);
         GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(new MessageResponseDto("ok"));
-        setStartNotificationSettings(request.getEmail());
         return ResponseEntity.ok(response);
-    }
-
-    public void setStartNotificationSettings(String email) {
-        List<NotificationSettingType> codes = Stream.of(NotificationSettingType.values()).collect(Collectors.toList());
-        for (int i = 0; i <= codes.size() - 1; i++) {
-            daoNotification.setDefaultSettings(daoPerson.getByEmail(email).getId(), codes.get(i).toString());
-        }
-    }
-
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setNotificationSettings(NotificationRequest request) {
-        System.out.println(request);
-        System.out.println(daoPerson.getAuthPerson().getId() + " " + request.getNotification_type() + " "
-                + request.isEnable());
-        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotification_type(),
-                request.isEnable());
-        return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
     }
 
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(SetPasswordDtoRequest request)
