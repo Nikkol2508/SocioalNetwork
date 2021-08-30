@@ -1,13 +1,15 @@
 package application.dao;
 
 import application.dao.mappers.PostMapper;
-import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 
 @Component
@@ -22,17 +24,48 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public List<Post> getAll() {
-        return jdbcTemplate.query("SELECT * FROM post ORDER BY time desc", new PostMapper());
+        return jdbcTemplate.query("SELECT * FROM post WHERE time < " +
+                System.currentTimeMillis() + " AND is_blocked = false ORDER BY time desc", new PostMapper());
     }
 
     @Override
     public void save(Post post) {
+//        KeyHolder key = new GeneratedKeyHolder();
+//        jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
+//                        "VALUES (?, ?, ?, ?, ?)",
+//                post.getTime(),
+//                post.getAuthorId(),
+//                post.getPostText(),
+//                post.getTitle(),
+//                post.isBlocked(), key);
+//        return key.getKey().intValue();
+    }
 
+    public Post savePost (Post post) {
+        String query = "INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        GeneratedKeyHolder key = new GeneratedKeyHolder();
+        jdbcTemplate.update(con -> {
+            PreparedStatement ps = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+                ps.setLong(1, post.getTime());
+                ps.setInt(2, post.getAuthorId());
+                ps.setString(3, post.getPostText());
+                ps.setString(4, post.getTitle());
+                ps.setBoolean(5, post.isBlocked());
+            return ps;},
+            key);
+        return getById((int) key.getKeys().get("id"));
     }
 
     @Override
     public void update(Post post) {
-
+        jdbcTemplate.update("UPDATE post SET time=?, author_id=?, post_text=?, title=?, is_blocked=? WHERE id=?",
+                post.getTime(),
+                post.getAuthorId(),
+                post.getPostText(),
+                post.getTitle(),
+                post.isBlocked(),
+                post.getId());
     }
 
     public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
@@ -46,8 +79,8 @@ public class DaoPost implements Dao<Post> {
     }
 
     @Override
-    public void delete(Post post) {
-
+    public void delete(int id) {
+        jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
     }
 
 
@@ -73,9 +106,6 @@ public class DaoPost implements Dao<Post> {
 //        }
     }
 
-    public void delete(Person person) {
-//        postRepository.deleteById(id);
-    }
 
     public void deleteGoalList() {
 //        postRepository.deleteAll();
@@ -107,4 +137,13 @@ public class DaoPost implements Dao<Post> {
                         dateTo, dateTo},
                 new PostMapper());
     }
+
+    public List<Post> getAllUsersPosts(int id) {
+        return jdbcTemplate.query("SELECT * FROM post WHERE time < " +
+                System.currentTimeMillis() +
+                " AND is_blocked = false " +
+                " AND author_id = " + id +
+                " ORDER BY time desc", new PostMapper());
+    }
+
 }

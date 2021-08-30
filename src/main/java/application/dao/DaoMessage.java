@@ -71,7 +71,7 @@ public class DaoMessage implements Dao<Message> {
     }
 
     @Override
-    public void delete(Message message) {
+    public void delete(int messageId) {
 
     }
 

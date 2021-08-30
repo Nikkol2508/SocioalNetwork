@@ -1,15 +1,13 @@
 package application.service;
 
-import application.dao.DaoComment;
-import application.dao.DaoLike;
-import application.dao.DaoPerson;
-import application.dao.DaoPost;
+import application.dao.*;
 import application.models.Person;
 import application.models.Post;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
+import application.models.requests.PostRequest;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +31,7 @@ public class ProfileService {
     private final DaoPost daoPost;
     private final DaoLike daoLike;
     private final DaoComment daoComment;
+    private final DaoTag daoTag;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
@@ -54,7 +53,7 @@ public class ProfileService {
 
         List<PostDto> postDtoList = new ArrayList<>();
 
-        for (Post post : daoPost.getAll()) {
+        for (Post post : daoPost.getAllUsersPosts(id)) {
             PostDto postDto = postsService.getPostDto(post.getId());
             postDto.setType("POSTED");
             postDtoList.add(postDto);
@@ -70,6 +69,21 @@ public class ProfileService {
                 .stream()
                 .map(PersonDto::fromPerson)
                 .collect(Collectors.toList()));
+    }
+
+    public GeneralResponse<Post> setPost(int authorId, Long publishDate, PostRequest postRequest) {
+        Post addPost = new Post();
+        addPost.setTitle(postRequest.getTitle());
+        addPost.setPostText(postRequest.getPostText());
+        addPost.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
+        addPost.setBlocked(false);
+        addPost.setAuthorId(authorId);
+        int postId = daoPost.savePost(addPost).getId();
+        for (String tag : postRequest.getTags()){
+            daoTag.save(tag);
+            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
+        return new GeneralResponse<>(addPost);
     }
 
     public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
@@ -97,7 +111,7 @@ public class ProfileService {
         daoLike.deleteByPersonId(person.getId());
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
-        daoPerson.delete(person);
-        return ResponseEntity.ok(new GeneralResponse<MessageResponseDto>(new MessageResponseDto("ok")));
+        daoPerson.delete(person.getId());
+        return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
     }
 }
