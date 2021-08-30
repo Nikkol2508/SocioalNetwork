@@ -1,6 +1,7 @@
 package application.dao;
 
 import application.dao.mappers.PostMapper;
+import application.models.NotificationType;
 import application.models.Person;
 import application.models.Post;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DaoPost implements Dao<Post> {
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
+    private final DaoPerson daoPerson;
 
     @Override
     public Post getById(int id) {
@@ -35,6 +38,10 @@ public class DaoPost implements Dao<Post> {
                 post.getPostText(),
                 post.getTitle(),
                 post.isBlocked());
+        for (Person person : daoPerson.getFriends(daoPerson.getAuthPerson().getId())) {
+            daoNotification.addNotification(person.getId(), post.getTime(), post.getId(),
+                    daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(), post.getTitle());
+        }
     }
 
     @Override

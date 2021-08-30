@@ -7,10 +7,7 @@ import application.models.responses.GeneralResponse;
 import application.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +22,7 @@ public class NotificationController {
   }
 
   @PutMapping("/notifications")
-  private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications() {
+  private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications(@RequestParam(required = false) boolean all) {
     return ResponseEntity.ok(notificationService.readNotifications());
   }
 }

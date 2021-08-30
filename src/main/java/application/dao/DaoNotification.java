@@ -7,6 +7,7 @@ import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +21,8 @@ public class DaoNotification {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Notification> getUserNotifications(int id) {
-        String selectNotifications = "SELECT * FROM notification WHERE person_id = ?";
+        String selectNotifications = "SELECT * FROM notification JOIN notification_type nt on nt.id = notification.type_id" +
+                " WHERE person_id = ? AND name != 'READ'";
         return jdbcTemplate.query(selectNotifications, new Object[]{id} ,new NotificationMapper());
     }
 
@@ -52,5 +54,16 @@ public class DaoNotification {
         String update = "UPDATE notification_type SET name = 'READ' WHERE id = (SELECT type_id FROM notification" +
                 " WHERE person_id = ?)";
         jdbcTemplate.update(update, id);
+    }
+
+    public String getNotificationName(int id) {
+        try {
+            String select = "SELECT name FROM notification_type JOIN notification n on notification_type.id = n.type_id" +
+                    " WHERE n.id = ?";
+            return jdbcTemplate.queryForObject(select, new Object[]{id}, String.class);
+        }
+        catch (EmptyResultDataAccessException e) {
+            return "";
+        }
     }
 }
