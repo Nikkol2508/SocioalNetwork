@@ -3,31 +3,31 @@
 
 CREATE TABLE IF NOT EXISTS "user"
 (
-    id       SERIAL    NOT NULL,
-    name     TEXT      NOT NULL,
-    e_mail   TEXT      NOT NULL,
-    password TEXT      NOT NULL,
-    type     TEXT      NOT NULL,
+    id       SERIAL NOT NULL,
+    name     TEXT   NOT NULL,
+    e_mail   TEXT   NOT NULL,
+    password TEXT   NOT NULL,
+    type     TEXT   NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE IF NOT EXISTS person
 (
-    Id                  SERIAL    NOT NULL,
-    first_name          TEXT      NOT NULL,
-    last_name           TEXT      NOT NULL,
+    Id                  SERIAL NOT NULL,
+    first_name          TEXT   NOT NULL,
+    last_name           TEXT   NOT NULL,
     reg_date            BIGINT NOT NULL,
     birth_date          BIGINT,
-    e_mail              TEXT      NOT NULL,
+    e_mail              TEXT   NOT NULL,
     phone               TEXT,
-    password            TEXT      NOT NULL,
+    password            TEXT   NOT NULL,
     photo               TEXT,
     about               TEXT,
     country             TEXT,
     city                TEXT,
     confirmation_code   TEXT,
     is_approved         BOOLEAN,
-    messages_permission TEXT      NOT NULL,
+    messages_permission TEXT   NOT NULL,
     last_online_time    BIGINT,
     is_blocked          BOOLEAN,
     PRIMARY KEY (id)
@@ -35,22 +35,22 @@ CREATE TABLE IF NOT EXISTS person
 
 CREATE TABLE IF NOT EXISTS post
 (
-    id         SERIAL    NOT NULL,
-    time       BIGINT    NOT NULL,
-    author_id  INT       NOT NULL,
-    title     TEXT       NOT NULL,
-    post_text  TEXT      NOT NULL,
-    is_blocked BOOLEAN   NOT NULL,
+    id         SERIAL  NOT NULL,
+    time       BIGINT  NOT NULL,
+    author_id  INT     NOT NULL,
+    title      TEXT    NOT NULL,
+    post_text  TEXT    NOT NULL,
+    is_blocked BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS friendship_status
 (
-    id   SERIAL    NOT NULL,
-    time BIGINT    NOT NULL,
-    name TEXT      NOT NULL,
-    code TEXT      NOT NULL,
+    id   SERIAL NOT NULL,
+    time BIGINT NOT NULL,
+    name TEXT   NOT NULL,
+    code TEXT   NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -71,13 +71,13 @@ CREATE TABLE IF NOT EXISTS tag
 
 CREATE TABLE IF NOT EXISTS post_comment
 (
-    id           SERIAL    NOT NULL,
-    time         BIGINT    NOT NULL,
-    post_id      INT       NOT NULL,
+    id           SERIAL  NOT NULL,
+    time         BIGINT  NOT NULL,
+    post_id      INT     NOT NULL,
     parent_id    INT,
-    author_id    INT       NOT NULL,
-    comment_text TEXT      NOT NULL,
-    is_blocked   BOOLEAN   NOT NULL,
+    author_id    INT     NOT NULL,
+    comment_text TEXT    NOT NULL,
+    is_blocked   BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
     FOREIGN KEY (parent_id) REFERENCES post_comment (id) ON DELETE RESTRICT,
@@ -86,12 +86,12 @@ CREATE TABLE IF NOT EXISTS post_comment
 
 CREATE TABLE IF NOT EXISTS block_history
 (
-    id         SERIAL    NOT NULL,
-    time       BIGINT    NOT NULL,
-    person_id  INT       NOT NULL,
-    post_id    INT       NOT NULL,
-    comment_id INT       NOT NULL,
-    action     TEXT      NOT NULL,
+    id         SERIAL NOT NULL,
+    time       BIGINT NOT NULL,
+    person_id  INT    NOT NULL,
+    post_id    INT    NOT NULL,
+    comment_id INT    NOT NULL,
+    action     TEXT   NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
@@ -100,12 +100,12 @@ CREATE TABLE IF NOT EXISTS block_history
 
 CREATE TABLE IF NOT EXISTS message
 (
-    id           SERIAL    NOT NULL,
-    time         BIGINT    NOT NULL,
-    author_id    INT       NOT NULL,
-    recipient_id INT       NOT NULL,
+    id           SERIAL NOT NULL,
+    time         BIGINT NOT NULL,
+    author_id    INT    NOT NULL,
+    recipient_id INT    NOT NULL,
     message_text TEXT,
-    read_status  TEXT      NOT NULL,
+    read_status  TEXT   NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (recipient_id) REFERENCES person (id) ON DELETE RESTRICT
@@ -125,10 +125,10 @@ CREATE TABLE IF NOT EXISTS friendship
 
 CREATE TABLE IF NOT EXISTS post_like
 (
-    id        SERIAL    NOT NULL,
+    id        SERIAL NOT NULL,
     time      BIGINT NOT NULL,
-    person_id INT       NOT NULL,
-    post_id   INT       NOT NULL,
+    person_id INT    NOT NULL,
+    post_id   INT    NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT
@@ -156,13 +156,31 @@ CREATE TABLE IF NOT EXISTS post2tag
 
 CREATE TABLE IF NOT EXISTS notification
 (
-    id        SERIAL    NOT NULL,
-    type_id   INT       NOT NULL,
-    send_time BIGINT    NOT NULL,
-    person_id INT       NOT NULL,
-    entity_id INT       NOT NULL,
-    contact   TEXT      NOT NULL,
+    id        SERIAL NOT NULL,
+    type_id   INT    NOT NULL,
+    send_time BIGINT NOT NULL,
+    person_id INT    NOT NULL,
+    entity_id INT    NOT NULL,
+    contact   TEXT   NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
     FOREIGN KEY (type_id) REFERENCES notification_type (id) ON DELETE RESTRICT
+);
+
+CREATE TABLE IF NOT EXISTS notification_setting_type
+(
+    id     SERIAL  NOT NULL,
+    code   TEXT    NOT NULL,
+    status BOOLEAN NOT NULL DEFAULT true,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS notification_settings
+(
+    id        SERIAL NOT NULL,
+    person_id INT    NOT NULL,
+    type_id   INT    NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
+    FOREIGN KEY (type_id) REFERENCES notification_setting_type (id) ON DELETE RESTRICT
 );

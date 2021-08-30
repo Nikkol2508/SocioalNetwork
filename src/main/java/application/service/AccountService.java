@@ -1,16 +1,17 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
+import application.models.NotificationSettingType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.dto.NotificationsSettingsDto;
+import application.models.requests.*;
+import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
@@ -27,6 +28,9 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +38,7 @@ public class AccountService {
 
     private final DaoPerson daoPerson;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final DaoNotification daoNotification;
     private final JavaMailSender mailSender;
 
     public ResponseEntity<GeneralResponse<MessageResponseDto>> register(RegistrationDtoRequest request)
@@ -49,11 +54,29 @@ public class AccountService {
         person.setEmail(request.getEmail());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
+        person.setPhoto("storage/stock.jpeg");
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
         GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(new MessageResponseDto("ok"));
+        setStartNotificationSettings(request.getEmail());
         return ResponseEntity.ok(response);
+    }
+
+    public void setStartNotificationSettings(String email) {
+        List<NotificationSettingType> codes = Stream.of(NotificationSettingType.values()).collect(Collectors.toList());
+        for (int i = 0; i <= codes.size() - 1; i++) {
+            daoNotification.setDefaultSettings(daoPerson.getByEmail(email).getId(), codes.get(i).toString());
+        }
+    }
+
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setNotificationSettings(NotificationRequest request) {
+        System.out.println(request);
+        System.out.println(daoPerson.getAuthPerson().getId() + " " + request.getNotification_type() + " "
+                + request.isEnable());
+        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotification_type(),
+                request.isEnable());
+        return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
     }
 
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(SetPasswordDtoRequest request)
@@ -180,4 +203,7 @@ public class AccountService {
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
 
+    public GeneralListResponse<NotificationsSettingsDto> getPersonNotificationsSettings() {
+        return new GeneralListResponse<>(daoNotification.getNotificationsSettings(daoPerson.getAuthPerson().getId()));
+    }
 }

@@ -19,7 +19,8 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public Post getById(int id) {
-        return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper())
+                .stream().findAny().orElse(null);
     }
 
     @Override
@@ -30,15 +31,7 @@ public class DaoPost implements Dao<Post> {
 
     @Override
     public void save(Post post) {
-//        KeyHolder key = new GeneratedKeyHolder();
-//        jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
-//                        "VALUES (?, ?, ?, ?, ?)",
-//                post.getTime(),
-//                post.getAuthorId(),
-//                post.getPostText(),
-//                post.getTitle(),
-//                post.isBlocked(), key);
-//        return key.getKey().intValue();
+
     }
 
     public Post savePost (Post post) {
@@ -68,47 +61,9 @@ public class DaoPost implements Dao<Post> {
                 post.getId());
     }
 
-    public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
-//        post.setTitle(title);
-//        post.setPostText(text);
-//        post.setTime(time);
-//        post.setAuthor(authorId);
-//        post.setBlocked(isBlocked);
-//        Post newPost = null;
-       return post.getId();
-    }
-
     @Override
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
-    }
-
-
-//    public int save(Post post,int authorId, String text, String title, long time, Boolean isBlocked) {
-////        post.setTitle(title);
-////        post.setPostText(text);
-////        post.setTime(time);
-////        post.setAuthor(authorId);
-////        post.setBlocked(isBlocked);
-////        Post newPost = null;
-//       return post.getId();
-//    }
-
-    public void update(@PathVariable int id, String text, String title, long time) {
-//        Optional<Post> postOptional = null;
-//        Post changedPost = postOptional.get();
-//        if (!postOptional.isPresent()) {
-//            System.out.println("not found");
-//        } else {
-//            changedPost.setPostText(text);
-//            changedPost.setTitle(title);
-//            changedPost.setTime(time);
-//        }
-    }
-
-
-    public void deleteGoalList() {
-//        postRepository.deleteAll();
     }
 
     public void deleteByAuthorId(int id){

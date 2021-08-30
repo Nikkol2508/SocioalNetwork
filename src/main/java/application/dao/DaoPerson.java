@@ -1,7 +1,9 @@
 package application.dao;
 
+import application.dao.mappers.IdMapper;
 import application.dao.mappers.PersonMapper;
 import application.models.FriendshipStatus;
+import application.models.NotificationType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +23,14 @@ import java.util.List;
 public class DaoPerson implements Dao<Person> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
 
+    public Integer getPersonIdByEmail(String email) {
+        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
+
+        return jdbcTemplate.query(selectPersonIdByEmail, new Object[]{email}, new IdMapper())
+            .stream().findAny().orElse(null);
+    }
 
     public Person getByEmail(String email) {
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
@@ -62,15 +71,16 @@ public class DaoPerson implements Dao<Person> {
 
     public void save(Person person) {
         String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
-                " e_mail, reg_date, messages_permission) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                " e_mail, reg_date, messages_permission, photo) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsertPerson,
                 person.getFirstName(),
                 person.getLastName(),
                 person.getPassword(),
                 person.getEmail(),
                 System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString());
+                PermissionMessagesType.ALL.toString(),
+                person.getPhoto());
     }
 
     @Override
@@ -132,6 +142,10 @@ public class DaoPerson implements Dao<Person> {
                 FriendshipStatus.REQUEST.toString());
 
         jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
+        int entityId = jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id = ? AND dst_person_id" +
+                " = ?", new Object[]{srcId, dtsId}, Integer.class);
+        daoNotification.addNotification(dtsId, System.currentTimeMillis(), entityId,
+                getAuthPerson().getEmail(), NotificationType.FRIEND_REQUEST.toString());
     }
 
     public void addFriendRequest(int srcId, int dtsId) {

@@ -34,3 +34,7 @@ databaseChangeLog:
   - include:
       file: like-corrections.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: create-image-table.sql
+      relativeToChangelogFile: true

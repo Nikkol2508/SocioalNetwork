@@ -18,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +35,7 @@ public class ProfileService {
     private final DaoLike daoLike;
     private final DaoComment daoComment;
     private final DaoTag daoTag;
+    private final DaoFile daoFile;
 
     public GeneralResponse<PersonDto> getPerson(int id) {
 
@@ -86,20 +90,26 @@ public class ProfileService {
         return new GeneralResponse<>(addPost);
     }
 
-    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Person person = daoPerson.getByEmail(authentication.getName());
+    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request)
+            throws ParseException {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Person person = daoPerson.getByEmail(email);
         if (person == null) {
-            throw new EntityNotFoundException("Person with this token is not found.");
+            throw new EntityNotFoundException("Person with email: " + email + " not found");
         }
 
-        daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(), request.getBirthDate(),
-                request.getPhone(), request.getPhoto(), request.getCity(), request.getCountry(), request.getAbout());
-
-        PersonDto personDto = PersonDto.fromPerson(person);
-
-        return ResponseEntity.ok(new GeneralResponse<>(personDto));
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
+        if (request.getFirstName().isBlank() || request.getLastName().isBlank()) {
+            return ResponseEntity.badRequest().body(new GeneralResponse<>(PersonDto.fromPerson(person)));
+        } else {
+            daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(),
+                    birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhotoId())),
+                    request.getCity(), request.getCountry(), request.getAbout());
+            return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
+        }
     }
+
 
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

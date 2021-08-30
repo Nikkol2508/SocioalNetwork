@@ -1,16 +1,25 @@
 package application.models.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class PersonSettingsDtoRequest {
 
-    private String firstName;
-    private String lastName;
     private String phone;
-    private String photo;
     private String about;
     private String city;
     private String country;
-    private long birthDate;
+
+    @JsonProperty("photo_id")
+    private String photoId;
+
+    @JsonProperty("last_name")
+    private String lastName;
+
+    @JsonProperty("first_name")
+    private String firstName;
+
+    @JsonProperty("birth_date")
+    private String birthDate;
 }

@@ -1,6 +1,6 @@
 package application.service;
 
-import application.models.dto.NotificationDTO;
+import application.models.dto.NotificationDto;
 import application.models.responses.GeneralListResponse;
 import org.springframework.stereotype.Service;
 
@@ -11,19 +11,18 @@ import java.util.List;
 public class NotificationService {
 
 
-    public GeneralListResponse<NotificationDTO> getNotifications() {
+    public GeneralListResponse<NotificationDto> getNotifications() {
 
-        List<NotificationDTO> notificationDTOList = new ArrayList<>();
+        List<NotificationDto> notificationDTOList = new ArrayList<>();
 
-        NotificationDTO notificationDTO = new NotificationDTO();
-        notificationDTO.setId(1);
-        notificationDTO.setType_id(1);
-        notificationDTO.setNotification_type("POST_COMMENT");
-        notificationDTO.setSent_time(System.currentTimeMillis());
-        notificationDTO.setEntity_id(8);
-        notificationDTO.setInfo("Проверка сообщений");
+        NotificationDto notificationDto = new NotificationDto();
+        notificationDto.setId(1);
+        notificationDto.setNotificationType("POST_COMMENT");
+        notificationDto.setSentTime(System.currentTimeMillis());
 
-        notificationDTOList.add(notificationDTO);
+        notificationDto.setInfo("Проверка сообщений");
+
+        notificationDTOList.add(notificationDto);
 
         return new GeneralListResponse<>(notificationDTOList);
     }

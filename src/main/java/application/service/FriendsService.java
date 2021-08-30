@@ -69,7 +69,7 @@ public class FriendsService {
             personDto.setLastName(person.getLastName());
             personDto.setRegDate(person.getRegDate());
             personDto.setBirthDate(person.getBirthDate());
-            personDto.setMessagesPermission("ALL");
+            personDto.setMessagesPermission(person.getMessagesPermission().toString());
             personDto.setLastOnlineTime(person.getLastOnlineTime());
             personDto.setBlocked(person.isBlocked());
             personDtos.add(personDto);
