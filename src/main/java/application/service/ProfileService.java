@@ -54,7 +54,11 @@ public class ProfileService {
 
         for (Post post : daoPost.getAllUsersPosts(id)) {
             PostDto postDto = postsService.getPostDto(post.getId());
-            postDto.setType("POSTED");
+            if (postDto.getTime() > System.currentTimeMillis()) {
+                postDto.setType("QUEUED");
+            } else {
+                postDto.setType("POSTED");
+            }
             postDtoList.add(postDto);
         }
         return new GeneralListResponse<>(postDtoList);
@@ -78,7 +82,7 @@ public class ProfileService {
         addPost.setBlocked(false);
         addPost.setAuthorId(authorId);
         int postId = daoPost.savePost(addPost).getId();
-        for (String tag : postRequest.getTags()){
+        for (String tag : postRequest.getTags()) {
             daoTag.save(tag);
             daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
