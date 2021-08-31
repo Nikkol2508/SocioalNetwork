@@ -39,7 +39,7 @@ public class NotificationService {
             notificationDto.setNotificationType(notification.getType());
             Person person = daoPerson.getById(notification.getEntityId());
             notificationDto.setEntityAuthor(new CommentAuthorDto(person.getId(), person.getFirstName(),
-                    person.getLastName()));
+                    person.getLastName(), person.getPhoto()));
             notificationDto.setSentTime(notification.getSentTime());
             notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
             notificationDtoList.add(notificationDto);

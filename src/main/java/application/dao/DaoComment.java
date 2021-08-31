@@ -20,11 +20,13 @@ public class DaoComment implements Dao<Comment> {
     private final DaoPerson daoPerson;
 
     public List<Comment> getCommentsByPostId(Integer postId) {
-        return jdbcTemplate.query("SELECT * FROM post_comment WHERE post_id = ? AND parent_id isnull ", new Object[]{postId}, new PostCommentMapper());
+        return jdbcTemplate.query("SELECT * FROM post_comment WHERE post_id = ? AND parent_id isnull ",
+                new Object[]{postId}, new PostCommentMapper());
     }
 
     public int getPostIdByCommentId(Integer commentId) {
-        return jdbcTemplate.queryForObject("SELECT post_id FROM post_comment WHERE id = ?", new Object[]{commentId}, Integer.class);
+        return jdbcTemplate.queryForObject("SELECT post_id FROM post_comment WHERE id = ?", new Object[]{commentId},
+                Integer.class);
     }
 
     public List<Comment> getSubComment(Integer id) {
@@ -54,7 +56,8 @@ public class DaoComment implements Dao<Comment> {
                 comment.isBlocked());
         Person person = daoPerson.getById(daoPost.getById(comment.getPostId()).getId());
         daoNotification.addNotification(person.getId(), comment.getTime(), comment.getId(), person.getEmail(),
-                NotificationType.POST_COMMENT.toString(), comment.getCommentText());
+                comment.getParentId() == null ? NotificationType.POST_COMMENT.toString()
+                        : NotificationType.COMMENT_COMMENT.toString(), comment.getCommentText());
     }
 
     @Override

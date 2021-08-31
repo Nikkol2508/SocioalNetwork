@@ -18,7 +18,7 @@ public class NotificationController {
 
   @GetMapping("/notifications")
   private ResponseEntity<GeneralListResponse<NotificationDto>> getNotifications() {
-    return ResponseEntity.ok(notificationService.getNotifications());
+      return ResponseEntity.ok(notificationService.getNotifications());
   }
 
   @PutMapping("/notifications")

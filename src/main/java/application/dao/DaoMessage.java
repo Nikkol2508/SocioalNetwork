@@ -4,6 +4,7 @@ import application.dao.mappers.DialogMapper;
 import application.dao.mappers.MessageMapper;
 import application.models.Dialog;
 import application.models.Message;
+import application.models.NotificationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -20,6 +21,8 @@ import java.util.Map;
 public class DaoMessage implements Dao<Message> {
 
     private final JdbcTemplate jdbcTemplate;
+    private final DaoNotification daoNotification;
+    private final DaoPerson daoPerson;
 
     @Override
     public Message getById(int id) {
@@ -55,6 +58,8 @@ public class DaoMessage implements Dao<Message> {
         parameters.put("message_text", message.getMessageText());
         parameters.put("read_status", message.getReadStatus().toString());
         parameters.put("dialog_id", message.getDialogId());
+        daoNotification.addNotification(message.getRecipientId(), message.getTime(), message.getId(),
+                daoPerson.getById(message.getAuthorId()).getEmail(), NotificationType.MESSAGE.toString());
         return getById(sji.executeAndReturnKey(parameters).intValue());
     }
 
