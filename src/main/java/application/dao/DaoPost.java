@@ -108,10 +108,7 @@ public class DaoPost implements Dao<Post> {
     }
 
     public List<Post> getAllUsersPosts(int id) {
-        return jdbcTemplate.query("SELECT * FROM post WHERE time < " +
-                System.currentTimeMillis() +
-                " AND is_blocked = false " +
-                " AND author_id = " + id +
+        return jdbcTemplate.query("SELECT * FROM post WHERE is_blocked = false AND author_id = " + id +
                 " ORDER BY time desc", new PostMapper());
     }
 }

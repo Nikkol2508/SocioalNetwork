@@ -122,7 +122,7 @@ public class PostsService {
         }
         daoComment.update(postComment);
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
-        CommentDto commentDto = CommentDto.fromComment(postComment,daoPerson.getAuthPerson(),
+        CommentDto commentDto = CommentDto.fromComment(postComment, daoPerson.getAuthPerson(),
                 getSubComments(postComment.getParentId()), likes);
         return new GeneralResponse<>(commentDto);
     }
@@ -134,14 +134,14 @@ public class PostsService {
                 daoComment.delete(subComment.getId());
             }
         }
-            if (postId.equals("undefined")) {
-                postId = String.valueOf(daoComment.getPostIdByCommentId(comment_id));
-                undefinedPostId = postId;
-            }
-            HashMap<String, Integer> response = new HashMap<>();
-            response.put("id", comment_id);
-            daoComment.delete(comment_id);
-            return new GeneralResponse<>(response);
+        if (postId.equals("undefined")) {
+            postId = String.valueOf(daoComment.getPostIdByCommentId(comment_id));
+            undefinedPostId = postId;
+        }
+        HashMap<String, Integer> response = new HashMap<>();
+        response.put("id", comment_id);
+        daoComment.delete(comment_id);
+        return new GeneralResponse<>(response);
     }
 
     public GeneralResponse<LikeResponseDto> getLikes(int itemId, String type) {
@@ -176,8 +176,7 @@ public class PostsService {
 
         if(request.getType().equals("Comment")) {
             undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(request.getItem_id()));
-        }
-        else undefinedPostId = String.valueOf(request.getItem_id());
+        } else undefinedPostId = String.valueOf(request.getItem_id());
 
         LikeResponseDto likeResponseDto = new LikeResponseDto();
         List<String> userList = daoLike.getUsersLike(request.getItem_id(), request.getType());
@@ -192,8 +191,7 @@ public class PostsService {
         daoLike.delete(itemId, type, currentPerson.getId());
         if(type.equals("Comment")) {
             undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(itemId));
-        }
-        else undefinedPostId = String.valueOf(itemId);
+        } else undefinedPostId = String.valueOf(itemId);
         HashMap<String, String> deleteLikeResponse = new HashMap<>();
         deleteLikeResponse.put("likes", "1");
         return new GeneralResponse<>(deleteLikeResponse);
@@ -252,7 +250,7 @@ public class PostsService {
         Post post = daoPost.getById(postId);
         post.setPostText(request.getPostText());
         post.setTitle(request.getTitle());
-        List <String> oldTagList = daoTag.getTagsByPostId(postId);
+        List<String> oldTagList = daoTag.getTagsByPostId(postId);
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
@@ -264,9 +262,32 @@ public class PostsService {
         return new GeneralResponse<>(getPostDto(postId));
     }
 
-    public GeneralResponse<MessageResponseDto> deletePost(int id) {
-
-        daoPost.delete(id);
+    public GeneralResponse<MessageRequestDto> deletePost(int postId) {
+        for (String tag : daoTag.getTagsByPostId(postId)) {
+            daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
+        for (Like like : daoLike.getLikeByPost(postId, "Post")) {
+            daoLike.delete(postId, "Post", like.getPersonId());
+        }
+        List<Comment> comments = daoComment.getCommentsByPostId(postId);
+        if (comments.size() != 0) {
+            for (Comment comment : comments) {
+                List<Comment> subComments = daoComment.getSubComment(comment.getId());
+                if (subComments.size() != 0) {
+                    for (Comment subComment : subComments) {
+                        for (Like likeOnSubComment : daoLike.getLikeByPost(subComment.getId(), "Comment")) {
+                            daoLike.delete(subComment.getId(), "Comment", likeOnSubComment.getPersonId());
+                        }
+                        daoComment.delete(subComment.getId());
+                    }
+                }
+                for (Like likeOnComment : daoLike.getLikeByPost(comment.getId(), "Comment")) {
+                    daoLike.delete(comment.getId(), "Comment", likeOnComment.getPersonId());
+                }
+                daoComment.delete(comment.getId());
+            }
+        }
+        daoPost.delete(postId);
         return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 }
