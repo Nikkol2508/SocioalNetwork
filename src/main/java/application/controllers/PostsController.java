@@ -42,14 +42,6 @@ public class PostsController {
         return ResponseEntity.ok(postsService.getCommentsResponse(id));
     }
 
-//    @GetMapping("/undefined/comments")
-//    public ResponseEntity<GeneralListResponse<CommentDto>> getSubComments(HttpServletResponse httpServletResponse)
-//            throws IOException {
-//
-//        httpServletResponse.sendRedirect("/api/v1/feeds");
-//        return ResponseEntity.ok(postsService.getSubCommentsResponse());
-//    }
-
     @PostMapping("/{id}/comments")
     public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
                                                                 @RequestBody CommentRequest commentRequest) {

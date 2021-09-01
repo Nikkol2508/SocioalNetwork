@@ -1,10 +1,14 @@
 package application.models.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
 public class CommentRequest {
 
-    private Integer parent_id;
-    private String comment_text;
+    @JsonProperty("parent_id")
+    private Integer parentId;
+
+    @JsonProperty("comment_text")
+    private String commentText;
 }

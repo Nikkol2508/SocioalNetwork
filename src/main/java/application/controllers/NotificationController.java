@@ -22,7 +22,8 @@ public class NotificationController {
   }
 
   @PutMapping("/notifications")
-  private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications(@RequestParam(required = false) boolean all) {
+  private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications(
+          @RequestParam(required = false) boolean all) throws InterruptedException {
     return ResponseEntity.ok(notificationService.readNotifications());
   }
 }

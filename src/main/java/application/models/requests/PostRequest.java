@@ -13,6 +13,6 @@ public class PostRequest {
     @JsonProperty("post_text")
     private String postText;
 
-    private List <String> tags;
+    private List<String> tags;
 
 }

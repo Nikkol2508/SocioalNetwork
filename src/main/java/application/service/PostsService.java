@@ -11,8 +11,6 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -73,12 +71,6 @@ public class PostsService {
         return subCommentsList;
     }
 
-
-//    public GeneralListResponse<CommentDto> getSubCommentsResponse() {
-//
-//        return new GeneralListResponse<>(getComments(Integer.valueOf(undefinedPostId)));
-//    }
-
     public GeneralResponse<PostDto> getPostResponse(int postId) {
         return new GeneralResponse<>(getPostDto(postId));
     }
@@ -94,10 +86,10 @@ public class PostsService {
 
     public GeneralResponse<CommentDto> setComment(String postId, CommentRequest commentRequest) {
         Comment postComment = new Comment();
-        postComment.setParentId(commentRequest.getParent_id());
-        postComment.setCommentText(commentRequest.getComment_text());
+        postComment.setParentId(commentRequest.getParentId());
+        postComment.setCommentText(commentRequest.getCommentText());
         if (postId.equals("undefined")) {
-            postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParent_id()));
+            postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParentId()));
             undefinedPostId = postId;
         }
         postComment.setPostId(Integer.valueOf(postId));
@@ -108,13 +100,13 @@ public class PostsService {
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
 
         CommentDto commentDto = CommentDto.fromComment(postComment, currentPerson,
-                getSubComments(commentRequest.getParent_id()), likes);
+                getSubComments(commentRequest.getParentId()), likes);
         return new GeneralResponse<>(commentDto);
     }
 
     public GeneralResponse<CommentDto> editComment(CommentRequest commentRequest, String postId, int comment_id) {
         Comment postComment = daoComment.getById(comment_id);
-        postComment.setCommentText(commentRequest.getComment_text());
+        postComment.setCommentText(commentRequest.getCommentText());
         if (postComment.getParentId() == 0) {
             postComment.setParentId(null);
         }
@@ -264,7 +256,7 @@ public class PostsService {
         return new GeneralResponse<>(getPostDto(postId));
     }
 
-    public GeneralResponse<MessageRequestDto> deletePost(int postId) {
+    public GeneralResponse<MessageResponseDto> deletePost(int postId) {
         for (String tag : daoTag.getTagsByPostId(postId)) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
@@ -290,6 +282,6 @@ public class PostsService {
             }
         }
         daoPost.delete(postId);
-        return new GeneralResponse<>(new MessageRequestDto("ok"));
+        return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
 }

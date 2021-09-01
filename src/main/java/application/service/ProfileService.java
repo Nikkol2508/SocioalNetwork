@@ -69,7 +69,9 @@ public class ProfileService {
         return new GeneralListResponse<>(postDtoList);
     }
 
-    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws EntityNotFoundException {
+    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom,
+                                                     Long ageTo, String country, String city)
+            throws EntityNotFoundException {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
 

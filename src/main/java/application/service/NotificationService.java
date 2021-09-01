@@ -3,7 +3,6 @@ package application.service;
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.Notification;
-import application.models.Person;
 import application.models.dto.CommentAuthorDto;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
@@ -26,7 +25,8 @@ public class NotificationService {
                 (daoNotification.getUserNotifications(daoPerson.getAuthPerson().getId())));
     }
 
-    public GeneralResponse<MessageResponseDto> readNotifications() {
+    public GeneralResponse<MessageResponseDto> readNotifications() throws InterruptedException {
+        Thread.sleep(5000);
         daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
         return new GeneralResponse<>(new MessageResponseDto("ok"));
     }
@@ -36,10 +36,9 @@ public class NotificationService {
         for (Notification notification : list) {
             NotificationDto notificationDto = new NotificationDto();
             notificationDto.setId(notification.getId());
-            notificationDto.setNotificationType(notification.getType());
-            Person person = daoPerson.getById(notification.getEntityId());
-            notificationDto.setEntityAuthor(new CommentAuthorDto(person.getId(), person.getFirstName(),
-                    person.getLastName(), person.getPhoto()));
+            notificationDto.setNotificationType(daoNotification.getNotificationType(notification.getId()));
+            notificationDto.setEntityAuthor(new CommentAuthorDto(1, "Вася",
+                    "Петров", "storage/stock.jpg"));
             notificationDto.setSentTime(notification.getSentTime());
             notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
             notificationDtoList.add(notificationDto);

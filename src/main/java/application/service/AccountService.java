@@ -9,7 +9,6 @@ import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.*;
 import application.models.requests.RecoverPassDtoRequest;
 import application.models.requests.RegistrationDtoRequest;
 import application.models.requests.SetPasswordDtoRequest;
@@ -31,9 +30,6 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +53,7 @@ public class AccountService {
         person.setEmail(request.getEmail());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
-        person.setPhoto("storage/stock.jpeg");
+        person.setPhoto("storage/stock.jpg");
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
