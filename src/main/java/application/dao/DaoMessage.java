@@ -58,9 +58,10 @@ public class DaoMessage implements Dao<Message> {
         parameters.put("message_text", message.getMessageText());
         parameters.put("read_status", message.getReadStatus().toString());
         parameters.put("dialog_id", message.getDialogId());
-        daoNotification.addNotification(message.getRecipientId(), message.getTime(), message.getId(),
-                daoPerson.getById(message.getAuthorId()).getEmail(), NotificationType.MESSAGE.toString());
-        return getById(sji.executeAndReturnKey(parameters).intValue());
+        Message insertedMessage = getById(sji.executeAndReturnKey(parameters).intValue());
+        daoNotification.addNotification(message.getRecipientId(), daoPerson.getAuthPerson().getId(), insertedMessage.getTime(), message.getId(),
+                daoPerson.getById(message.getAuthorId()).getEmail(), NotificationType.MESSAGE.toString(), message.getMessageText());
+        return insertedMessage;
     }
 
     public Message updateAndReturnMessage(Message message) {

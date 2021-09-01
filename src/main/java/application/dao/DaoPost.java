@@ -42,7 +42,7 @@ public class DaoPost implements Dao<Post> {
                 post.getTitle(),
                 post.isBlocked());
         for (Person person : daoPerson.getFriends(daoPerson.getAuthPerson().getId())) {
-            daoNotification.addNotification(person.getId(), post.getTime(), post.getId(),
+            daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), post.getTime(), post.getId(),
                     daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(), post.getTitle());
         }
     }

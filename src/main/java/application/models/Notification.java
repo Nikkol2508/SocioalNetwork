@@ -10,4 +10,5 @@ public class Notification {
     private int entityId;
     private String contact;
     private String name;
+    private int srcPersonId;
 }

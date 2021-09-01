@@ -55,7 +55,7 @@ public class DaoComment implements Dao<Comment> {
                 comment.getCommentText(),
                 comment.isBlocked());
         Person person = daoPerson.getById(daoPost.getById(comment.getPostId()).getAuthorId());
-        daoNotification.addNotification(person.getId(), comment.getTime(), comment.getId(), person.getEmail(),
+        daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), comment.getTime(), comment.getId(), person.getEmail(),
                 comment.getParentId() == null ? NotificationType.POST_COMMENT.toString()
                         : NotificationType.COMMENT_COMMENT.toString(), comment.getCommentText());
     }

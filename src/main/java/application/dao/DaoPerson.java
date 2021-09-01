@@ -144,7 +144,7 @@ public class DaoPerson implements Dao<Person> {
         jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
         int entityId = jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id" +
                 " IN (?, ?)", new Object[]{srcId, dtsId, dtsId, srcId}, Integer.class);
-        daoNotification.addNotification(dtsId, System.currentTimeMillis(), entityId,
+        daoNotification.addNotification(dtsId, srcId, System.currentTimeMillis(), entityId,
                 getById(dtsId).getEmail(), NotificationType.FRIEND_REQUEST.toString());
     }
 

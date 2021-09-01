@@ -6,12 +6,16 @@ import application.models.Notification;
 import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import liquibase.pro.packaged.S;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -42,14 +46,14 @@ public class DaoNotification {
         jdbcTemplate.update(insertNotificationsType, id);
     }
 
-    public void addNotification(int id, long sentTime, int entityId, String contact,
+    public void addNotification(int id, int srsId, long sentTime, int entityId, String contact,
                                 String type, String... name) {
         String insertIntoNotificationsStatus = "INSERT INTO notification_type (code, name) VALUES (?, ?)";
         jdbcTemplate.update(insertIntoNotificationsStatus, type,
                 name);
-        String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, contact)" +
-                " VALUES ((SELECT max(notification_type.id) FROM notification_type), ?, ?, ?, ?)";
-        jdbcTemplate.update(insertIntoNotifications, sentTime, id, entityId, contact);
+        String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, contact, src_person_id)" +
+                " VALUES ((SELECT max(notification_type.id) FROM notification_type), ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(insertIntoNotifications, sentTime, id, entityId, contact, srsId);
     }
 
     public void readNotifications(int id) {

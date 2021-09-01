@@ -3,6 +3,8 @@ package application.service;
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.Notification;
+import application.models.NotificationType;
+import application.models.Person;
 import application.models.dto.CommentAuthorDto;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
@@ -37,8 +39,9 @@ public class NotificationService {
             NotificationDto notificationDto = new NotificationDto();
             notificationDto.setId(notification.getId());
             notificationDto.setNotificationType(daoNotification.getNotificationType(notification.getId()));
-            notificationDto.setEntityAuthor(new CommentAuthorDto(1, "Вася",
-                    "Петров", "storage/stock.jpg"));
+            Person person = daoPerson.getById(notification.getSrcPersonId());
+            notificationDto.setEntityAuthor(new CommentAuthorDto(person.getId(), person.getFirstName(),
+                    person.getLastName(), person.getPhoto()));
             notificationDto.setSentTime(notification.getSentTime());
             notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
             notificationDtoList.add(notificationDto);
