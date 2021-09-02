@@ -1,12 +1,12 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.FriendshipStatus;
+import application.models.NotificationType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
-import application.models.responses.GeneralListResponse;
-import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,42 +16,28 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class FriendsService {
+
     private final DaoPerson daoPerson;
+    private final DaoNotification daoNotification;
 
-    public GeneralListResponse<PersonDto> getUserFriends() {
+    public List<PersonDto> getUserFriends() {
         Person currentPerson = daoPerson.getAuthPerson();
-        GeneralListResponse<PersonDto> friendResponse = new GeneralListResponse<>(getPersonDtoOnPerson(daoPerson
-                .getFriends(currentPerson.getId())));
-        friendResponse.setTotal(0);
-        friendResponse.setOffset(0);
-        friendResponse.setPerPage(20);
-        return friendResponse;
+        return getPersonDtoOnPerson(daoPerson.getFriends(currentPerson.getId()));
     }
 
-    public GeneralListResponse<PersonDto> getUserFriendsRequest() {
-
+    public List<PersonDto> getUserFriendsRequest() {
         List<Person> personList = daoPerson.getFriendsRequest(daoPerson.getAuthPerson().getId());
-        GeneralListResponse<PersonDto> requestResponse = new GeneralListResponse<>(getPersonDtoOnPerson(personList));
-        requestResponse.setTotal(0);
-        requestResponse.setOffset(0);
-        requestResponse.setPerPage(20);
-        return requestResponse;
+        return getPersonDtoOnPerson(personList);
     }
 
-    public GeneralListResponse<PersonDto> getUserFriendsRecommendations() {
-        List<PersonDto> personDtoList = getPersonDtoOnPerson(daoPerson
-                .getRecommendations(daoPerson.getAuthPerson().getId()));
-
+    public List<PersonDto> getUserFriendsRecommendations() {
+        List<PersonDto> personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendations(daoPerson
+                .getAuthPerson().getId()));
         if (personDtoList.size() == 0) {
-            personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendationsOnRegDate(daoPerson.getAuthPerson().getId()));
+            personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendationsOnRegDate(daoPerson
+                    .getAuthPerson().getId()));
         }
-
-        GeneralListResponse<PersonDto> recommendationResponse = new GeneralListResponse<>(personDtoList);
-        recommendationResponse.setTotal(0);
-        recommendationResponse.setOffset(0);
-        recommendationResponse.setPerPage(20);
-
-        return recommendationResponse;
+        return personDtoList;
     }
 
     public List<PersonDto> getPersonDtoOnPerson(List<Person> personList) {
@@ -77,20 +63,22 @@ public class FriendsService {
         return personDtos;
     }
 
-    public GeneralResponse<MessageResponseDto> addFriendForId(int id) {
+    public MessageResponseDto addFriendForId(int id) {
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus == null) {
-            daoPerson.addFriendForId(currentPerson.getId(), id);
+            int entityId = daoPerson.addFriendByIdAndReturnEntityId(currentPerson.getId(), id);
+            daoNotification.addNotification(id, currentPerson.getId(), System.currentTimeMillis(), entityId,
+                    daoPerson.getById(id).getEmail(), NotificationType.FRIEND_REQUEST.toString());
         } else if (friendStatus.equals(FriendshipStatus.REQUEST.toString())) {
             daoPerson.addFriendRequest(id, currentPerson.getId());
         } else if (friendStatus.equals(FriendshipStatus.DECLINED.toString())) {
             daoPerson.updateDeclined(currentPerson.getId(), id);
         }
-        return new GeneralResponse<>(new MessageResponseDto("ok"));
+        return new MessageResponseDto();
     }
 
-    public GeneralResponse<MessageResponseDto> deleteFriendForId(int id) {
+    public MessageResponseDto deleteFriendForId(int id) {
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus.equals(FriendshipStatus.FRIEND.toString())) {
@@ -98,6 +86,6 @@ public class FriendsService {
         } else if (friendStatus.equals(FriendshipStatus.REQUEST.toString())) {
             daoPerson.unAcceptRequest(currentPerson.getId(), id);
         }
-        return new GeneralResponse<>(new MessageResponseDto("ok"));
+        return new MessageResponseDto();
     }
 }

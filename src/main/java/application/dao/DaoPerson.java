@@ -1,9 +1,7 @@
 package application.dao;
 
-import application.dao.mappers.IdMapper;
 import application.dao.mappers.PersonMapper;
 import application.models.FriendshipStatus;
-import application.models.NotificationType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
@@ -19,17 +17,13 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
-public class DaoPerson implements Dao<Person> {
+public class DaoPerson {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DaoNotification daoNotification;
 
     public Integer getPersonIdByEmail(String email) {
         String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
-
-        return jdbcTemplate.query(selectPersonIdByEmail, new Object[]{email}, new IdMapper())
-            .stream().findAny().orElse(null);
+        return jdbcTemplate.queryForObject(selectPersonIdByEmail, new Object[]{email}, Integer.class);
     }
 
     public Person getByEmail(String email) {
@@ -39,22 +33,15 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public Person getByConfirmationCode(String code) {
-
         String query = "SELECT * FROM person WHERE confirmation_code = ?";
         return jdbcTemplate.query(query, new Object[]{code}, new PersonMapper())
                 .stream().findAny().orElse(null);
     }
 
-    @Override
     public Person getById(int id) {
         String selectPersonForId = "SELECT * FROM person WHERE id = ?";
         return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
                 .findAny().orElse(null);
-    }
-
-    @Override
-    public List<Person> getAll() {
-        return null;
     }
 
     public List<Person> getRecommendations(int id) {
@@ -83,10 +70,6 @@ public class DaoPerson implements Dao<Person> {
                 person.getPhoto());
     }
 
-    @Override
-    public void update(Person person) {
-    }
-
     public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
                                  String city, String country, String about){
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
@@ -96,18 +79,15 @@ public class DaoPerson implements Dao<Person> {
     }
 
     public void updateConfirmationCode(int id, String code) {
-
         String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
         jdbcTemplate.update(query, code, id);
     }
 
     public void updatePassword(int id, String password) {
-
         String query = "UPDATE person SET password = ? WHERE id = ?";
         jdbcTemplate.update(query, password, id);
     }
 
-    @Override
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM person where id = ?", id);
     }
@@ -121,39 +101,34 @@ public class DaoPerson implements Dao<Person> {
         jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
     }
     public List<Person> getFriends(int id) {
-
         String select = "SELECT * FROM person WHERE id IN (SELECT src_person_id FROM friendship" +
                 " JOIN friendship_status fs on fs.id = friendship.status_id " +
-                "WHERE code = '" + FriendshipStatus.FRIEND + "' AND dst_person_id = " + id + " union SELECT dst_person_id" +
-                " FROM friendship JOIN friendship_status fs " +
-                "on fs.id = friendship.status_id WHERE code = '" + FriendshipStatus.FRIEND + "' AND src_person_id = " + id + ")";
+                "WHERE code = '" + FriendshipStatus.FRIEND + "' AND dst_person_id = " + id + " " +
+                "UNION SELECT dst_person_id FROM friendship JOIN friendship_status fs " +
+                "ON fs.id = friendship.status_id WHERE code = '" + FriendshipStatus.FRIEND + "' " +
+                "AND src_person_id = " + id + ")";
 
         return jdbcTemplate.query(select, new PersonMapper());
     }
 
-    public void addFriendForId(int srcId, int dtsId) {
-
+    @Transactional
+    public Integer addFriendByIdAndReturnEntityId(int srcId, int dstId) {
         String insertIntoFriendshipStatus = "INSERT INTO friendship_status (time, name, code) VALUES (?, ?, ?)";
-        String insetIntoFriendship = "INSERT INTO friendship (status_id, src_person_id, dst_person_id) " +
+        String insertIntoFriendship = "INSERT INTO friendship (status_id, src_person_id, dst_person_id) " +
                 "VALUES ((SELECT max(friendship_status.id) from friendship_status), ?, ?)";
-
         jdbcTemplate.update(insertIntoFriendshipStatus, System.currentTimeMillis(),
-                "Запрос на добавление в друзья",
-                FriendshipStatus.REQUEST.toString());
-
-        jdbcTemplate.update(insetIntoFriendship, srcId, dtsId);
-        int entityId = jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id" +
-                " IN (?, ?)", new Object[]{srcId, dtsId, dtsId, srcId}, Integer.class);
-        daoNotification.addNotification(dtsId, System.currentTimeMillis(), entityId,
-                getById(dtsId).getEmail(), NotificationType.FRIEND_REQUEST.toString());
+                "Запрос на добавление в друзья", FriendshipStatus.REQUEST.toString());
+        jdbcTemplate.update(insertIntoFriendship, srcId, dstId);
+        return jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id " +
+                "IN (?, ?) AND dst_person_id IN (?, ?)", new Object[]{srcId, dstId, dstId, srcId}, Integer.class);
     }
 
-    public void addFriendRequest(int srcId, int dtsId) {
+    public void addFriendRequest(int srcId, int dstId) {
 
         String update = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id FROM friendship" +
                 " WHERE src_person_id = ? AND dst_person_id = ?)";
 
-        jdbcTemplate.update(update, FriendshipStatus.FRIEND.toString(), srcId, dtsId);
+        jdbcTemplate.update(update, FriendshipStatus.FRIEND.toString(), srcId, dstId);
     }
 
     public List<Person> getFriendsRequest(int id) {
@@ -165,27 +140,26 @@ public class DaoPerson implements Dao<Person> {
                 id}, new PersonMapper());
     }
 
-    public String getFriendStatus(int srcId, int dtsId) {
+    public String getFriendStatus(int srcId, int dstId) {
 
         try {
-            String select = "select code from friendship f join friendship_status fs2 on f.status_id = fs2.id " +
-                    "where src_person_id IN (?, ?)" +
-                    " and dst_person_id IN (?, ?)";
+            String select = "SELECT code FROM friendship f JOIN friendship_status fs2 ON f.status_id = fs2.id WHERE" +
+                    " src_person_id IN (?, ?)" +
+                    " AND dst_person_id IN (?, ?)";
 
-            return jdbcTemplate.queryForObject(select, new Object[]{srcId, dtsId, dtsId, srcId}, String.class);
+            return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, String.class);
         } catch (EmptyResultDataAccessException e) {
             return null;
         }
     }
 
     public void deleteFriendForID(int srcId, int dtcId) {
-        String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
-
+        String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
+                "AND dst_person_id IN (?, ?)";
         String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
-        int selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId}, Integer.class);
-
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
-
+        Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId},
+                    Integer.class);
         jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
         jdbcTemplate.update(deleteFriendshipStatus, selectedId);
     }
@@ -195,17 +169,17 @@ public class DaoPerson implements Dao<Person> {
         return getByEmail(authentication.getName());
     }
 
-    public void unAcceptRequest(int dtsId, int srcId) {
+    public void unAcceptRequest(int dstId, int srcId) {
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE dst_person_id = ? AND src_person_id = ?)";
         jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(),
-                dtsId, srcId);
+                dstId, srcId);
     }
 
+    @Transactional
     public void updateDeclined(int srcId, int dtcId) {
         String updateFriendship = "UPDATE friendship SET src_person_id = ?, dst_person_id = ? " +
                 "WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
-
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE src_person_id = ? AND dst_person_id = ?)";
         jdbcTemplate.update(updateFriendship, srcId, dtcId, srcId, dtcId, dtcId, srcId);
@@ -264,10 +238,5 @@ public class DaoPerson implements Dao<Person> {
         } catch (EmptyResultDataAccessException ex) {
             return null;
         }
-    }
-
-    public void updateLastOnlineTime(int id) {
-        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
-        jdbcTemplate.update(query, System.currentTimeMillis(), id);
     }
 }

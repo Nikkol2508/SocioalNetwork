@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.*;
+import application.models.NotificationType;
 import application.models.Person;
 import application.models.Post;
 import application.models.dto.MessageResponseDto;
@@ -8,11 +9,8 @@ import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
-import application.models.responses.GeneralListResponse;
-import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -36,24 +34,25 @@ public class ProfileService {
     private final DaoComment daoComment;
     private final DaoTag daoTag;
     private final DaoFile daoFile;
+    private final DaoNotification daoNotification;
 
-    public GeneralResponse<PersonDto> getPerson(int id) {
+    public PersonDto getPerson(int id) {
 
         Person person = daoPerson.getById(id);
-        return new GeneralResponse<>(PersonDto.fromPerson(person));
+        return PersonDto.fromPerson(person);
     }
 
-    public GeneralResponse<PersonDto> getProfile() {
+    public PersonDto getProfile() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
 
-        return new GeneralResponse<>(personDto);
+        return personDto;
     }
 
-    public GeneralListResponse<PostDto> getWall(int id) {
+    public List<PostDto> getWall(int id) {
 
         List<PostDto> postDtoList = new ArrayList<>();
 
@@ -66,35 +65,42 @@ public class ProfileService {
             }
             postDtoList.add(postDto);
         }
-        return new GeneralListResponse<>(postDtoList);
+        return postDtoList;
     }
 
-    public GeneralListResponse<PersonDto> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country, String city) throws EntityNotFoundException {
+    public List<PersonDto> getPersons(String firstName, String lastName, Long ageFrom,
+                                                     Long ageTo, String country, String city)
+            throws EntityNotFoundException {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
 
-        return new GeneralListResponse<>(listPersons
+        return listPersons
                 .stream()
                 .map(PersonDto::fromPerson)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 
-    public GeneralResponse<Post> setPost(int authorId, Long publishDate, PostRequest postRequest) {
-        Post addPost = new Post();
-        addPost.setTitle(postRequest.getTitle());
-        addPost.setPostText(postRequest.getPostText());
-        addPost.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
-        addPost.setBlocked(false);
-        addPost.setAuthorId(authorId);
-        int postId = daoPost.savePost(addPost).getId();
+    public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
+        Post post = new Post();
+        post.setTitle(postRequest.getTitle());
+        post.setPostText(postRequest.getPostText());
+        post.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
+        post.setBlocked(false);
+        post.setAuthorId(authorId);
+        int postId = daoPost.savePost(post).getId();
+        for (Person person : daoPerson.getFriends(daoPerson.getAuthPerson().getId())) {
+            daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), post.getTime(),
+                    post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
+                    post.getTitle());
+        }
         for (String tag : postRequest.getTags()) {
             daoTag.save(tag);
             daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
-        return new GeneralResponse<>(addPost);
+        return post;
     }
 
-    public ResponseEntity<GeneralResponse<PersonDto>> changeProfile(PersonSettingsDtoRequest request)
+    public PersonDto changeProfile(PersonSettingsDtoRequest request)
             throws ParseException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
@@ -104,18 +110,16 @@ public class ProfileService {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
-        if (request.getFirstName().isBlank() || request.getLastName().isBlank()) {
-            return ResponseEntity.badRequest().body(new GeneralResponse<>(PersonDto.fromPerson(person)));
-        } else {
+        if (!request.getFirstName().isBlank() && !request.getLastName().isBlank()) {
             daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(),
                     birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhotoId())),
                     request.getCity(), request.getCountry(), request.getAbout());
-            return ResponseEntity.ok(new GeneralResponse<>(PersonDto.fromPerson(person)));
         }
+        return PersonDto.fromPerson(person);
     }
 
 
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteProfile() {
+    public MessageResponseDto deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
@@ -126,6 +130,6 @@ public class ProfileService {
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person.getId());
-        return ResponseEntity.ok(new GeneralResponse<>(new MessageResponseDto("ok")));
+        return new MessageResponseDto();
     }
 }

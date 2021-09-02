@@ -7,8 +7,6 @@ import application.models.requests.CommentRequest;
 import application.models.requests.LikeRequest;
 import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
-import application.models.responses.GeneralListResponse;
-import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.springframework.stereotype.Service;
@@ -28,6 +26,7 @@ public class PostsService {
     private final DaoComment daoComment;
     private final DaoLike daoLike;
     private final DaoTag daoTag;
+    private final DaoNotification daoNotification;
     private String undefinedPostId;
 
     public PostDto getPostDto(int postId) {
@@ -56,12 +55,12 @@ public class PostsService {
         return commentDtoList;
     }
 
-    public List<CommentDto> getSubComments(Integer parentId) {
+    public List<CommentDto> getSubComments(int parentId) {
         List<Comment> subComments = daoComment.getSubComment(parentId);
         List<CommentDto> subCommentsList = new ArrayList<>();
 
-        if(subComments.size() > 0) {
-            for(Comment subComment : subComments) {
+        if (subComments.size() > 0) {
+            for (Comment subComment : subComments) {
                 Person person = daoPerson.getById(subComment.getAuthorId());
                 int myLike = daoLike.getMyLike(subComment.getId(), "Comment", daoPerson.getAuthPerson().getId());
                 CommentDto commentDto = CommentDto.fromComment(subComment, person, null, myLike);
@@ -71,31 +70,25 @@ public class PostsService {
         return subCommentsList;
     }
 
-
-//    public GeneralListResponse<CommentDto> getSubCommentsResponse() {
-//
-//        return new GeneralListResponse<>(getComments(Integer.valueOf(undefinedPostId)));
-//    }
-
-    public GeneralResponse<PostDto> getPostResponse(int postId) {
-        return new GeneralResponse<>(getPostDto(postId));
+    public PostDto getPostResponse(int postId) {
+        return getPostDto(postId);
     }
 
-    public GeneralListResponse<CommentDto> getCommentsResponse(String postId) {
+    public List<CommentDto> getCommentsResponse(String postId) {
 
         if (postId.equals("undefined")) {
             postId = undefinedPostId;
             undefinedPostId = null;
         }
-        return new GeneralListResponse<>(getComments(Integer.valueOf(postId)));
+        return getComments(Integer.valueOf(postId));
     }
 
-    public GeneralResponse<CommentDto> setComment(String postId, CommentRequest commentRequest) {
+    public CommentDto setComment(String postId, CommentRequest commentRequest) {
         Comment postComment = new Comment();
-        postComment.setParentId(commentRequest.getParent_id());
-        postComment.setCommentText(commentRequest.getComment_text());
-        if(postId.equals("undefined")) {
-            postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParent_id()));
+        postComment.setParentId(commentRequest.getParentId());
+        postComment.setCommentText(commentRequest.getCommentText());
+        if (postId.equals("undefined")) {
+            postId = String.valueOf(daoComment.getPostIdByCommentId(commentRequest.getParentId()));
             undefinedPostId = postId;
         }
         postComment.setPostId(Integer.valueOf(postId));
@@ -103,31 +96,33 @@ public class PostsService {
         Person currentPerson = daoPerson.getAuthPerson();
         postComment.setAuthorId(currentPerson.getId());
         daoComment.save(postComment);
+        Person person = daoPerson.getById(daoPost.getById(postComment.getPostId()).getAuthorId());
+        daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), postComment.getTime(),
+                postComment.getId(), person.getEmail(), postComment.getParentId() == null
+                        ? NotificationType.POST_COMMENT.toString()
+                        : NotificationType.COMMENT_COMMENT.toString(), postComment.getCommentText());
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
 
-        CommentDto commentDto = CommentDto.fromComment(postComment, currentPerson,
-                getSubComments(commentRequest.getParent_id()), likes);
-        return new GeneralResponse<>(commentDto);
+        return CommentDto.fromComment(postComment, currentPerson, getSubComments(commentRequest.getParentId()), likes);
     }
 
-    public GeneralResponse<CommentDto> editComment(CommentRequest commentRequest, String postId, int comment_id) {
+    public CommentDto editComment(CommentRequest commentRequest, String postId, int comment_id) {
         Comment postComment = daoComment.getById(comment_id);
-        postComment.setCommentText(commentRequest.getComment_text());
-        if(postComment.getParentId() == 0) {
+        postComment.setCommentText(commentRequest.getCommentText());
+        if (postComment.getParentId() == 0) {
             postComment.setParentId(null);
         }
-        if(postId.equals("undefined")) {
+        if (postId.equals("undefined")) {
             postId = String.valueOf(daoComment.getPostIdByCommentId(postComment.getId()));
             undefinedPostId = postId;
         }
         daoComment.update(postComment);
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
-        CommentDto commentDto = CommentDto.fromComment(postComment, daoPerson.getAuthPerson(),
+        return CommentDto.fromComment(postComment, daoPerson.getAuthPerson(),
                 getSubComments(postComment.getParentId()), likes);
-        return new GeneralResponse<>(commentDto);
     }
 
-    public GeneralResponse<HashMap<String, Integer>> deleteComment(String postId, int comment_id) {
+    public HashMap<String, Integer> deleteComment(String postId, int comment_id) {
         List<CommentDto> subComments = getSubComments(comment_id);
         if (subComments.size() != 0) {
             for (CommentDto subComment : subComments) {
@@ -141,30 +136,30 @@ public class PostsService {
         HashMap<String, Integer> response = new HashMap<>();
         response.put("id", comment_id);
         daoComment.delete(comment_id);
-        return new GeneralResponse<>(response);
+        return response;
     }
 
-    public GeneralResponse<LikeResponseDto> getLikes(int itemId, String type) {
+    public LikeResponseDto getLikes(int itemId, String type) {
         LikeResponseDto likeResponseDto = new LikeResponseDto();
         List<String> userList = daoLike.getUsersLike(itemId, type);
         likeResponseDto.setUsers(userList);
         likeResponseDto.setLikes(String.valueOf(userList.size()));
-        return new GeneralResponse<>(likeResponseDto);
+        return likeResponseDto;
     }
 
-    public GeneralResponse<Map<String, Boolean>> getLiked(int user_id, int itemId, String type) {
+    public Map<String, Boolean> getLiked(int user_id, int itemId, String type) {
         Map<String, Boolean> isLiked = new HashMap<>();
         List<String> usersList = daoLike.getUsersLike(itemId, type);
         isLiked.put("likes", usersList.contains(String.valueOf(user_id)));
 
-        return new GeneralResponse<>(isLiked);
+        return isLiked;
     }
 
-    public GeneralResponse<LikeResponseDto> setLikes(LikeRequest request) {
+    public LikeResponseDto setLikes(LikeRequest request) {
 
         Person currentPerson = daoPerson.getAuthPerson();
 
-        if(!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).getData().get("likes")) {
+        if (!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).get("likes")) {
 
             Like like = new Like();
             like.setItemId(request.getItem_id());
@@ -174,7 +169,7 @@ public class PostsService {
             daoLike.save(like);
         }
 
-        if(request.getType().equals("Comment")) {
+        if (request.getType().equals("Comment")) {
             undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(request.getItem_id()));
         } else undefinedPostId = String.valueOf(request.getItem_id());
 
@@ -183,49 +178,41 @@ public class PostsService {
         likeResponseDto.setUsers(userList);
         likeResponseDto.setLikes(String.valueOf(userList.size()));
 
-        return new GeneralResponse<>(likeResponseDto);
+        return likeResponseDto;
     }
 
-    public GeneralResponse<Map<String, String>> deleteLike(int itemId, String type) {
+    public Map<String, String> deleteLike(int itemId, String type) {
         Person currentPerson = daoPerson.getAuthPerson();
         daoLike.delete(itemId, type, currentPerson.getId());
-        if(type.equals("Comment")) {
+        if (type.equals("Comment")) {
             undefinedPostId = String.valueOf(daoComment.getPostIdByCommentId(itemId));
         } else undefinedPostId = String.valueOf(itemId);
         HashMap<String, String> deleteLikeResponse = new HashMap<>();
         deleteLikeResponse.put("likes", "1");
-        return new GeneralResponse<>(deleteLikeResponse);
+        return deleteLikeResponse;
     }
 
-    public GeneralListResponse<Tag> getTags() {
-        return new GeneralListResponse<>(daoTag.getAll());
+    public List<Tag> getTags() {
+        return daoTag.getAll();
     }
 
-    public GeneralResponse<Tag> setTag(TagRequest request) {
+    public Tag setTag(TagRequest request) {
         Tag tag = daoTag.findTagByName(request.getTag());
-        if(tag.equals(null)) {
+        if (tag == null) {
             daoTag.save(request.getTag());
             tag = daoTag.findTagByName(request.getTag());
         }
-        return new GeneralResponse<>(tag);
+        return tag;
     }
 
-    public void attachTag2Post(int tagId, int postId) {
-        daoTag.attachTag2Post(tagId, postId);
-    }
-
-    public void detachTag2Post(int tagId, int postId) {
-        daoTag.detachTag2Post(tagId, postId);
-    }
-
-    public GeneralResponse<HashMap<String, String>> deleteTag(int tagId) {
+    public HashMap<String, String> deleteTag(int tagId) {
         daoTag.delete(tagId);
         HashMap<String, String> response = new HashMap<>();
         response.put("message", "ok");
-        return new GeneralResponse<>(response);
+        return response;
     }
 
-    public GeneralListResponse<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo) {
+    public List<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo) {
 
         val listPersonsId = daoPerson.getPersonsByFirstNameSurname(author)
                 .stream()
@@ -236,17 +223,17 @@ public class PostsService {
                 .map(item -> getPosts(text, item, dateFrom, dateTo))
                 .flatMap(List::stream).collect(Collectors.toList());
 
-        return new GeneralListResponse<>(posts
+        return posts
                 .stream()
                 .map(item -> getPostDto(item.getId()))
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
     }
 
     private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
         return daoPost.getPosts(text, authorId, dateFrom, dateTo);
     }
 
-    public GeneralResponse<PostDto> editPost(PostRequest request, int postId) {
+    public PostDto editPost(PostRequest request, int postId) {
         Post post = daoPost.getById(postId);
         post.setPostText(request.getPostText());
         post.setTitle(request.getTitle());
@@ -259,10 +246,10 @@ public class PostsService {
             daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
         daoPost.update(post);
-        return new GeneralResponse<>(getPostDto(postId));
+        return getPostDto(postId);
     }
 
-    public GeneralResponse<MessageRequestDto> deletePost(int postId) {
+    public MessageResponseDto deletePost(int postId) {
         for (String tag : daoTag.getTagsByPostId(postId)) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
@@ -288,6 +275,6 @@ public class PostsService {
             }
         }
         daoPost.delete(postId);
-        return new GeneralResponse<>(new MessageResponseDto("ok"));
+        return new MessageResponseDto();
     }
 }

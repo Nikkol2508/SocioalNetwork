@@ -15,15 +15,18 @@ public class DaoTag {
     private final JdbcTemplate jdbcTemplate;
 
     public Tag findByID(int id) {
-        return jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper())
+                .stream().findAny().orElse(null);
     }
 
     public Tag findTagByName(String tagName) {
-        return jdbcTemplate.query("SELECT * FROM tag WHERE tag = ?", new Object[]{tagName}, new TagMapper()).stream().findAny().orElse(null);
+        return jdbcTemplate.query("SELECT * FROM tag WHERE tag = ?", new Object[]{tagName}, new TagMapper())
+                .stream().findAny().orElse(null);
     }
 
     public List<String> getTagsByPostId(Integer id) {
-        return jdbcTemplate.queryForList("SELECT tag.tag FROM tag join post2tag on post2tag.id = tag.id where post2tag.post_id = ?", new Object[]{id}, String.class);
+        return jdbcTemplate.queryForList("SELECT tag.tag FROM tag join post2tag on post2tag.tag_id = tag.id " +
+                "where post2tag.post_id = ?", new Object[]{id}, String.class);
     }
 
     public List<Tag> getAll() {
@@ -31,8 +34,7 @@ public class DaoTag {
     }
 
     public void save(String tag) {
-        jdbcTemplate.update(("INSERT INTO tag (tag) VALUES (?)"),
-                tag);
+        jdbcTemplate.update("INSERT INTO tag (tag) VALUES (?)", tag);
     }
 
     public void attachTag2Post (int tagId, int postId) {
@@ -46,6 +48,6 @@ public class DaoTag {
     }
 
     public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM tag where id = ?", id);
+        jdbcTemplate.update("DELETE FROM tag WHERE id = ?", id);
     }
 }

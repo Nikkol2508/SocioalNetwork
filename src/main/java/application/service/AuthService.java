@@ -5,10 +5,8 @@ import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
-import application.models.responses.GeneralResponse;
 import application.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,7 +24,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
+    public PersonDto login(@RequestBody AuthDtoRequest request)
             throws UsernameNotFoundException, BadCredentialsException {
         try {
             String email = request.getEmail();
@@ -36,22 +34,22 @@ public class AuthService {
                 throw new UsernameNotFoundException("User with email: " + email + " not found");
             }
             String token = jwtTokenProvider.createToken(email);
-            return ResponseEntity.ok(getAuth(request, token));
+            return getAuth(request, token);
         } catch (AuthenticationException ex) {
             throw new BadCredentialsException("Invalid username or password");
         }
     }
 
-    public GeneralResponse<MessageResponseDto> getLogout() {
+    public MessageResponseDto getLogout() {
         SecurityContextHolder.getContext().setAuthentication(null);
-        return new GeneralResponse<>(new MessageResponseDto("ok"));
+        return new MessageResponseDto();
     }
 
-    private GeneralResponse<PersonDto> getAuth(AuthDtoRequest authDtoRequest, String token) {
+    private PersonDto getAuth(AuthDtoRequest authDtoRequest, String token) {
         Person person = daoPerson.getByEmail(authDtoRequest.getEmail());
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(token);
-        return new GeneralResponse<>(personDto);
+        return personDto;
     }
 
     private Person getPerson(String email) {
