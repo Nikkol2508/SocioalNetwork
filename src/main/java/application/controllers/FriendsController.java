@@ -22,6 +22,7 @@ public class FriendsController {
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(friendService.getUserFriends(), offset, itemPerPage));
     }
 
@@ -30,6 +31,7 @@ public class FriendsController {
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(friendService.getUserFriendsRequest(), offset, itemPerPage));
     }
 
@@ -37,17 +39,20 @@ public class FriendsController {
     public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations(
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
-        return ResponseEntity.ok(new GeneralListResponse<>(
-                friendService.getUserFriendsRecommendations(), offset, itemPerPage));
+
+        return ResponseEntity.ok(new GeneralListResponse<>(friendService
+                .getUserFriendsRecommendations(), offset, itemPerPage));
     }
 
     @PostMapping("friends/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> addFriendForId(@PathVariable int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(friendService.addFriendForId(id)));
     }
 
     @DeleteMapping("friends/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteFriendForId(@PathVariable int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(friendService.deleteFriendForId(id)));
     }
 }

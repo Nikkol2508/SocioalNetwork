@@ -17,58 +17,52 @@ public class DaoComment {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Comment> getCommentsByPostId(int postId) {
+
         return jdbcTemplate.query("SELECT * FROM post_comment WHERE post_id = ? AND parent_id isnull",
                 new Object[]{postId}, new PostCommentMapper());
     }
 
     public Integer getPostIdByCommentId(int commentId) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT post_id FROM post_comment WHERE id = ?",
-                    new Object[]{commentId}, Integer.class);
-        } catch (DataAccessException ex) {
-            throw new EntityNotFoundException("Post by comment id not found");
-        }
+
+        return jdbcTemplate.queryForObject("SELECT post_id FROM post_comment WHERE id = ?", new Object[]{commentId},
+                Integer.class);
     }
 
     public List<Comment> getSubComment(int id) {
+
         return jdbcTemplate.query("SELECT * FROM post_comment where parent_id = ?", new Object[]{id},
                 new PostCommentMapper());
     }
 
     public Comment getById(int id) {
+
         return jdbcTemplate.query("SELECT * FROM post_comment WHERE id = ?", new Object[]{id},
                         new PostCommentMapper()).stream().findAny()
                         .orElse(null);
     }
 
     public void save(Comment comment) {
+
         jdbcTemplate.update("INSERT INTO post_comment (time, post_id, parent_id, author_id, comment_text, " +
-                        "is_blocked) VALUES (?, ?, ?, ?, ?, ?)",
-                comment.getTime(),
-                comment.getPostId(),
-                comment.getParentId(),
-                comment.getAuthorId(),
-                comment.getCommentText(),
-                comment.isBlocked());
+                        "is_blocked) VALUES (?, ?, ?, ?, ?, ?)", comment.getTime(), comment.getPostId(),
+                comment.getParentId(), comment.getAuthorId(), comment.getCommentText(), comment.isBlocked());
     }
 
     public void update(Comment comment) {
+
         jdbcTemplate.update("UPDATE post_comment SET time = ?, post_id = ?, parent_id = ?, author_id = ?, " +
-                "comment_text = ?, is_blocked = ? WHERE id = ?",
-                comment.getTime(),
-                comment.getPostId(),
-                comment.getParentId(),
-                comment.getAuthorId(),
-                comment.getCommentText(),
-                comment.isBlocked(),
+                "comment_text = ?, is_blocked = ? WHERE id = ?", comment.getTime(), comment.getPostId(),
+                comment.getParentId(), comment.getAuthorId(), comment.getCommentText(), comment.isBlocked(),
                 comment.getId());
     }
 
     public void delete(int id) {
+
         jdbcTemplate.update("DELETE FROM post_comment where id = ?", id);
     }
 
     public void deleteByAuthorId(int id) {
+
         jdbcTemplate.update("DELETE FROM post_comment WHERE author_id = ?", id);
     }
 }

@@ -20,17 +20,20 @@ public class NotificationService {
     private final DaoPerson daoPerson;
 
     public List<NotificationDto> getNotifications() {
-        return getNotificationsDtoForNotifications(daoNotification.getUserNotifications(daoPerson
-                .getAuthPerson().getId()));
+
+        return getNotificationsDtoForNotifications(daoNotification.getUserNotifications(daoPerson.getAuthPerson()
+                .getId()));
     }
 
     public MessageResponseDto readNotifications() throws InterruptedException {
+
         Thread.sleep(5000);
         daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }
 
     private List<NotificationDto> getNotificationsDtoForNotifications(List<Notification> list) {
+
         List<NotificationDto> notificationDtoList = new ArrayList<>();
         for (Notification notification : list) {
             NotificationDto notificationDto = new NotificationDto();
