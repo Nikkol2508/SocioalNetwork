@@ -5,13 +5,11 @@ import application.models.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-@Transactional
 public class DaoTag {
 
     private final JdbcTemplate jdbcTemplate;
@@ -36,8 +34,7 @@ public class DaoTag {
     }
 
     public void save(String tag) {
-        jdbcTemplate.update(("INSERT INTO tag (tag) VALUES (?)"),
-                tag);
+        jdbcTemplate.update("INSERT INTO tag (tag) VALUES (?)", tag);
     }
 
     public void attachTag2Post (int tagId, int postId) {
@@ -51,6 +48,6 @@ public class DaoTag {
     }
 
     public void delete(int id) {
-        jdbcTemplate.update("DELETE FROM tag where id = ?", id);
+        jdbcTemplate.update("DELETE FROM tag WHERE id = ?", id);
     }
 }

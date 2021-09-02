@@ -14,10 +14,13 @@ public class GeneralListResponse<T> {
     private int perPage;
     private List<T> data;
 
-    public GeneralListResponse(List<T> data) {
+    public GeneralListResponse(List<T> data, int offset, int perPage) {
         error = "Error";
         timestamp = System.currentTimeMillis();
         this.data = data;
+        total = data.size();
+        this.perPage = perPage;
+        this.offset = offset;
     }
 }
 

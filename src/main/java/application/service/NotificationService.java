@@ -3,13 +3,10 @@ package application.service;
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.Notification;
-import application.models.NotificationType;
 import application.models.Person;
 import application.models.dto.CommentAuthorDto;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationDto;
-import application.models.responses.GeneralListResponse;
-import application.models.responses.GeneralResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +19,15 @@ public class NotificationService {
     private final DaoNotification daoNotification;
     private final DaoPerson daoPerson;
 
-    public GeneralListResponse<NotificationDto> getNotifications() {
-        return new GeneralListResponse<>(getNotificationsDtoForNotifications
-                (daoNotification.getUserNotifications(daoPerson.getAuthPerson().getId())));
+    public List<NotificationDto> getNotifications() {
+        return getNotificationsDtoForNotifications(daoNotification.getUserNotifications(daoPerson
+                .getAuthPerson().getId()));
     }
 
-    public GeneralResponse<MessageResponseDto> readNotifications() throws InterruptedException {
+    public MessageResponseDto readNotifications() throws InterruptedException {
         Thread.sleep(5000);
         daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
-        return new GeneralResponse<>(new MessageResponseDto("ok"));
+        return new MessageResponseDto();
     }
 
     private List<NotificationDto> getNotificationsDtoForNotifications(List<Notification> list) {

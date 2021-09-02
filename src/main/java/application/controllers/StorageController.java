@@ -13,14 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class StorageController {
 
-  private final StorageService storageService;
+    private final StorageService storageService;
 
-  @PostMapping
-  public ResponseEntity<GeneralResponse<FileDescription>> handleFileUpload(
-      @RequestParam("type") String type,
-      @RequestPart("file") MultipartFile file) {
+    @PostMapping
+    public ResponseEntity<GeneralResponse<FileDescription>> handleFileUpload(
+            @RequestParam("type") String type,
+            @RequestPart("file") MultipartFile file) {
 
-    return ResponseEntity.ok(storageService.saveFileInStorage(type, file));
+        return ResponseEntity.ok(new GeneralResponse<>(storageService.saveFileInStorage(type, file)));
     }
-  }
+}
 

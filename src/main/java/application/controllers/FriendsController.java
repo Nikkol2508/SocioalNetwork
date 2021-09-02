@@ -18,27 +18,36 @@ public class FriendsController {
     private final FriendsService friendService;
 
     @GetMapping("/friends")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends() {
-        return ResponseEntity.ok(friendService.getUserFriends());
+    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriends(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
+            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+        return ResponseEntity.ok(new GeneralListResponse<>(friendService.getUserFriends(), offset, itemPerPage));
     }
 
     @GetMapping("/friends/request")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRequest() {
-        return ResponseEntity.ok(friendService.getUserFriendsRequest());
+    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRequest(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
+            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+        return ResponseEntity.ok(new GeneralListResponse<>(friendService.getUserFriendsRequest(), offset, itemPerPage));
     }
 
     @GetMapping("/friends/recommendations")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations() {
-        return ResponseEntity.ok(friendService.getUserFriendsRecommendations());
+    public ResponseEntity<GeneralListResponse<PersonDto>> getUserFriendsRecommendations(
+            @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
+            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+        return ResponseEntity.ok(new GeneralListResponse<>(
+                friendService.getUserFriendsRecommendations(), offset, itemPerPage));
     }
 
     @PostMapping("friends/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> addFriendForId(@PathVariable int id) {
-        return ResponseEntity.ok(friendService.addFriendForId(id));
+        return ResponseEntity.ok(new GeneralResponse<>(friendService.addFriendForId(id)));
     }
 
     @DeleteMapping("friends/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteFriendForId(@PathVariable int id) {
-        return ResponseEntity.ok(friendService.deleteFriendForId(id));
+        return ResponseEntity.ok(new GeneralResponse<>(friendService.deleteFriendForId(id)));
     }
 }

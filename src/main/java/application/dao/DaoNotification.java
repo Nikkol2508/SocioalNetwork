@@ -6,35 +6,31 @@ import application.models.Notification;
 import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import liquibase.pro.packaged.S;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @RequiredArgsConstructor
-@Slf4j
 public class DaoNotification {
+
     private final JdbcTemplate jdbcTemplate;
 
     public List<Notification> getUserNotifications(int id) {
-        String selectNotifications = "SELECT * FROM notification JOIN notification_type nt on nt.id = notification.type_id" +
-                " WHERE person_id = ? AND name != 'READ'";
+        String selectNotifications = "SELECT * FROM notification JOIN notification_type nt " +
+                "ON nt.id = notification.type_id WHERE person_id = ? AND name != 'READ'";
         return jdbcTemplate.query(selectNotifications, new Object[]{id}, new NotificationMapper());
     }
 
     public List<NotificationsSettingsDto> getNotificationsSettings(int id) {
         String select = "SELECT code, status FROM notification_setting_type JOIN notification_settings ns " +
-                "on notification_setting_type.id = ns.type_id WHERE person_id = ?";
+                "ON notification_setting_type.id = ns.type_id WHERE person_id = ?";
         return jdbcTemplate.query(select, new Object[]{id}, new NotificationsSettingsMapper());
     }
 
@@ -51,8 +47,9 @@ public class DaoNotification {
         String insertIntoNotificationsStatus = "INSERT INTO notification_type (code, name) VALUES (?, ?)";
         jdbcTemplate.update(insertIntoNotificationsStatus, type,
                 name);
-        String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, contact, src_person_id)" +
-                " VALUES ((SELECT max(notification_type.id) FROM notification_type), ?, ?, ?, ?, ?)";
+        String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, " +
+                "contact, src_person_id) VALUES ((SELECT max(notification_type.id) " +
+                "FROM notification_type), ?, ?, ?, ?, ?)";
         jdbcTemplate.update(insertIntoNotifications, sentTime, id, entityId, contact, srsId);
     }
 
@@ -64,11 +61,11 @@ public class DaoNotification {
 
     public String getNotificationName(int id) {
         try {
-            String select = "SELECT name FROM notification_type JOIN notification n on notification_type.id = n.type_id" +
-                    " WHERE n.id = ?";
-            return jdbcTemplate.queryForObject(select, new Object[]{id}, String.class)
+            String select = "SELECT name FROM notification_type JOIN notification n " +
+                    "ON notification_type.id = n.type_id WHERE n.id = ?";
+            return Objects.requireNonNull(jdbcTemplate.queryForObject(select, new Object[]{id}, String.class))
                     .replaceAll("(^[{}\"]{0,2})|([{}\"]{0,2}$)", "");
-        } catch (EmptyResultDataAccessException e) {
+        } catch (DataAccessException e) {
             return "";
         }
     }
