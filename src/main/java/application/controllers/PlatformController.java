@@ -22,6 +22,7 @@ public class PlatformController {
             @RequestParam(value = "language", required = false) String language,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(platformService.getLanguage(), offset, itemPerPage));
     }
 
@@ -30,6 +31,7 @@ public class PlatformController {
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(platformService.getCountry(country), offset, itemPerPage));
     }
 
@@ -38,6 +40,7 @@ public class PlatformController {
                                                                @RequestParam String country,
                                                                @RequestParam Integer offset,
                                                                @RequestParam Integer itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(platformService
                 .getCity(countryId, country), offset, itemPerPage));
     }

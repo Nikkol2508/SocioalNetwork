@@ -23,16 +23,19 @@ public class TagController {
             @RequestParam(value = "tag", required = false) String tag,
             @RequestParam(value = "offset", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(postsService.getTags(), offset, itemPerPage));
     }
 
     @PostMapping("/tags")
     public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.setTag(request)));
     }
 
     @DeleteMapping("/tags")
     public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.deleteTag(id)));
     }
 }

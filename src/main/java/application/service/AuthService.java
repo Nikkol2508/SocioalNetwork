@@ -26,6 +26,7 @@ public class AuthService {
 
     public PersonDto login(@RequestBody AuthDtoRequest request)
             throws UsernameNotFoundException, BadCredentialsException {
+
         try {
             String email = request.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
@@ -41,11 +42,13 @@ public class AuthService {
     }
 
     public MessageResponseDto getLogout() {
+
         SecurityContextHolder.getContext().setAuthentication(null);
         return new MessageResponseDto();
     }
 
     private PersonDto getAuth(AuthDtoRequest authDtoRequest, String token) {
+
         Person person = daoPerson.getByEmail(authDtoRequest.getEmail());
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(token);
@@ -53,6 +56,7 @@ public class AuthService {
     }
 
     private Person getPerson(String email) {
+
         return daoPerson.getByEmail(email);
     }
 

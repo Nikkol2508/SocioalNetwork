@@ -73,7 +73,6 @@ public class ProfileService {
             throws EntityNotFoundException {
 
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
-
         return listPersons
                 .stream()
                 .map(PersonDto::fromPerson)
@@ -81,6 +80,7 @@ public class ProfileService {
     }
 
     public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
+
         Post post = new Post();
         post.setTitle(postRequest.getTitle());
         post.setPostText(postRequest.getPostText());
@@ -102,12 +102,12 @@ public class ProfileService {
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request)
             throws ParseException {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
         if (person == null) {
             throw new EntityNotFoundException("Person with email: " + email + " not found");
         }
-
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
         if (!request.getFirstName().isBlank() && !request.getLastName().isBlank()) {

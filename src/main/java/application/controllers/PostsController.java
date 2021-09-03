@@ -29,12 +29,14 @@ public class PostsController {
             @RequestParam(value = "date_to", required = false) Long dateTo,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
-        return ResponseEntity.ok(new GeneralListResponse<>(postsService.getPosts(text, author, dateFrom, dateTo),
-                offset, itemPerPage));
+
+        return ResponseEntity.ok(new GeneralListResponse<>(postsService
+                .getPosts(text, author, dateFrom, dateTo), offset, itemPerPage));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GeneralResponse<PostDto>> getPost(@PathVariable int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.getPostResponse(id)));
     }
 
@@ -43,12 +45,14 @@ public class PostsController {
             @PathVariable String id,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+
         return ResponseEntity.ok(new GeneralListResponse<>(postsService.getCommentsResponse(id), offset, itemPerPage));
     }
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
                                                                    @RequestBody CommentRequest commentRequest) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.setComment(id, commentRequest)));
     }
 
@@ -56,23 +60,27 @@ public class PostsController {
     public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
                                                                    @PathVariable String id,
                                                                    @PathVariable int comment_id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.editComment(request, id, comment_id)));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
                                                              @PathVariable int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.editPost(postRequest, id)));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deletePost(@PathVariable int id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.deletePost(id)));
     }
 
     @DeleteMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<HashMap<String, Integer>>> deleteComment(@PathVariable String id,
                                                                                    @PathVariable int comment_id) {
+
         return ResponseEntity.ok(new GeneralResponse<>(postsService.deleteComment(id, comment_id)));
     }
 }

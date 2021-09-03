@@ -26,11 +26,13 @@ public class DialogsService {
     private final DaoDialog daoDialog;
 
     private int getAuthorId() {
+
         Person person = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         return person.getId();
     }
 
     public Message sendMessage(int dialogId, MessageSendDtoRequest request) {
+
         Message message = new Message();
         message.setMessageText(request.getMessageText());
         message.setAuthorId(getAuthorId());
@@ -51,11 +53,13 @@ public class DialogsService {
     }
 
     public MessageDeleteDto deleteMessage(int messageId, int dialogId) {
+
         daoMessage.deleteById(messageId, dialogId);
         return new MessageDeleteDto(messageId);
     }
 
     public Message editMessage(int messageId, MessageSendDtoRequest request) {
+
         Message message = daoMessage.getById(messageId);
         if (message == null) {
             throw new EntityNotFoundException("Message with id = " + messageId + " is not exist");
@@ -65,6 +69,7 @@ public class DialogsService {
     }
 
     public MessageResponseDto readMessage(int dialogId, int messageId) {
+
         Message message = daoMessage.getById(messageId);
         if (message == null) {
             throw new EntityNotFoundException("Message with id = " + messageId + " is not exist");
@@ -74,44 +79,45 @@ public class DialogsService {
     }
 
     public DialogsActivityResponseDto getActivity(int dialogId, int userId) {
+
         return new DialogsActivityResponseDto(true, daoPerson.getLastOnlineTime(userId));
     }
 
     public UnreadedCountDto getUnreadedCount() {
+
         int id = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         return new UnreadedCountDto(daoMessage.getCountUnreadedMessagesForUser(id));
     }
 
     public List<DialogDto> getDialogs() {
+
         int userId = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         List<Dialog> dialogList = daoDialog.getDialogListForUser(userId);
         return dialogList.stream().map(dialog -> fromDialog(dialog, userId)).collect(Collectors.toList());
     }
 
-    public List<MessageDto> getMessagesInDialog(int offset,
-                                                int itemPerPage,
-                                                int dialogId) {
+    public List<MessageDto> getMessagesInDialog(int offset, int itemPerPage, int dialogId) {
+
         int userId = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName()).getId();
         List<MessageDto> messageDtoList = daoMessage.getMessagesInDialog(daoDialog.getDialogById(dialogId))
                 .stream().map(message -> fromMessage(message, userId))
                 .collect(Collectors.toList());
-        messageDtoList.stream().filter(messageDto ->
-                messageDto.getReadStatus() == ReadStatus.SENT && messageDto.getRecipientId().getId() == userId)
-                .forEach(message -> daoMessage.readMessage(dialogId, message.getId()));
+        messageDtoList.stream().filter(messageDto -> messageDto.getReadStatus() == ReadStatus.SENT &&
+                messageDto.getRecipientId().getId() == userId).forEach(message -> daoMessage
+                .readMessage(dialogId, message.getId()));
         return messageDtoList;
     }
 
     public DialogIdDto createDialog(DialogCreateDtoRequest request) {
+
         int activeUserId = daoPerson.getByEmail(SecurityContextHolder.getContext()
                 .getAuthentication().getName()).getId();
         Dialog foundDialog = daoDialog.getDialogByUsersId(activeUserId, request.getUsersIds().get(0));
         if (foundDialog == null) {
-            int dialogId = daoDialog.createDialog(
-                    activeUserId, request.getUsersIds().get(0));
+            int dialogId = daoDialog.createDialog(activeUserId, request.getUsersIds().get(0));
             Person personFromRequest = daoPerson.getById(request.getUsersIds().get(0));
             sendMessage(dialogId, new MessageSendDtoRequest(String.format("Create new dialog with %s %s",
-                    personFromRequest.getFirstName(),
-                    personFromRequest.getLastName())));
+                    personFromRequest.getFirstName(), personFromRequest.getLastName())));
             return new DialogIdDto(dialogId);
         } else {
             return new DialogIdDto(foundDialog.getId());
@@ -119,17 +125,18 @@ public class DialogsService {
     }
 
     private DialogDto fromDialog(Dialog dialog, int userId) {
+
         DialogDto dialogDto = new DialogDto();
         dialogDto.setId(dialog.getId());
         dialogDto.setUnreadCount(daoMessage.getCountUnreadedMessagesInDialog(userId, dialog.getId()));
-        dialogDto.setRecipient(PersonDialogsDto.fromPerson(daoPerson.getById(dialog.getFirstUserId() == userId
-                ? dialog.getSecondUserId()
-                : dialog.getFirstUserId())));
+        dialogDto.setRecipient(PersonDialogsDto.fromPerson(daoPerson
+                .getById(dialog.getFirstUserId() == userId ? dialog.getSecondUserId() : dialog.getFirstUserId())));
         dialogDto.setLastMessage(fromMessage(daoMessage.getLastMessageInDialog(dialog), userId));
         return dialogDto;
     }
 
     private MessageDto fromMessage(Message message, int userId) {
+
         MessageDto messageDto = new MessageDto();
         messageDto.setMessageText(message.getMessageText());
         messageDto.setId(message.getId());

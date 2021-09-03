@@ -22,29 +22,33 @@ public class DaoPerson {
     private final JdbcTemplate jdbcTemplate;
 
     public Integer getPersonIdByEmail(String email) {
+
         String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
         return jdbcTemplate.queryForObject(selectPersonIdByEmail, new Object[]{email}, Integer.class);
     }
 
     public Person getByEmail(String email) {
+
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
         return jdbcTemplate.query(selectPersonByEmail, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
     }
 
     public Person getByConfirmationCode(String code) {
+
         String query = "SELECT * FROM person WHERE confirmation_code = ?";
-        return jdbcTemplate.query(query, new Object[]{code}, new PersonMapper())
-                .stream().findAny().orElse(null);
+        return jdbcTemplate.query(query, new Object[]{code}, new PersonMapper()).stream().findAny().orElse(null);
     }
 
     public Person getById(int id) {
+
         String selectPersonForId = "SELECT * FROM person WHERE id = ?";
-        return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream()
-                .findAny().orElse(null);
+        return jdbcTemplate.query(selectPersonForId, new Object[]{id}, new PersonMapper()).stream().findAny()
+                .orElse(null);
     }
 
     public List<Person> getRecommendations(int id) {
+
         String selectRecommendations = "SELECT * FROM person WHERE id IN (SELECT src_person_id from friendship " +
                 "JOIN friendship_status fs on fs.id = friendship.status_id WHERE code = ? AND dst_person_id " +
                 "IN (SELECT src_person_id FROM friendship WHERE dst_person_id = ?)) AND person.id != ? " +
@@ -57,42 +61,40 @@ public class DaoPerson {
     }
 
     public void save(Person person) {
+
         String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
-                " e_mail, reg_date, messages_permission, photo) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsertPerson,
-                person.getFirstName(),
-                person.getLastName(),
-                person.getPassword(),
-                person.getEmail(),
-                System.currentTimeMillis(),
-                PermissionMessagesType.ALL.toString(),
-                person.getPhoto());
+                " e_mail, reg_date, messages_permission, photo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlInsertPerson, person.getFirstName(), person.getLastName(), person.getPassword(),
+                person.getEmail(), System.currentTimeMillis(), PermissionMessagesType.ALL.toString(), person.getPhoto());
     }
 
     public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
                                  String city, String country, String about){
+
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?",
-                firstName, lastName, birthDate, phone, photo,
-                city, country, about, id);
+        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
+                birthDate, phone, photo, city, country, about, id);
     }
 
     public void updateConfirmationCode(int id, String code) {
+
         String query = "UPDATE person SET confirmation_code = ? WHERE id = ?";
         jdbcTemplate.update(query, code, id);
     }
 
     public void updatePassword(int id, String password) {
+
         String query = "UPDATE person SET password = ? WHERE id = ?";
         jdbcTemplate.update(query, password, id);
     }
 
     public void delete(int id) {
+
         jdbcTemplate.update("DELETE FROM person where id = ?", id);
     }
 
     public void deleteFriendshipByPersonId(int id){
+
         jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
                 "WHERE src_person_id = ?)", id);
         jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
@@ -100,7 +102,9 @@ public class DaoPerson {
         jdbcTemplate.update("DELETE FROM friendship WHERE src_person_id = ?", id);
         jdbcTemplate.update("DELETE FROM friendship WHERE dst_person_id = ?", id);
     }
+
     public List<Person> getFriends(int id) {
+
         String select = "SELECT * FROM person WHERE id IN (SELECT src_person_id FROM friendship" +
                 " JOIN friendship_status fs on fs.id = friendship.status_id " +
                 "WHERE code = '" + FriendshipStatus.FRIEND + "' AND dst_person_id = " + id + " " +
@@ -113,6 +117,7 @@ public class DaoPerson {
 
     @Transactional
     public Integer addFriendByIdAndReturnEntityId(int srcId, int dstId) {
+
         String insertIntoFriendshipStatus = "INSERT INTO friendship_status (time, name, code) VALUES (?, ?, ?)";
         String insertIntoFriendship = "INSERT INTO friendship (status_id, src_person_id, dst_person_id) " +
                 "VALUES ((SELECT max(friendship_status.id) from friendship_status), ?, ?)";
@@ -142,18 +147,13 @@ public class DaoPerson {
 
     public String getFriendStatus(int srcId, int dstId) {
 
-        try {
-            String select = "SELECT code FROM friendship f JOIN friendship_status fs2 ON f.status_id = fs2.id WHERE" +
-                    " src_person_id IN (?, ?)" +
-                    " AND dst_person_id IN (?, ?)";
-
-            return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, String.class);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        String select = "SELECT code FROM friendship f JOIN friendship_status fs2 ON f.status_id = fs2.id WHERE" +
+                " src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+        return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, String.class);
     }
 
     public void deleteFriendForID(int srcId, int dtcId) {
+
         String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
                 "AND dst_person_id IN (?, ?)";
         String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
@@ -165,19 +165,21 @@ public class DaoPerson {
     }
 
     public Person getAuthPerson() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return getByEmail(authentication.getName());
     }
 
     public void unAcceptRequest(int dstId, int srcId) {
+
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE dst_person_id = ? AND src_person_id = ?)";
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(),
-                dstId, srcId);
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(), dstId, srcId);
     }
 
     @Transactional
     public void updateDeclined(int srcId, int dtcId) {
+
         String updateFriendship = "UPDATE friendship SET src_person_id = ?, dst_person_id = ? " +
                 "WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
@@ -187,6 +189,7 @@ public class DaoPerson {
     }
 
     public List<Person> getRecommendationsOnRegDate(int id) {
+
         String selectRecommendations = "SELECT * FROM person WHERE reg_date > ? AND id != ?";
         long twoDays = 17280000000L;
         return jdbcTemplate.query(selectRecommendations, new Object[]{System.currentTimeMillis() - twoDays, id},
@@ -227,16 +230,14 @@ public class DaoPerson {
     }
 
     public void updateEmail(int id, String email) {
+
         String query = "UPDATE person SET e_mail = ? WHERE id = ?";
         jdbcTemplate.update(query, email, id);
     }
 
     public Long getLastOnlineTime(int id) {
+
         String query = "SELECT last_online_time FROM person WHERE id = ?";
-        try {
-            return jdbcTemplate.queryForObject(query, new Object[]{id}, Long.class);
-        } catch (EmptyResultDataAccessException ex) {
-            return null;
-        }
+        return jdbcTemplate.queryForObject(query, new Object[]{id}, Long.class);
     }
 }

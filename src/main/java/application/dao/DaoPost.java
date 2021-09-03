@@ -18,30 +18,28 @@ public class DaoPost {
     private final JdbcTemplate jdbcTemplate;
 
     public Post getById(int id) {
+
         return jdbcTemplate.query("SELECT * FROM post WHERE id = ?", new Object[]{id}, new PostMapper())
                 .stream().findAny().orElse(null);
     }
 
     public List<Post> getAll() {
+
         return jdbcTemplate.query("SELECT * FROM post WHERE time < " +
                 System.currentTimeMillis() + " AND is_blocked = false ORDER BY time desc", new PostMapper());
     }
 
     public void save(Post post) {
+
         jdbcTemplate.update("INSERT INTO post (time, author_id, post_text, title, is_blocked) " +
-                        "VALUES (?, ?, ?, ?, ?)",
-                post.getTime(),
-                post.getAuthorId(),
-                post.getPostText(),
-                post.getTitle(),
-                post.isBlocked());
+                        "VALUES (?, ?, ?, ?, ?)", post.getTime(), post.getAuthorId(), post.getPostText(),
+                post.getTitle(), post.isBlocked());
 
     }
 
     public Post savePost(Post post) {
-        SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("post")
-                .usingGeneratedKeyColumns("id");
+
+        SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate).withTableName("post").usingGeneratedKeyColumns("id");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("time", post.getTime());
         parameters.put("author_id", post.getAuthorId());
@@ -52,42 +50,34 @@ public class DaoPost {
     }
 
     public void update(Post post) {
+
         jdbcTemplate.update("UPDATE post SET time = ?, author_id = ?, post_text = ?, title = ?, is_blocked = ? " +
-                        "WHERE id=?",
-                post.getTime(),
-                post.getAuthorId(),
-                post.getPostText(),
-                post.getTitle(),
-                post.isBlocked(),
-                post.getId());
+                        "WHERE id=?", post.getTime(), post.getAuthorId(), post.getPostText(), post.getTitle(),
+                post.isBlocked(), post.getId());
     }
 
     public void delete(int id) {
+
         jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
     }
 
     public void deleteByAuthorId(int id){
+
         jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
     public List<Post> getPostsByTitle(String text) {
+
         String query = "select * from post where title LIKE concat(concat('%',?), '%')";
         return jdbcTemplate.query(query, new Object[]{text}, new PostMapper());
     }
 
     public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
 
-        String query = "select * from post where " +
-                "post_text LIKE concat(concat('%',?), '%')" +
-                "and (author_id  = ? or ?::int is null) " +
-                "and (time >= ? or ?::bigint is null) " +
-                "and (time <= ? or ?::bigint is null)";
+        String query = "SELECT * FROM post WHERE post_text LIKE concat(concat('%',?), '%') AND (author_id  = ? " +
+                "OR ?::int IS NULL) AND (time >= ? OR ?::bigint IS NULL) AND (time <= ? OR ?::bigint IS NULL)";
 
-        return jdbcTemplate.query(query,
-                new Object[]{text,
-                        authorId, authorId,
-                        dateFrom, dateFrom,
-                        dateTo, dateTo},
+        return jdbcTemplate.query(query, new Object[]{text, authorId, authorId, dateFrom, dateFrom, dateTo, dateTo},
                 new PostMapper());
     }
 

@@ -21,16 +21,19 @@ public class FriendsService {
     private final DaoNotification daoNotification;
 
     public List<PersonDto> getUserFriends() {
+
         Person currentPerson = daoPerson.getAuthPerson();
         return getPersonDtoOnPerson(daoPerson.getFriends(currentPerson.getId()));
     }
 
     public List<PersonDto> getUserFriendsRequest() {
+
         List<Person> personList = daoPerson.getFriendsRequest(daoPerson.getAuthPerson().getId());
         return getPersonDtoOnPerson(personList);
     }
 
     public List<PersonDto> getUserFriendsRecommendations() {
+
         List<PersonDto> personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendations(daoPerson
                 .getAuthPerson().getId()));
         if (personDtoList.size() == 0) {
@@ -41,6 +44,7 @@ public class FriendsService {
     }
 
     public List<PersonDto> getPersonDtoOnPerson(List<Person> personList) {
+
         List<PersonDto> personDtos = new ArrayList<>();
         for (Person person : personList) {
             PersonDto personDto = new PersonDto();
@@ -64,6 +68,7 @@ public class FriendsService {
     }
 
     public MessageResponseDto addFriendForId(int id) {
+
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus == null) {
@@ -79,6 +84,7 @@ public class FriendsService {
     }
 
     public MessageResponseDto deleteFriendForId(int id) {
+
         Person currentPerson = daoPerson.getAuthPerson();
         String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
         if (friendStatus.equals(FriendshipStatus.FRIEND.toString())) {

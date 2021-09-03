@@ -40,6 +40,7 @@ public class AccountService {
 
     public MessageResponseDto register(RegistrationDtoRequest request)
             throws PasswordsNotEqualsException, EmailAlreadyExistsException {
+
         if (!request.getPasswd1().equals(request.getPasswd2())) {
             throw new PasswordsNotEqualsException();
         }
@@ -60,6 +61,7 @@ public class AccountService {
 
     public MessageResponseDto setPassword(SetPasswordDtoRequest request)
             throws PasswordNotValidException, EntityNotFoundException {
+
         //проверка валидности пароля (не короче 8 символов)
         if (request.getPassword().length() < 8) {
             throw new PasswordNotValidException();
@@ -74,6 +76,7 @@ public class AccountService {
     }
 
     public MessageResponseDto setEmail(ShiftEmailDtoRequest request, String code) {
+
         // Здесь можно добавить проверку на валидность email (request.getEmail())
         Person person = getByConfirmationCode(code);
         if (person == null) {
@@ -86,14 +89,14 @@ public class AccountService {
     public MessageResponseDto recoverPassword(
             HttpServletRequest servletRequest, @RequestBody RecoverPassDtoRequest request)
             throws MessagingException, UnsupportedEncodingException {
+
         String email = request.getEmail();
         String code = RandomString.make(30);
         updateConfirmationCode(code, email);
         String siteURL = servletRequest.getRequestURL().toString()
                 .replace(servletRequest.getServletPath(), "");
-        String urn = servletRequest.getHeader("Referer").indexOf("settings") > 0
-                ? "/shift-password"
-                : "/change-password";
+        String urn = servletRequest.getHeader("Referer")
+                .indexOf("settings") > 0 ? "/shift-password" : "/change-password";
         String resetPasswordLink = siteURL + urn + "?code=" + code;
         sendEmailToRecoverPassword(email, resetPasswordLink);
         return new MessageResponseDto();
@@ -101,6 +104,7 @@ public class AccountService {
 
     public MessageResponseDto changeEmail(HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         String code = RandomString.make(30);
         updateConfirmationCode(code, email);
@@ -112,16 +116,19 @@ public class AccountService {
     }
 
     public static String getCode(HttpServletRequest request) {
+
         String url = request.getHeader("Referer");
         return url.substring(url.indexOf("=") + 1);
     }
 
     public List<NotificationsSettingsDto> getPersonNotificationsSettings() {
+
         return daoNotification.getNotificationsSettings(daoPerson.getAuthPerson().getId());
     }
 
     private void sendEmailToChangeEmail(String recipientEmail, String link)
             throws MessagingException, UnsupportedEncodingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
         helper.setFrom("noreply@social.network.skillbox", "Support");
@@ -141,6 +148,7 @@ public class AccountService {
 
     private void sendEmailToRecoverPassword(String recipientEmail, String link)
             throws MessagingException, UnsupportedEncodingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
         helper.setFrom("noreply@social.network.skillbox", "Support");
@@ -159,6 +167,7 @@ public class AccountService {
     }
 
     private void updateConfirmationCode(String code, String email) {
+
         Person person = daoPerson.getByEmail(email);
         if (person != null) {
             daoPerson.updateConfirmationCode(person.getId(), code);
@@ -168,10 +177,12 @@ public class AccountService {
     }
 
     private Person getByConfirmationCode(String code) {
+
         return daoPerson.getByConfirmationCode(code);
     }
 
     private void updatePassword(Person person, String newPassword) {
+
         String encodedPassword = passwordEncoder.encode(newPassword);
         int personId = person.getId();
         daoPerson.updatePassword(personId, encodedPassword);
