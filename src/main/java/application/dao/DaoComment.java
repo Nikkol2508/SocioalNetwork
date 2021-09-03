@@ -3,11 +3,9 @@ package application.dao;
 import application.dao.mappers.PostCommentMapper;
 import application.models.Comment;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Component
@@ -22,13 +20,13 @@ public class DaoComment {
                 new Object[]{postId}, new PostCommentMapper());
     }
 
-    public Integer getPostIdByCommentId(int commentId) {
+    public Integer getPostIdByCommentId(Integer commentId) {
 
         return jdbcTemplate.queryForObject("SELECT post_id FROM post_comment WHERE id = ?", new Object[]{commentId},
                 Integer.class);
     }
 
-    public List<Comment> getSubComment(int id) {
+    public List<Comment> getSubComment(Integer id) {
 
         return jdbcTemplate.query("SELECT * FROM post_comment where parent_id = ?", new Object[]{id},
                 new PostCommentMapper());

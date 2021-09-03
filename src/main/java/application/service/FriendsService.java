@@ -8,6 +8,7 @@ import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -70,7 +71,12 @@ public class FriendsService {
     public MessageResponseDto addFriendForId(int id) {
 
         Person currentPerson = daoPerson.getAuthPerson();
-        String friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
+        String friendStatus;
+        try {
+            friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);
+        } catch (EmptyResultDataAccessException ex) {
+            friendStatus = null;
+        }
         if (friendStatus == null) {
             int entityId = daoPerson.addFriendByIdAndReturnEntityId(currentPerson.getId(), id);
             daoNotification.addNotification(id, currentPerson.getId(), System.currentTimeMillis(), entityId,
