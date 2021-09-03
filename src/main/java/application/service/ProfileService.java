@@ -68,15 +68,16 @@ public class ProfileService {
         return postDtoList;
     }
 
-    public List<PersonDto> getPersons(String firstName, String lastName, Long ageFrom,
+    public List<PersonDto> getPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
                                                      Long ageTo, String country, String city)
             throws EntityNotFoundException {
 
+        if (firstOrLastName != null) {
+            return daoPerson.getPersonsByFirstNameSurname(firstOrLastName).stream().map(PersonDto::fromPerson)
+                    .collect(Collectors.toList());
+        }
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
-        return listPersons
-                .stream()
-                .map(PersonDto::fromPerson)
-                .collect(Collectors.toList());
+        return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
