@@ -8,13 +8,12 @@ import application.models.requests.LikeRequest;
 import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.slf4j.Marker;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -240,14 +239,18 @@ public class PostsService {
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
-        for (String tag : request.getTags()) {
-            if (saveTag(tag)) {
-                daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
-            }
-        }
+        attachTags2Post(request.getTags(), postId);
         daoPost.update(post);
         log.info("Edit post id " + postId + " user id " + post.getAuthorId());
         return getPostDto(postId);
+    }
+
+    public void attachTags2Post (List tags, int postId) {
+        Set<String> setTags = new HashSet<>(tags);
+        for (String tag : setTags) {
+            saveTag(tag);
+            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+        }
     }
 
     public MessageResponseDto deletePost(int postId) {
