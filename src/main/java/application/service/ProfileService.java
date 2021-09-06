@@ -94,10 +94,7 @@ public class ProfileService {
                     post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                     post.getTitle());
         }
-        for (String tag : postRequest.getTags()) {
-            daoTag.save(tag);
-            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
-        }
+        postsService.attachTags2Post(postRequest.getTags(), postId);
         return post;
     }
 

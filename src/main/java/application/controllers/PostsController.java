@@ -9,12 +9,14 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class PostsController {
     @GetMapping("/{id}")
     public ResponseEntity<GeneralResponse<PostDto>> getPost(@PathVariable int id) {
 
+        log.info("Get post {}");
         return ResponseEntity.ok(new GeneralResponse<>(postsService.getPostResponse(id)));
     }
 
@@ -76,6 +79,7 @@ public class PostsController {
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deletePost(@PathVariable int id) {
 
+        log.info("Delete post {}", id);
         return ResponseEntity.ok(new GeneralResponse<>(postsService.deletePost(id)));
     }
 

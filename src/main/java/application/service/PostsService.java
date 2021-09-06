@@ -8,15 +8,16 @@ import application.models.requests.LikeRequest;
 import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.slf4j.Marker;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PostsService {
 
@@ -198,14 +199,21 @@ public class PostsService {
         return daoTag.getAll();
     }
 
+    public boolean saveTag(String tagName) {
+
+        Tag tag = daoTag.findTagByName(tagName);
+        if (tag == null) {
+            daoTag.save(tagName);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Tag setTag(TagRequest request) {
 
-        Tag tag = daoTag.findTagByName(request.getTag());
-        if (tag == null) {
-            daoTag.save(request.getTag());
-            tag = daoTag.findTagByName(request.getTag());
-        }
-        return tag;
+        saveTag(request.getTag());
+        return daoTag.findTagByName(request.getTag());
     }
 
     public HashMap<String, String> deleteTag(int tagId) {
@@ -231,12 +239,18 @@ public class PostsService {
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
-        for (String tag : request.getTags()) {
-            daoTag.save(tag);
+        attachTags2Post(request.getTags(), postId);
+        daoPost.update(post);
+        log.info("Edit post id " + postId + " user id " + post.getAuthorId());
+        return getPostDto(postId);
+    }
+
+    public void attachTags2Post (List tags, int postId) {
+        Set<String> setTags = new HashSet<>(tags);
+        for (String tag : setTags) {
+            saveTag(tag);
             daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
-        daoPost.update(post);
-        return getPostDto(postId);
     }
 
     public MessageResponseDto deletePost(int postId) {

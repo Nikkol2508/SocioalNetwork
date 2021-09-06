@@ -38,7 +38,7 @@ public class ProfileController {
     public ResponseEntity<GeneralListResponse<PostDto>> getWall(
             @PathVariable int id,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
-            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+            @RequestParam(value = "itemPerPage", defaultValue = "5", required = false) int itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(profileService.getWall(id), offset, itemPerPage));
     }
