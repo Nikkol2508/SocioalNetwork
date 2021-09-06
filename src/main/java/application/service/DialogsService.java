@@ -124,6 +124,17 @@ public class DialogsService {
         }
     }
 
+    public DialogIdDto deleteDialog(int id) {
+
+        daoDialog.deleteDialogById(id);
+        return new DialogIdDto(id);
+    }
+
+    public UserIdsDto addUserInDialog(UserIdsDto ids) {
+
+        return ids;
+    }
+
     private DialogDto fromDialog(Dialog dialog, int userId) {
 
         DialogDto dialogDto = new DialogDto();

@@ -48,4 +48,10 @@ public class DaoDialog {
         return jdbcTemplate.query(getDialog, new Object[]{firstUserId, secondUserId, secondUserId, firstUserId},
                 new DialogMapper()).stream().findAny().orElse(null);
     }
+
+    public void deleteDialogById(int id) {
+
+        String deleteDialog = "DELETE FROM dialog WHERE id = ?";
+        jdbcTemplate.update(deleteDialog, id);
+    }
 }
