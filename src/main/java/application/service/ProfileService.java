@@ -94,8 +94,9 @@ public class ProfileService {
                     post.getTitle());
         }
         for (String tag : postRequest.getTags()) {
-            daoTag.save(tag);
-            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+            if (postsService.saveTag(tag)) {
+                daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
+            }
         }
         return post;
     }
