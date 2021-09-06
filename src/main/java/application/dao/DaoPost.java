@@ -66,19 +66,21 @@ public class DaoPost {
         jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
-    public List<Post> getPostsByTitle(String text) {
+    public List<Post> getPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
+        String tagsInStr = tags != null ? String.join("|", tags) : null;
+        String query = "SELECT * FROM post_tag_user_view WHERE (post_text ILIKE ? OR title ILIKE ?) " +
+                "AND ((first_name ILIKE ? OR ?::text IS NULL) OR (last_name ILIKE ? OR ?::text IS NULL))" +
+                "AND (time >= ? OR ?::bigint IS NULL) AND (time <= ? OR ?::bigint IS NULL) " +
+                "AND (tag ~* ? OR ?::text IS NULL)";
 
-        String query = "select * from post where title LIKE concat(concat('%',?), '%')";
-        return jdbcTemplate.query(query, new Object[]{text}, new PostMapper());
+        return jdbcTemplate.query(query, new Object[]{prepareParam(text), prepareParam(text),
+                prepareParam(author), author, prepareParam(author), author, dateFrom, dateFrom, dateTo, dateTo,
+                tagsInStr, tagsInStr}, new PostMapper());
+
     }
 
-    public List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
-
-        String query = "SELECT * FROM post WHERE post_text LIKE concat(concat('%',?), '%') AND (author_id  = ? " +
-                "OR ?::int IS NULL) AND (time >= ? OR ?::bigint IS NULL) AND (time <= ? OR ?::bigint IS NULL)";
-
-        return jdbcTemplate.query(query, new Object[]{text, authorId, authorId, dateFrom, dateFrom, dateTo, dateTo},
-                new PostMapper());
+    private String prepareParam(String param) {
+        return "%" + param + "%";
     }
 
     public List<Post> getAllUsersPosts(int id) {

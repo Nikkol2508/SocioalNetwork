@@ -58,7 +58,7 @@ public class PostsService {
         return commentDtoList;
     }
 
-    public List<CommentDto> getSubComments(int parentId) {
+    public List<CommentDto> getSubComments(Integer parentId) {
 
         List<Comment> subComments = daoComment.getSubComment(parentId);
         List<CommentDto> subCommentsList = new ArrayList<>();
@@ -226,24 +226,10 @@ public class PostsService {
         return response;
     }
 
-    public List<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo) {
+    public List<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
 
-        val listPersonsId = daoPerson.getPersonsByFirstNameSurname(author)
-                .stream()
-                .map(Person::getId)
-                .collect(Collectors.toList());
-        val posts = listPersonsId.stream()
-                .map(item -> getPosts(text, item, dateFrom, dateTo))
-                .flatMap(List::stream).collect(Collectors.toList());
-        return posts
-                .stream()
-                .map(item -> getPostDto(item.getId()))
-                .collect(Collectors.toList());
-    }
-
-    private List<Post> getPosts(String text, Integer authorId, Long dateFrom, Long dateTo) {
-
-        return daoPost.getPosts(text, authorId, dateFrom, dateTo);
+        List<Post> posts = daoPost.getPosts(text, author, dateFrom, dateTo, tags);
+        return posts.stream().map(item -> getPostDto(item.getId())).collect(Collectors.toList());
     }
 
     public PostDto editPost(PostRequest request, int postId) {

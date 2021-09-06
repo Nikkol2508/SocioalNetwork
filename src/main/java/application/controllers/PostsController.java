@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -29,11 +30,12 @@ public class PostsController {
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "date_from", required = false) Long dateFrom,
             @RequestParam(value = "date_to", required = false) Long dateTo,
+            @RequestParam(value = "tags", required = false) List<String> tags,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(postsService
-                .getPosts(text, author, dateFrom, dateTo), offset, itemPerPage));
+                .getPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage));
     }
 
     @GetMapping("/{id}")
