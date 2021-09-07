@@ -31,13 +31,13 @@ public class StorageService {
 
                 fileDto.setOwnerId(daoPerson.getPersonIdByEmail(
                         SecurityContextHolder.getContext().getAuthentication().getName()));
-                fileDto.setName(file.getOriginalFilename());
+                fileDto.setFileName(file.getOriginalFilename());
                 String servletPath = "storage/" + file.getOriginalFilename();
                 fileDto.setRelativeFilePath(servletPath);
                 fileDto.setRawFileURL("какой то урл");
-                fileDto.setFormat(file.getContentType());
+                fileDto.setFileFormat(file.getContentType());
                 fileDto.setBytes(bytes.length);
-                fileDto.setType(type);
+                fileDto.setFileType(type);
                 fileDto = daoFile.saveAndReturn(fileDto);
                 return fileDto;
             } catch (Exception e) {
