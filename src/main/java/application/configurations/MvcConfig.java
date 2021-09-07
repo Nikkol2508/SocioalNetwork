@@ -14,16 +14,16 @@ import javax.servlet.MultipartConfigElement;
 @Configuration
 public class MvcConfig implements WebMvcConfigurer {
 
-  @Bean
-  MultipartConfigElement multipartConfigElement() {
-    MultipartConfigFactory factory = new MultipartConfigFactory();
-    factory.setMaxFileSize(DataSize.parse("15MB"));
-    factory.setMaxRequestSize(DataSize.parse("15MB"));
-    return factory.createMultipartConfig();
-  }
+    @Bean
+    MultipartConfigElement multipartConfigElement() {
+        MultipartConfigFactory factory = new MultipartConfigFactory();
+        factory.setMaxFileSize(DataSize.parse("15MB"));
+        factory.setMaxRequestSize(DataSize.parse("15MB"));
+        return factory.createMultipartConfig();
+    }
 
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**").allowedOrigins("*").allowCredentials(true).allowedMethods("*");
-  }
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedOrigins("*").allowCredentials(true).allowedMethods("*");
+    }
 }
