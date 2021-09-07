@@ -46,3 +46,7 @@ databaseChangeLog:
   - include:
       file: create-post-tag-user-view.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: notification-settings-data.sql
+      relativeToChangelogFile: true
