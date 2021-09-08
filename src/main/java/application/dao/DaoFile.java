@@ -20,9 +20,9 @@ public class DaoFile {
     public void save(FileDescription fileDescription) {
         String sqlInsertFileDescription = "INSERT INTO image (owner_id, name, path," +
                 " url, format, bytes, type, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlInsertFileDescription, fileDescription.getOwnerId(), fileDescription.getName(),
-                fileDescription.getRelativeFilePath(), fileDescription.getRawFileURL(), fileDescription.getFormat(),
-                fileDescription.getBytes(), fileDescription.getType(), fileDescription.getTime());
+        jdbcTemplate.update(sqlInsertFileDescription, fileDescription.getOwnerId(), fileDescription.getFileName(),
+                fileDescription.getRelativeFilePath(), fileDescription.getRawFileURL(), fileDescription.getFileFormat(),
+                fileDescription.getBytes(), fileDescription.getFileType(), fileDescription.getCreatedAt());
     }
 
     public String getPath(int id) {
@@ -37,12 +37,12 @@ public class DaoFile {
         SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate).withTableName("image").usingGeneratedKeyColumns("id");
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("owner_id", fileDescription.getOwnerId());
-        parameters.put("name", fileDescription.getName());
+        parameters.put("name", fileDescription.getFileName());
         parameters.put("path", fileDescription.getRelativeFilePath());
         parameters.put("url", fileDescription.getRawFileURL());
-        parameters.put("format", fileDescription.getFormat());
+        parameters.put("format", fileDescription.getFileFormat());
         parameters.put("bytes", fileDescription.getBytes());
-        parameters.put("type", fileDescription.getType());
+        parameters.put("type", fileDescription.getFileType());
         parameters.put("time", System.currentTimeMillis());
         return getById(sji.executeAndReturnKey(parameters).intValue());
     }
