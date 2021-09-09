@@ -9,6 +9,8 @@ import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -26,6 +28,7 @@ public class PostsService {
     private final DaoTag daoTag;
     private final DaoNotification daoNotification;
     private String undefinedPostId;
+    private static final Logger logger = LogManager.getLogger("app");
 
     public PostDto getPostDto(int postId) {
 
@@ -240,7 +243,8 @@ public class PostsService {
 
         attachTags2Post(request.getTags(), postId);
         daoPost.update(post);
-        log.info("Edit post id " + postId + " user id " + post.getAuthorId());
+        logger.error("Edit post id " + postId + " user id " + post.getAuthorId());
+        logger.info("Edit post id " + postId + " user id " + post.getAuthorId());
         return getPostDto(postId);
     }
 
