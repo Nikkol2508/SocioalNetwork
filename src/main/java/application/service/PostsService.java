@@ -9,8 +9,8 @@ import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.slf4j.Marker;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,6 +28,7 @@ public class PostsService {
     private final DaoTag daoTag;
     private final DaoNotification daoNotification;
     private String undefinedPostId;
+    private static final Logger logger = LogManager.getLogger("app");
 
     public PostDto getPostDto(int postId) {
 
@@ -239,13 +240,15 @@ public class PostsService {
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
+
         attachTags2Post(request.getTags(), postId);
         daoPost.update(post);
-        log.info("Edit post id " + postId + " user id " + post.getAuthorId());
+        logger.error("Edit post id " + postId + " user id " + post.getAuthorId());
+        logger.info("Edit post id " + postId + " user id " + post.getAuthorId());
         return getPostDto(postId);
     }
 
-    public void attachTags2Post (List tags, int postId) {
+    public void attachTags2Post(List tags, int postId) {
         Set<String> setTags = new HashSet<>(tags);
         for (String tag : setTags) {
             saveTag(tag);
