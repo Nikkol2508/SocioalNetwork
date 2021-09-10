@@ -12,13 +12,14 @@ public class FileDescriptionMapper implements RowMapper<FileDescription> {
         FileDescription fileDescription = new FileDescription();
         fileDescription.setId(rs.getInt("id"));
         fileDescription.setOwnerId(rs.getInt("owner_id"));
-        fileDescription.setName(rs.getString("name"));
+        fileDescription.setFileName(rs.getString("name"));
         fileDescription.setRelativeFilePath(rs.getString("path"));
         fileDescription.setRawFileURL(rs.getString("url"));
-        fileDescription.setFormat(rs.getString("format"));
+        fileDescription.setFileFormat(rs.getString("format"));
         fileDescription.setBytes(rs.getInt("bytes"));
-        fileDescription.setType(rs.getString("type"));
-        fileDescription.setTime(rs.getLong("time"));
+        fileDescription.setFileType(rs.getString("type"));
+        fileDescription.setCreatedAt(rs.getLong("time"));
+        fileDescription.setData(rs.getBytes("data"));
         return fileDescription;
     }
 }

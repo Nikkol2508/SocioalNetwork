@@ -7,11 +7,12 @@ public class FileDescription {
 
   private int id;
   private int ownerId;
-  private String name;
+  private String fileName;
   private String relativeFilePath;
   private String rawFileURL;
-  private String format;
+  private String fileFormat;
   private int bytes;
-  private String type;
-  private long time;
+  private String fileType;
+  private byte[] data;
+  private long createdAt;
 }
