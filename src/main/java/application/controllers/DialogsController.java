@@ -50,6 +50,19 @@ public class DialogsController {
         return ResponseEntity.ok(new GeneralResponse<>(dialogsService.getUnreadedCount()));
     }
 
+    @DeleteMapping("/{id}")
+    private ResponseEntity<GeneralResponse<DialogIdDto>> deleteDialog(@PathVariable int id) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(dialogsService.deleteDialog(id)));
+    }
+
+    @PutMapping("/{id}/users")
+    private ResponseEntity<GeneralResponse<UserIdsDto>> addUserInDialog(@PathVariable int id,
+                                                                        @RequestBody UserIdsDto ids) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(dialogsService.addUserInDialog(ids)));
+    }
+
     @PostMapping("/{id}/messages")
     private ResponseEntity<GeneralResponse<Message>> sendMessage(@PathVariable int id,
                                                                  @RequestBody MessageSendDtoRequest request) {

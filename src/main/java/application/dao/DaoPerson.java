@@ -212,12 +212,12 @@ public class DaoPerson {
         return "%" + param + "%";
     }
 
-    public List<Person> getPersonsByFirstNameSurname(String author) {
+    public List<Person> getPersonsByFirstNameSurname(String firstOrLastName) {
 
-        String query = "SELECT * FROM person WHERE (first_name ILIKE ? OR ?::text IS NULL) " +
-                "OR (last_name ILIKE ? OR ?::text IS NULL)";
+        String query = "SELECT * FROM person WHERE (first_name ILIKE ?) " +
+                "OR (last_name ILIKE ?)";
 
-        return jdbcTemplate.query(query, new Object[]{prepareParam(author), author, prepareParam(author), author},
+        return jdbcTemplate.query(query, new Object[]{prepareParam(firstOrLastName), prepareParam(firstOrLastName)},
                 new PersonMapper());
     }
 

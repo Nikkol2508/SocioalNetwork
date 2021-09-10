@@ -70,15 +70,16 @@ public class ProfileService {
         return postDtoList;
     }
 
-    public List<PersonDto> getPersons(String firstName, String lastName, Long ageFrom,
-                                      Long ageTo, String country, String city)
+    public List<PersonDto> getPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
+                                                     Long ageTo, String country, String city)
             throws EntityNotFoundException {
 
+        if (firstOrLastName != null) {
+            return daoPerson.getPersonsByFirstNameSurname(firstOrLastName).stream().map(PersonDto::fromPerson)
+                    .collect(Collectors.toList());
+        }
         val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
-        return listPersons
-                .stream()
-                .map(PersonDto::fromPerson)
-                .collect(Collectors.toList());
+        return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
@@ -95,10 +96,7 @@ public class ProfileService {
                     post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                     post.getTitle());
         }
-        for (String tag : postRequest.getTags()) {
-            daoTag.save(tag);
-            daoTag.attachTag2Post(daoTag.findTagByName(tag).getId(), postId);
-        }
+        postsService.attachTags2Post(postRequest.getTags(), postId);
         return post;
     }
 
@@ -111,7 +109,6 @@ public class ProfileService {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
-        //daoFile.deleteByPersonId(person.getId(),person.getPhoto());
         String firstName = request.getFirstName().isBlank() ? person.getFirstName() : request.getFirstName();
         String lastName = request.getLastName().isBlank() ? person.getLastName() : request.getLastName();
         daoPerson.updatePersonData(person.getId(), firstName, lastName, birthDate, request.getPhone(),

@@ -20,6 +20,25 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private static final String[] AUTH_WHITELIST = {
+            "/v2/api-docs",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/configuration/ui",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/webjars/**",
+            "/*",
+            "/static/**",
+            "/api/v1/auth/*",
+            "/api/v1/platform/*",
+            "/api/v1/account/register",
+            "/api/v1/account/password/*",
+            "/api/v1/account/email",
+            "/storage/*"
+            // other public endpoints of your API may be appended to this array
+    };
     private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
@@ -36,13 +55,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers("/*", "/static/**", "/api/v1/auth/*", "/api/v1/platform/*", "/api/v1/account/register").permitAll()
-                    .antMatchers("/api/v1/account/password/*", "/api/v1/account/email").permitAll()
-                    .antMatchers("/storage/*").permitAll()
+                    .antMatchers(AUTH_WHITELIST).permitAll()
                     .anyRequest().hasAuthority(Permission.USER.getPermission())
                 .and()
                 .exceptionHandling()
-                    .accessDeniedHandler(accessDeniedHandler()).authenticationEntryPoint(authenticationEntryPoint())
+                    .accessDeniedHandler(accessDeniedHandler())
+                    .authenticationEntryPoint(authenticationEntryPoint())
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }

@@ -38,13 +38,14 @@ public class ProfileController {
     public ResponseEntity<GeneralListResponse<PostDto>> getWall(
             @PathVariable int id,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
-            @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
+            @RequestParam(value = "itemPerPage", defaultValue = "5", required = false) int itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(profileService.getWall(id), offset, itemPerPage));
     }
 
     @GetMapping("/search")
     public ResponseEntity<GeneralListResponse<PersonDto>> getPersons(
+            @RequestParam(value = "first_or_last_name", required = false) String firstOrLastName,
             @RequestParam(value = "first_name", required = false) String firstName,
             @RequestParam(value = "last_name", required = false) String lastName,
             @RequestParam(value = "age_from", required = false) Long ageFrom,
@@ -55,7 +56,7 @@ public class ProfileController {
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(profileService
-                .getPersons(firstName, lastName, ageFrom, ageTo, country, city), offset, itemPerPage));
+                .getPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city), offset, itemPerPage));
     }
 
     @PutMapping("/me")
