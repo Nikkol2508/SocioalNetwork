@@ -17,7 +17,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public JwtUser loadUserByUsername(String email) throws UsernameNotFoundException {
         Person person = daoPerson.getByEmail(email);
         if (person == null) {
-            throw new UsernameNotFoundException("User with email: " +  email + "doesn't exists");
+            throw new UsernameNotFoundException("User with email: " +  email + " doesn't exists");
         }
         return JwtUser.fromPerson(person);
     }

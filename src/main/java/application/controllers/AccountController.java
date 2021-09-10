@@ -5,13 +5,11 @@ import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,4 +72,10 @@ public class AccountController {
         return ResponseEntity.ok(new GeneralListResponse<>(
                 accountService.getPersonNotificationsSettings(), offset, itemPerPage));
     }
+    @PutMapping("/notifications")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>>
+    setAccountNotifications(@RequestBody NotificationRequest notificationRequest) {
+        return ResponseEntity.ok(new GeneralResponse<>(accountService.setNotificationSettings(notificationRequest)));
+    }
+
 }

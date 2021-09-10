@@ -73,7 +73,6 @@ public class PostsController {
     public ResponseEntity<GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
                                                              @PathVariable int id) {
 
-        log.info("Edit post {}", id);
         return ResponseEntity.ok(new GeneralResponse<>(postsService.editPost(postRequest, id)));
     }
 

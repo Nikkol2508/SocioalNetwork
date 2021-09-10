@@ -6,13 +6,16 @@ import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -117,14 +120,22 @@ public class DaoPerson {
     @Transactional
     public Integer addFriendByIdAndReturnEntityId(int srcId, int dstId) {
 
-        String insertIntoFriendshipStatus = "INSERT INTO friendship_status (time, name, code) VALUES (?, ?, ?)";
-        String insertIntoFriendship = "INSERT INTO friendship (status_id, src_person_id, dst_person_id) " +
-                "VALUES ((SELECT max(friendship_status.id) from friendship_status), ?, ?)";
-        jdbcTemplate.update(insertIntoFriendshipStatus, System.currentTimeMillis(),
-                "Запрос на добавление в друзья", FriendshipStatus.REQUEST.toString());
-        jdbcTemplate.update(insertIntoFriendship, srcId, dstId);
-        return jdbcTemplate.queryForObject("SELECT status_id FROM friendship WHERE src_person_id " +
-                "IN (?, ?) AND dst_person_id IN (?, ?)", new Object[]{srcId, dstId, dstId, srcId}, Integer.class);
+        Map<String, Object> params = new HashMap<>();
+        params.put("time", System.currentTimeMillis());
+        params.put("name", "Запрос на добавление в друзья");
+        params.put("code", FriendshipStatus.REQUEST);
+
+        int friendshipStatusId = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("friendship_status").usingGeneratedKeyColumns("id")
+                .executeAndReturnKey(params).intValue();
+        params.clear();
+
+        params.put("status_id", friendshipStatusId);
+        params.put("src_person_id", srcId);
+        params.put("dst_person_id", dstId);
+
+        return new SimpleJdbcInsert(jdbcTemplate).withTableName("friendship").usingGeneratedKeyColumns("id")
+                .executeAndReturnKey(params).intValue();
     }
 
     public void addFriendRequest(int srcId, int dstId) {
@@ -212,12 +223,12 @@ public class DaoPerson {
         return "%" + param + "%";
     }
 
-    public List<Person> getPersonsByFirstNameSurname(String author) {
+    public List<Person> getPersonsByFirstNameSurname(String firstOrLastName) {
 
-        String query = "SELECT * FROM person WHERE (first_name ILIKE ? OR ?::text IS NULL) " +
-                "OR (last_name ILIKE ? OR ?::text IS NULL)";
+        String query = "SELECT * FROM person WHERE (first_name ILIKE ?) " +
+                "OR (last_name ILIKE ?)";
 
-        return jdbcTemplate.query(query, new Object[]{prepareParam(author), author, prepareParam(author), author},
+        return jdbcTemplate.query(query, new Object[]{prepareParam(firstOrLastName), prepareParam(firstOrLastName)},
                 new PersonMapper());
     }
 

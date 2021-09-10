@@ -25,9 +25,8 @@ public class NotificationService {
                 .getId()));
     }
 
-    public MessageResponseDto readNotifications() throws InterruptedException {
+    public MessageResponseDto readNotifications() {
 
-        Thread.sleep(5000);
         daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }

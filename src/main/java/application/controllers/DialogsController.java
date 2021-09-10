@@ -8,8 +8,11 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.DialogsService;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/dialogs")
@@ -48,6 +51,39 @@ public class DialogsController {
     private ResponseEntity<GeneralResponse<UnreadedCountDto>> getCountUnreaded() {
 
         return ResponseEntity.ok(new GeneralResponse<>(dialogsService.getUnreadedCount()));
+    }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<GeneralResponse<DialogIdDto>> deleteDialog(@PathVariable int id) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(dialogsService.deleteDialog(id)));
+    }
+
+    @PutMapping("/{id}/users")
+    private ResponseEntity<GeneralResponse<UserIdsDto>> addUserInDialog(@PathVariable int id,
+                                                                        @RequestBody UserIdsDto ids) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(dialogsService.addUserInDialog(ids)));
+    }
+
+    @DeleteMapping("/{id}/users/{ids}")
+    private ResponseEntity<GeneralResponse<UserIdsDto>> deleteUsersFromDialog(
+            @PathVariable(value = "id") int dialogId,
+            @PathVariable(value = "ids") List<Integer> usersIds) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(dialogsService.deleteUsersFromDialog(usersIds, dialogId)));
+    }
+
+    @GetMapping("/{id}/users/invite")
+    private ResponseEntity<GeneralResponse<InviteLinkDto>> getLinkToJoinDialog(@PathVariable int id) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(new InviteLinkDto()));
+    }
+
+    @PutMapping("/{id}/users/join")
+    private ResponseEntity<GeneralResponse<UserIdsDto>> joinDialogByLink(@PathVariable int id) {
+
+        return ResponseEntity.ok(new GeneralResponse<>(new UserIdsDto()));
     }
 
     @PostMapping("/{id}/messages")
