@@ -24,15 +24,7 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: person-email-unique.sql
-      relativeToChangelogFile: true
-
-  - include:
       file: create-dialog-table-and-message-data.sql
-      relativeToChangelogFile: true
-
-  - include:
-      file: like-corrections.sql
       relativeToChangelogFile: true
 
   - include:

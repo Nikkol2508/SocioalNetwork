@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS image
     bytes    BIGINT NOT NULL,
     type     TEXT   NOT NULL,
     time     BIGINT NOT NULL,
+    data     BYTEA  NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (owner_id) REFERENCES person (id) ON DELETE RESTRICT
-    );
+);

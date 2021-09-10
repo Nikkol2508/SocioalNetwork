@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:8086", maxAge = 3600)
 @RestController
 @RequestMapping("api/v1/platform")
 @RequiredArgsConstructor
