@@ -98,21 +98,20 @@ public class ProfileService {
         return post;
     }
 
-    public PersonDto changeProfile(PersonSettingsDtoRequest request)
-            throws ParseException {
-
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        Person person = daoPerson.getByEmail(email);
+    public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
-            throw new EntityNotFoundException("Person with email: " + email + " not found");
+            throw new EntityNotFoundException("Person with this token is not found.");
         }
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
-        if (!request.getFirstName().isBlank() && !request.getLastName().isBlank()) {
-            daoPerson.updatePersonData(person.getId(), request.getFirstName(), request.getLastName(),
-                    birthDate, request.getPhone(), daoFile.getPath(Integer.parseInt(request.getPhotoId())),
-                    request.getCity(), request.getCountry(), request.getAbout());
-        }
+        String firstName = request.getFirstName().isBlank() ? person.getFirstName() : request.getFirstName();
+        String lastName = request.getLastName().isBlank() ? person.getLastName() : request.getLastName();
+        daoPerson.updatePersonData(person.getId(), firstName, lastName, birthDate, request.getPhone(),
+                daoFile.getPath(Integer.parseInt(request.getPhotoId())), request.getCity(), request.getCountry(),
+                request.getAbout());
         return PersonDto.fromPerson(person);
     }
 

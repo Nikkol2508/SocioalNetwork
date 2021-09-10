@@ -19,10 +19,10 @@ public class DaoFile {
 
     public void save(FileDescription fileDescription) {
         String sqlInsertFileDescription = "INSERT INTO image (owner_id, name, path," +
-                " url, format, bytes, type, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                " url, format, bytes, type, time, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsertFileDescription, fileDescription.getOwnerId(), fileDescription.getFileName(),
                 fileDescription.getRelativeFilePath(), fileDescription.getRawFileURL(), fileDescription.getFileFormat(),
-                fileDescription.getBytes(), fileDescription.getFileType(), fileDescription.getCreatedAt());
+                fileDescription.getBytes(), fileDescription.getFileType(), fileDescription.getCreatedAt(), fileDescription.getData());
     }
 
     public String getPath(int id) {
@@ -44,14 +44,33 @@ public class DaoFile {
         parameters.put("bytes", fileDescription.getBytes());
         parameters.put("type", fileDescription.getFileType());
         parameters.put("time", System.currentTimeMillis());
+        parameters.put("data", fileDescription.getData());
         return getById(sji.executeAndReturnKey(parameters).intValue());
     }
 
     public FileDescription getById(int id) {
-
         String query = "SELECT * FROM image WHERE id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{id}, new FileDescriptionMapper());
     }
+
+    public FileDescription getByImageName(String name) {
+        String query = "SELECT * FROM image WHERE name = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{name}, new FileDescriptionMapper());
+    }
+
+    public void deleteImage(int personId) {
+        jdbcTemplate.update("DELETE FROM image where owner_id = ?", personId);
+    }
+
+//    public void deleteByPersonId(int personId, String path) throws NullPointerException {
+//
+//        String query = "DELETE FROM image WHERE owner_id = ?";
+//        File file = new File(path);
+//        if (file.) {
+//            file.delete();
+//            jdbcTemplate.update(query, personId);
+//        }
+//    }
 }
 
 

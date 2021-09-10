@@ -8,7 +8,6 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.DialogsService;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

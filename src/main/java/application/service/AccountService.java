@@ -5,7 +5,6 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
-import application.models.NotificationSettingType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
@@ -25,7 +24,6 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -51,7 +49,7 @@ public class AccountService {
         person.setEmail(request.getEmail());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
-        person.setPhoto("storage/stock.jpg");
+        person.setPhoto(null);
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);

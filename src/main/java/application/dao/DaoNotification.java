@@ -3,7 +3,6 @@ package application.dao;
 import application.dao.mappers.NotificationMapper;
 import application.dao.mappers.NotificationsSettingsMapper;
 import application.models.Notification;
-import application.models.NotificationSettingType;
 import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,14 +10,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Component
 @JsonInclude(JsonInclude.Include.NON_NULL)

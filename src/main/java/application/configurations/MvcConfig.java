@@ -1,7 +1,5 @@
 package application.configurations;
 
-import javax.servlet.MultipartConfigElement;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.web.servlet.MultipartConfigFactory;
@@ -11,6 +9,8 @@ import org.springframework.util.unit.DataSize;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import javax.servlet.MultipartConfigElement;
 
 @EnableAutoConfiguration
 @Configuration
