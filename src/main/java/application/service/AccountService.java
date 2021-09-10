@@ -5,14 +5,12 @@ import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
 import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
+import application.models.NotificationSettingType;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +25,7 @@ import javax.mail.internet.MimeMessage;
 import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -56,6 +55,7 @@ public class AccountService {
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
+        daoNotification.setDefaultSettings(daoPerson.getByEmail(person.getEmail()).getId());
         return new MessageResponseDto();
     }
 
@@ -193,4 +193,11 @@ public class AccountService {
         daoPerson.updateEmail(person.getId(), email);
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
+
+    public MessageResponseDto setNotificationSettings(NotificationRequest request) {
+        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotification_type(),
+                request.isEnable());
+        return new MessageResponseDto();
+    }
+
 }
