@@ -14,20 +14,20 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
-  @Bean
-  public Docket SwaggerConfig() {
-    return new Docket(DocumentationType.SWAGGER_2)
-        .useDefaultResponseMessages(false)
-        .select()
-        .apis(RequestHandlerSelectors.basePackage("application"))
-        .paths(PathSelectors.any())
-        .build();
-  }
+    @Bean
+    public Docket SwaggerConfig() {
+        return new Docket(DocumentationType.SWAGGER_2)
+                .useDefaultResponseMessages(false)
+                .select()
+                .apis(RequestHandlerSelectors.basePackage("application"))
+                .paths(PathSelectors.any())
+                .build();
+    }
 
-  private ApiInfo apiEndPointsInfo() {
-    return new ApiInfoBuilder().title("")
-        .description("javapro-socialnetwork-studygroup-16 API")
-        .version("1.0.0")
-        .build();
-  }
+    private ApiInfo apiEndPointsInfo() {
+        return new ApiInfoBuilder().title("")
+                .description("javapro-socialnetwork-studygroup-16 API")
+                .version("1.0.0")
+                .build();
+    }
 }

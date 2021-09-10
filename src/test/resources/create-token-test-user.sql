@@ -1,0 +1,1 @@
+UPDATE person SET confirmation_code = 'uniqueToken' WHERE e_mail = 'test@test.ru';

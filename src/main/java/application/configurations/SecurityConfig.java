@@ -21,6 +21,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+  private final JwtTokenProvider jwtTokenProvider;
+
     private static final String[] AUTH_WHITELIST = {
             "/v2/api-docs",
             "/swagger-resources",
@@ -39,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/storage/*"
             // other public endpoints of your API may be appended to this array
     };
-    private final JwtTokenProvider jwtTokenProvider;
+
 
     @Bean
     @Override

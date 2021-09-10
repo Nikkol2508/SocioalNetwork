@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS person
     last_name           TEXT   NOT NULL,
     reg_date            BIGINT NOT NULL,
     birth_date          BIGINT,
-    e_mail              TEXT   NOT NULL,
+    e_mail              TEXT   NOT NULL UNIQUE,
     phone               TEXT,
     password            TEXT   NOT NULL,
     photo               TEXT,
@@ -128,10 +128,10 @@ CREATE TABLE IF NOT EXISTS post_like
     id        SERIAL NOT NULL,
     time      BIGINT NOT NULL,
     person_id INT    NOT NULL,
-    post_id   INT    NOT NULL,
+    item_id   INT    NOT NULL,
+    type      TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS post_file

@@ -9,10 +9,7 @@ import application.models.PermissionMessagesType;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -56,33 +53,24 @@ public class AccountService {
         person.setMessagesPermission(PermissionMessagesType.ALL.toString());
         person.setApproved(false);
         daoPerson.save(person);
+        daoNotification.setDefaultSettings(daoPerson.getByEmail(person.getEmail()).getId());
         return new MessageResponseDto();
     }
 
-    public MessageResponseDto setPassword(SetPasswordDtoRequest request)
-            throws PasswordNotValidException, EntityNotFoundException {
+    public MessageResponseDto setPassword(SetPasswordDtoRequest request) throws PasswordNotValidException {
 
         //проверка валидности пароля (не короче 8 символов)
         if (request.getPassword().length() < 8) {
             throw new PasswordNotValidException();
         }
-        Person person = getByConfirmationCode(request.getToken());
-        if (person == null) {
-            throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
-        }
-        updatePassword(person, request.getPassword());
-        SecurityContextHolder.getContext().getAuthentication().setAuthenticated(false);
+        updatePassword(getPersonByConfirmationCode(request.getToken()), request.getPassword());
         return new MessageResponseDto();
     }
 
     public MessageResponseDto setEmail(ShiftEmailDtoRequest request, String code) {
 
         // Здесь можно добавить проверку на валидность email (request.getEmail())
-        Person person = getByConfirmationCode(code);
-        if (person == null) {
-            throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
-        }
-        updateEmail(person, request.getEmail());
+        updateEmail(getPersonByConfirmationCode(code), request.getEmail());
         return new MessageResponseDto();
     }
 
@@ -131,7 +119,7 @@ public class AccountService {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-        helper.setFrom("noreply@social.network.skillbox", "Support");
+        helper.setFrom("social.network.skillbox@yandex.ru", "Support");
         helper.setTo(recipientEmail);
         String subject = "Here's the link to confirm your new email";
         String content = "<p>Hello,</p>"
@@ -151,7 +139,7 @@ public class AccountService {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
-        helper.setFrom("noreply@social.network.skillbox", "Support");
+        helper.setFrom("social.network.skillbox@yandex.ru", "Support");
         helper.setTo(recipientEmail);
         String subject = "Here's the link to reset your password";
         String content = "<p>Hello,</p>"
@@ -176,9 +164,13 @@ public class AccountService {
         }
     }
 
-    private Person getByConfirmationCode(String code) {
+    private Person getPersonByConfirmationCode(String code) {
 
-        return daoPerson.getByConfirmationCode(code);
+        Person person = daoPerson.getByConfirmationCode(code);
+        if (person == null) {
+            throw new EntityNotFoundException("This link is no longer active, check your mail to find actual link");
+        }
+        return person;
     }
 
     private void updatePassword(Person person, String newPassword) {
@@ -193,4 +185,11 @@ public class AccountService {
         daoPerson.updateEmail(person.getId(), email);
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
+
+    public MessageResponseDto setNotificationSettings(NotificationRequest request) {
+        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotification_type(),
+                request.isEnable());
+        return new MessageResponseDto();
+    }
+
 }
