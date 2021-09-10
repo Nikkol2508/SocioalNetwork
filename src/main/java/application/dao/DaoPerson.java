@@ -123,7 +123,7 @@ public class DaoPerson {
         Map<String, Object> params = new HashMap<>();
         params.put("time", System.currentTimeMillis());
         params.put("name", "Запрос на добавление в друзья");
-        params.put("code", FriendshipStatus.FRIEND);
+        params.put("code", FriendshipStatus.REQUEST);
 
         int friendshipStatusId = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("friendship_status").usingGeneratedKeyColumns("id")
