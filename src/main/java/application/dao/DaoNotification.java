@@ -3,7 +3,7 @@ package application.dao;
 import application.dao.mappers.NotificationMapper;
 import application.dao.mappers.NotificationsSettingsMapper;
 import application.models.Notification;
-import application.models.NotificationSettingType;
+import application.models.NotificationType;
 import application.models.dto.NotificationsSettingsDto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -11,8 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +25,12 @@ import java.util.*;
 public class DaoNotification {
 
     private final JdbcTemplate jdbcTemplate;
+    private static final String INSERT_INTO_NOTIFICATIONS = "INSERT INTO notification " +
+            "(send_time, person_id, entity_id, contact, src_person_id, type, name) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     public List<Notification> getUserNotifications(int id) {
 
-        String selectNotifications = "SELECT * FROM notification JOIN notification_type nt " +
-                "ON nt.id = notification.type_id WHERE person_id = ? AND name != 'READ'";
+        String selectNotifications = "SELECT * FROM notification WHERE person_id = ? AND name != 'READ'";
         return jdbcTemplate.query(selectNotifications, new Object[]{id}, new NotificationMapper());
     }
 
@@ -60,41 +59,39 @@ public class DaoNotification {
         });
     }
 
-    @Transactional
     public void addNotification(int id, int srsId, long sentTime, int entityId, String contact,
                                 String type, String... name) {
 
-        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("notification_type").usingGeneratedKeyColumns("id");
-        Map<String, Object> params = new HashMap<>();
-        params.put("code", type);
-        params.put("name", name.length == 0 ? "" : name[0]);
-        int newId = simpleJdbcInsert.executeAndReturnKey(params).intValue();
+               jdbcTemplate.update(INSERT_INTO_NOTIFICATIONS, sentTime, id, entityId, contact, srsId,
+                type, name[0].length() == 0 ? "" : name[0]);
+    }
 
-        String insertIntoNotifications = "INSERT INTO notification (type_id, send_time, person_id, entity_id, " +
-                "contact, src_person_id) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(insertIntoNotifications, newId, sentTime, id, entityId, contact, srsId);
+    public void addNotificationsForFriends(List<Integer> ids, int srsId, long sentTime, int entityId, String contact,
+                                           String type, String name) {
+        jdbcTemplate.batchUpdate(INSERT_INTO_NOTIFICATIONS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, sentTime);
+                ps.setInt(2, ids.get(i));
+                ps.setInt(3, entityId);
+                ps.setString(4, contact);
+                ps.setInt(5, srsId);
+                ps.setString(6, type);
+                ps.setString(7, name);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return ids.size();
+            }
+        });
+
     }
 
     public void readNotifications(int id) {
 
-        String update = "UPDATE notification_type SET name = 'READ' WHERE id IN (SELECT type_id FROM notification" +
-                " WHERE person_id = ?)";
+        String update = "UPDATE notification SET name = 'READ' WHERE person_id = ?";
         jdbcTemplate.update(update, id);
-    }
-
-    public String getNotificationName(int id) {
-
-        String select = "SELECT name FROM notification_type JOIN notification n " +
-                "ON notification_type.id = n.type_id WHERE n.id = ?";
-        return Objects.requireNonNull(jdbcTemplate.queryForObject(select, new Object[]{id}, String.class))
-                .replaceAll("(^[{}\"]{0,2})|([{}\"]{0,2}$)", "");
-    }
-
-    public String getNotificationType(int id) {
-
-        String s = "SELECT code FROM notification_type WHERE id = ?";
-        return jdbcTemplate.queryForObject(s, new Object[]{id}, String.class);
     }
 
     public void setSettings(int id, String notification_type, boolean enable) {
@@ -108,5 +105,32 @@ public class DaoNotification {
                 "type_id = (SELECT notification_setting_type.id FROM notification_setting_type " +
                 "WHERE notification_setting_type.code = ? AND notification_setting_type.id = notification_settings.type_id)";
         jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notification_type);
+    }
+
+    public void readNotificationForId(int id) {
+        String update = "DELETE FROM notification WHERE id = ?";
+        jdbcTemplate.update(update, id);
+    }
+
+    public void addFriendBirthdateNotification(long currentTimeMillis, int id, List<Integer> idList,
+                                               String email, NotificationType friendBirthday, String... name) {
+
+        jdbcTemplate.batchUpdate(INSERT_INTO_NOTIFICATIONS, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, currentTimeMillis);
+                ps.setInt(2, id);
+                ps.setInt(3, idList.get(i));
+                ps.setString(4, email);
+                ps.setInt(5, idList.get(i));
+                ps.setString(6, friendBirthday.toString());
+                ps.setString(7, name[0].length() == 0 ? "" : name[0]);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return idList.size();
+            }
+        });
     }
 }

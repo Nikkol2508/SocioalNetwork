@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
@@ -7,6 +8,7 @@ import application.models.dto.PersonDto;
 import application.models.requests.AuthDtoRequest;
 import application.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -23,6 +31,7 @@ public class AuthService {
     private final DaoPerson daoPerson;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final DaoNotification daoNotification;
 
     public PersonDto login(@RequestBody AuthDtoRequest request)
             throws UsernameNotFoundException, BadCredentialsException {
@@ -59,5 +68,4 @@ public class AuthService {
 
         return daoPerson.getByEmail(email);
     }
-
 }

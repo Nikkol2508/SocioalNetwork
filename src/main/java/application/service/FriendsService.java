@@ -8,11 +8,13 @@ import application.models.Person;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,49 +25,24 @@ public class FriendsService {
 
     public List<PersonDto> getUserFriends() {
 
-        Person currentPerson = daoPerson.getAuthPerson();
-        return getPersonDtoOnPerson(daoPerson.getFriends(currentPerson.getId()));
+        return daoPerson.getFriends(daoPerson.getAuthPerson().getId()).stream()
+                .map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public List<PersonDto> getUserFriendsRequest() {
 
-        List<Person> personList = daoPerson.getFriendsRequest(daoPerson.getAuthPerson().getId());
-        return getPersonDtoOnPerson(personList);
+        return daoPerson.getFriendsRequest(daoPerson.getAuthPerson().getId())
+                .stream().map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public List<PersonDto> getUserFriendsRecommendations() {
+        Person currentPerson = daoPerson.getAuthPerson();
+        val personList = daoPerson.getRecommendations(currentPerson.getId());
 
-        List<PersonDto> personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendations(daoPerson
-                .getAuthPerson().getId()));
-        if (personDtoList.size() == 0) {
-            personDtoList = getPersonDtoOnPerson(daoPerson.getRecommendationsOnRegDate(daoPerson
-                    .getAuthPerson().getId()));
-        }
-        return personDtoList;
-    }
-
-    public List<PersonDto> getPersonDtoOnPerson(List<Person> personList) {
-
-        List<PersonDto> personDtos = new ArrayList<>();
-        for (Person person : personList) {
-            PersonDto personDto = new PersonDto();
-            personDto.setId(person.getId());
-            personDto.setEmail(person.getEmail());
-            personDto.setPhone(person.getPhone());
-            personDto.setPhoto(person.getPhoto());
-            personDto.setAbout(person.getAbout());
-            personDto.setCity(person.getCity());
-            personDto.setCountry(person.getCountry());
-            personDto.setFirstName(person.getFirstName());
-            personDto.setLastName(person.getLastName());
-            personDto.setRegDate(person.getRegDate());
-            personDto.setBirthDate(person.getBirthDate());
-            personDto.setMessagesPermission(person.getMessagesPermission().toString());
-            personDto.setLastOnlineTime(person.getLastOnlineTime());
-            personDto.setBlocked(person.isBlocked());
-            personDtos.add(personDto);
-        }
-        return personDtos;
+        return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
+                .map(PersonDto::fromPerson).collect(Collectors.toList()) :
+                daoPerson.getRecommendations(currentPerson.getId()).stream().map(PersonDto::fromPerson)
+                        .collect(Collectors.toList());
     }
 
     public MessageResponseDto addFriendForId(int id) {

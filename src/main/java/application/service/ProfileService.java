@@ -89,11 +89,13 @@ public class ProfileService {
         post.setBlocked(false);
         post.setAuthorId(authorId);
         int postId = daoPost.savePost(post).getId();
-        for (Person person : daoPerson.getFriends(daoPerson.getAuthPerson().getId())) {
-            daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), post.getTime(),
+
+            daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
+                    .map(Person::getId).collect(Collectors.toList()),
+                    daoPerson.getAuthPerson().getId(), post.getTime(),
                     post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                     post.getTitle());
-        }
+
         postsService.attachTags2Post(postRequest.getTags(), postId);
         return post;
     }

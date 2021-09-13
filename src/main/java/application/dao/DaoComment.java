@@ -4,9 +4,12 @@ import application.dao.mappers.PostCommentMapper;
 import application.models.Comment;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -39,11 +42,19 @@ public class DaoComment {
                         .orElse(null);
     }
 
-    public void save(Comment comment) {
+    public Integer save(Comment comment) {
+        SimpleJdbcInsert sji = new SimpleJdbcInsert(jdbcTemplate).withTableName("post_comment")
+                .usingGeneratedKeyColumns("id");
 
-        jdbcTemplate.update("INSERT INTO post_comment (time, post_id, parent_id, author_id, comment_text, " +
-                        "is_blocked) VALUES (?, ?, ?, ?, ?, ?)", comment.getTime(), comment.getPostId(),
-                comment.getParentId(), comment.getAuthorId(), comment.getCommentText(), comment.isBlocked());
+        Map<String, Object> param = new HashMap<>();
+        param.put("time", comment.getTime());
+        param.put("post_id", comment.getPostId());
+        param.put("parent_id", comment.getParentId());
+        param.put("author_id", comment.getAuthorId());
+        param.put("comment_text", comment.getCommentText());
+        param.put("is_blocked", comment.isBlocked());
+
+        return sji.executeAndReturnKey(param).intValue();
     }
 
     public void update(Comment comment) {

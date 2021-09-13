@@ -99,10 +99,10 @@ public class PostsService {
         postComment.setTime(System.currentTimeMillis());
         Person currentPerson = daoPerson.getAuthPerson();
         postComment.setAuthorId(currentPerson.getId());
-        daoComment.save(postComment);
+        int comId = daoComment.save(postComment);
         Person person = daoPerson.getById(daoPost.getById(postComment.getPostId()).getAuthorId());
         daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), postComment.getTime(),
-                postComment.getId(), person.getEmail(), postComment.getParentId() == null
+                comId, person.getEmail(), postComment.getParentId() == null
                         ? NotificationType.POST_COMMENT.toString() : NotificationType.COMMENT_COMMENT.toString(),
                 postComment.getCommentText());
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
