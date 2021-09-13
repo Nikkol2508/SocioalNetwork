@@ -182,12 +182,14 @@ public class AccountService {
     }
 
     private void updateEmail(Person person, String email) {
+
         daoPerson.updateEmail(person.getId(), email);
         daoPerson.updateConfirmationCode(person.getId(), null);
     }
 
     public MessageResponseDto setNotificationSettings(NotificationRequest request) {
-        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotification_type(),
+
+        daoNotification.setSettings(daoPerson.getAuthPerson().getId(), request.getNotificationType(),
                 request.isEnable());
         return new MessageResponseDto();
     }

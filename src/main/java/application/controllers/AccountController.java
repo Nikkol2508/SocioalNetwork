@@ -71,9 +71,11 @@ public class AccountController {
         return ResponseEntity.ok(new GeneralListResponse<>(
                 accountService.getPersonNotificationsSettings(), offset, itemPerPage));
     }
+
     @PutMapping("/notifications")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>>
-    setAccountNotifications(@RequestBody NotificationRequest notificationRequest) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setAccountNotifications(
+            @RequestBody NotificationRequest notificationRequest) {
+
         return ResponseEntity.ok(new GeneralResponse<>(accountService.setNotificationSettings(notificationRequest)));
     }
 

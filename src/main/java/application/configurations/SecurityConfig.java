@@ -21,7 +21,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-  private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     private static final String[] AUTH_WHITELIST = {
             "/v2/api-docs",
@@ -57,12 +57,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                    .antMatchers(AUTH_WHITELIST).permitAll()
-                    .anyRequest().hasAuthority(Permission.USER.getPermission())
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().hasAuthority(Permission.USER.getPermission())
                 .and()
                 .exceptionHandling()
-                    .accessDeniedHandler(accessDeniedHandler())
-                    .authenticationEntryPoint(authenticationEntryPoint())
+                .accessDeniedHandler(accessDeniedHandler())
+                .authenticationEntryPoint(authenticationEntryPoint())
                 .and()
                 .apply(new JwtConfigurer(jwtTokenProvider));
     }

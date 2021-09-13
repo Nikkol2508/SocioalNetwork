@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthControllerIntegrationTest {
 
     @Autowired
@@ -42,6 +42,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void loginSuccess() throws Exception {
+
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
         request.setPassword("12345678");
@@ -52,6 +53,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void loginEmailNotExistsFailed() throws Exception {
+
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("emailnotexist@ya.ru");
         request.setPassword("12345678");
@@ -63,6 +65,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     public void loginWrongPasswordFailed() throws Exception {
+
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
         request.setPassword("87654321");
@@ -70,5 +73,13 @@ public class AuthControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("invalid_request"))
                 .andExpect(jsonPath("$.error_description").value("Invalid username or password"));
+    }
+
+    @Test
+    @WithUserDetails("vasy@yandex.ru")
+    public void logoutSuccess() throws Exception {
+
+        mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.message").value("ok"));
     }
 }

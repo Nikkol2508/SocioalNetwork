@@ -1,9 +1,6 @@
 package application.controllers;
 
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,6 +48,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(1)
     public void registerUserSuccess() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
         request.setPasswd2("12345678");
@@ -66,6 +64,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(2)
     public void registerUserEmailExistsFailed() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
         request.setPasswd2("12345678");
@@ -83,6 +82,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(3)
     public void registerPasswordsAreNotEqualsFailed() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
         request.setPasswd2("87654321");
@@ -101,6 +101,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(4)
     public void setPasswordSuccess() throws Exception {
+
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("87654321");
         String token = "uniqueToken";
@@ -113,6 +114,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(5)
     public void setPasswordNotValidFailed() throws Exception {
+
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("1");
         String token = "uniqueToken";
@@ -127,6 +129,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(6)
     public void setEmailSuccess() throws Exception {
+
         ShiftEmailDtoRequest request = new ShiftEmailDtoRequest();
         request.setEmail("test@test.ru");
         String token = "uniqueToken";
@@ -139,6 +142,7 @@ public class AccountControllerIntegrationTest {
     @Test
     @Order(7)
     public void recoverPasswordSuccess() throws Exception {
+
         RecoverPassDtoRequest request = new RecoverPassDtoRequest();
         request.setEmail("test@test.ru");
         mockMvc.perform(put("/api/v1/account/password/recovery")
@@ -153,6 +157,7 @@ public class AccountControllerIntegrationTest {
     @WithUserDetails("test@test.ru")
     @Order(8)
     public void changeEmailSuccess() throws Exception {
+
         mockMvc.perform(put("/api/v1/account/shift-email")
                         .header("Request URL", "http://test.ru/"))
                 .andExpect(status().isOk())
@@ -162,9 +167,21 @@ public class AccountControllerIntegrationTest {
     @Test
     @WithUserDetails("test@test.ru")
     @Order(9)
-    public void getAccountNotifications() throws Exception {
+    public void getAccountNotificationsSuccess() throws Exception {
+
         mockMvc.perform(get("/api/v1/account/notifications"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @WithUserDetails("test@test.ru")
+    public void setAccountNotifications() throws Exception {
+        NotificationRequest request = new NotificationRequest();
+        request.setNotificationType("POST");
+        request.setEnable(true);
+        mockMvc.perform(put("/api/v1/account/notifications").content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.message").value("ok"));
     }
 }
