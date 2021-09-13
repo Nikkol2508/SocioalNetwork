@@ -10,6 +10,8 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,12 +25,15 @@ import java.io.UnsupportedEncodingException;
 public class AccountController {
 
     private final AccountService accountService;
+    private static final Logger logger = LogManager.getLogger("app");
 
     @PostMapping("/register")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> register(@RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
-
-        return ResponseEntity.ok(new GeneralResponse<>(accountService.register(request)));
+        GeneralResponse generalResponse = new GeneralResponse<>(accountService.register(request));
+        //Реализовать сокрытие данных пользователя
+        logger.info("Register(): start(): request = {}, response = {}", " ", generalResponse);
+        return ResponseEntity.ok(generalResponse);
     }
 
     @PutMapping("/password/set")
