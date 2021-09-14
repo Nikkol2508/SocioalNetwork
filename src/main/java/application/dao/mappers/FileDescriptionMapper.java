@@ -19,6 +19,7 @@ public class FileDescriptionMapper implements RowMapper<FileDescription> {
         fileDescription.setBytes(rs.getInt("bytes"));
         fileDescription.setFileType(rs.getString("type"));
         fileDescription.setCreatedAt(rs.getLong("time"));
+        fileDescription.setData(rs.getBytes("data"));
         return fileDescription;
     }
 }

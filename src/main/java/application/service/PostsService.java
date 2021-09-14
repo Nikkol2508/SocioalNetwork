@@ -9,8 +9,6 @@ import application.models.requests.PostRequest;
 import application.models.requests.TagRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.slf4j.Marker;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -239,13 +237,14 @@ public class PostsService {
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
+
         attachTags2Post(request.getTags(), postId);
         daoPost.update(post);
         log.info("Edit post id " + postId + " user id " + post.getAuthorId());
         return getPostDto(postId);
     }
 
-    public void attachTags2Post (List tags, int postId) {
+    public void attachTags2Post(List tags, int postId) {
         Set<String> setTags = new HashSet<>(tags);
         for (String tag : setTags) {
             saveTag(tag);

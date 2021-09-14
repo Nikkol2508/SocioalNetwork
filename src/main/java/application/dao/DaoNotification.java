@@ -94,17 +94,17 @@ public class DaoNotification {
         jdbcTemplate.update(update, id);
     }
 
-    public void setSettings(int id, String notification_type, boolean enable) {
+    public void setSettings(int id, String notificationType, boolean enable) {
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("notification_setting_type")
                 .usingGeneratedKeyColumns("id");
         Map<String, Object> param = new HashMap<>();
-        param.put("code", notification_type);
+        param.put("code", notificationType);
         param.put("status", enable);
         String update = "UPDATE notification_settings SET type_id = ? WHERE person_id = ? AND " +
                 "type_id = (SELECT notification_setting_type.id FROM notification_setting_type " +
                 "WHERE notification_setting_type.code = ? AND notification_setting_type.id = notification_settings.type_id)";
-        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notification_type);
+        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notificationType);
     }
 
     public void readNotificationForId(int id) {
