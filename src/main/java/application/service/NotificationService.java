@@ -31,18 +31,23 @@ public class NotificationService {
         return new MessageResponseDto();
     }
 
+    public MessageResponseDto readNotificationForId(int id) {
+        daoNotification.readNotificationForId(id);
+        return new MessageResponseDto();
+    }
+
     private List<NotificationDto> getNotificationsDtoForNotifications(List<Notification> list) {
 
         List<NotificationDto> notificationDtoList = new ArrayList<>();
         for (Notification notification : list) {
             NotificationDto notificationDto = new NotificationDto();
             notificationDto.setId(notification.getId());
-            notificationDto.setNotificationType(daoNotification.getNotificationType(notification.getId()));
+            notificationDto.setNotificationType(notification.getType());
             Person person = daoPerson.getById(notification.getSrcPersonId());
             notificationDto.setEntityAuthor(new CommentAuthorDto(person.getId(), person.getFirstName(),
                     person.getLastName(), person.getPhoto()));
             notificationDto.setSentTime(notification.getSentTime());
-            notificationDto.setInfo(daoNotification.getNotificationName(notification.getId()));
+            notificationDto.setInfo(notification.getName());
             notificationDtoList.add(notificationDto);
         }
         return notificationDtoList;

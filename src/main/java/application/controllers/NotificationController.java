@@ -30,4 +30,10 @@ public class NotificationController {
 
         return ResponseEntity.ok(new GeneralResponse<>(notificationService.readNotifications()));
     }
+
+    @PutMapping("/notifications/{id}")
+    private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotificationForId
+            (@RequestParam(value = "id") int id) {
+        return ResponseEntity.ok(new GeneralResponse<>(notificationService.readNotificationForId(id)));
+    }
 }

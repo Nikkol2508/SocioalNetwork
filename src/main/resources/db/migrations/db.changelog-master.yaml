@@ -42,3 +42,7 @@ databaseChangeLog:
   - include:
       file: notification-settings-data.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: update-notification-table.sql
+      relativeToChangelogFile: true
