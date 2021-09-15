@@ -20,7 +20,7 @@ public class ScheduledService {
     private final DaoPerson daoPerson;
     private final DaoNotification daoNotification;
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${scheduled.time.birthdate.friends}")
     private void getBirthDateId() {
         LocalDate now = LocalDate.now();
         Person currentPerson = daoPerson.getAuthPerson();
@@ -30,7 +30,7 @@ public class ScheduledService {
                 .ofEpochMilli(person.getBirthDate()).atZone(ZoneId.systemDefault())
                 .toLocalDate().getMonth() == now.getMonth()).map(Person::getId).collect(Collectors.toList());
 
-        daoNotification.addFriendBirthdateNotification(System.currentTimeMillis(), currentPerson.getId()
-                , idList, currentPerson.getEmail(), NotificationType.FRIEND_BIRTHDAY);
+        daoNotification.addFriendBirthdateNotification(System.currentTimeMillis(), currentPerson.getId(),
+                idList, currentPerson.getEmail(), NotificationType.FRIEND_BIRTHDAY);
     }
 }

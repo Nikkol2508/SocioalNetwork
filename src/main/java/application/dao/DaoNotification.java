@@ -63,7 +63,7 @@ public class DaoNotification {
                                 String type, String... name) {
 
                jdbcTemplate.update(INSERT_INTO_NOTIFICATIONS, sentTime, id, entityId, contact, srsId,
-                type, name[0].length() == 0 ? "" : name[0]);
+                type, name.length == 0 ? "" : name[0]);
     }
 
     public void addNotificationsForFriends(List<Integer> ids, int srsId, long sentTime, int entityId, String contact,
@@ -124,7 +124,7 @@ public class DaoNotification {
                 ps.setString(4, email);
                 ps.setInt(5, idList.get(i));
                 ps.setString(6, friendBirthday.toString());
-                ps.setString(7, name[0].length() == 0 ? "" : name[0]);
+                ps.setString(7, name.length == 0 ? "" : name[0]);
             }
 
             @Override
