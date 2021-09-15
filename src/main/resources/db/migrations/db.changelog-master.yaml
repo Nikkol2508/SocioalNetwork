@@ -32,17 +32,9 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
-      file: update-notification.sql
-      relativeToChangelogFile: true
-
-  - include:
       file: create-post-tag-user-view.sql
       relativeToChangelogFile: true
 
   - include:
       file: notification-settings-data.sql
-      relativeToChangelogFile: true
-
-  - include:
-      file: update-notification-table.sql
       relativeToChangelogFile: true

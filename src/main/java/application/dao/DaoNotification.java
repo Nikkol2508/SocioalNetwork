@@ -16,9 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -65,7 +63,7 @@ public class DaoNotification {
                                 String type, String... name) {
 
                jdbcTemplate.update(INSERT_INTO_NOTIFICATIONS, sentTime, id, entityId, contact, srsId,
-                type, name[0].length() == 0 ? "" : name[0]);
+                type, name.length == 0 ? "" : name[0]);
     }
 
     public void addNotificationsForFriends(List<Integer> ids, int srsId, long sentTime, int entityId, String contact,
@@ -96,17 +94,17 @@ public class DaoNotification {
         jdbcTemplate.update(update, id);
     }
 
-    public void setSettings(int id, String notification_type, boolean enable) {
+    public void setSettings(int id, String notificationType, boolean enable) {
 
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("notification_setting_type")
                 .usingGeneratedKeyColumns("id");
         Map<String, Object> param = new HashMap<>();
-        param.put("code", notification_type);
+        param.put("code", notificationType);
         param.put("status", enable);
         String update = "UPDATE notification_settings SET type_id = ? WHERE person_id = ? AND " +
                 "type_id = (SELECT notification_setting_type.id FROM notification_setting_type " +
                 "WHERE notification_setting_type.code = ? AND notification_setting_type.id = notification_settings.type_id)";
-        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notification_type);
+        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notificationType);
     }
 
     public void readNotificationForId(int id) {
@@ -126,7 +124,7 @@ public class DaoNotification {
                 ps.setString(4, email);
                 ps.setInt(5, idList.get(i));
                 ps.setString(6, friendBirthday.toString());
-                ps.setString(7, name[0].length() == 0 ? "" : name[0]);
+                ps.setString(7, name.length == 0 ? "" : name[0]);
             }
 
             @Override
