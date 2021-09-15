@@ -1,7 +1,5 @@
 package application.models.dto;
 
-import application.models.Notification;
-import application.models.Person;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

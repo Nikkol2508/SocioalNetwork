@@ -19,11 +19,11 @@ public class LikeController {
 
     @GetMapping("/liked")
     public ResponseEntity<GeneralResponse<Map<String, Boolean>>> getLiked(
-            @RequestParam(value = "user_id", required = false) int user_id,
+            @RequestParam(value = "user_id", required = false) int userId,
             @RequestParam(value = "item_id") int itemId,
             @RequestParam(value = "type") String type) {
 
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.getLiked(user_id, itemId, type)));
+        return ResponseEntity.ok(new GeneralResponse<>(postsService.getLiked(userId, itemId, type)));
     }
 
     @GetMapping("/likes")

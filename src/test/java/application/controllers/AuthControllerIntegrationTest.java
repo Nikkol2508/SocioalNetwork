@@ -3,9 +3,7 @@ package application.controllers;
 import application.models.requests.AuthDtoRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +46,21 @@ public class AuthControllerIntegrationTest {
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.email").value("vasy@yandex.ru"));
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.first_name").value("Вася"))
+                .andExpect(jsonPath("$.data.last_name").value("Васичкин"))
+                .andExpect(jsonPath("$.data.reg_date").value(1625127990000L))
+                .andExpect(jsonPath("$.data.birth_date").value(964513590000L))
+                .andExpect(jsonPath("$.data.email").value("vasy@yandex.ru"))
+                .andExpect(jsonPath("$.data.phone").value("89998887744"))
+                .andExpect(jsonPath("$.data[0].recipient.photo").doesNotExist())
+                .andExpect(jsonPath("$.data.about").value("Я Вася"))
+                .andExpect(jsonPath("$.data.city").value("Москва"))
+                .andExpect(jsonPath("$.data.country").value("Россия"))
+                .andExpect(jsonPath("$.data.messages_permission").value("ALL"))
+                .andExpect(jsonPath("$.data.last_online_time").value(1627200965049L))
+                .andExpect(jsonPath("$.data.is_blocked").value(false))
+                .andExpect(jsonPath("$.data.token").isNotEmpty());
     }
 
     @Test
@@ -80,6 +92,8 @@ public class AuthControllerIntegrationTest {
     public void logoutSuccess() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 }
