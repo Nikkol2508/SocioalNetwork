@@ -16,7 +16,9 @@ public class PostDto {
     private long time;
     private PersonDto author;
     private String title;
-    private int likes;
+
+    @JsonProperty("likes")
+    private int countLikes;
 
     @JsonProperty("my_like")
     private int myLike;
@@ -42,7 +44,7 @@ public class PostDto {
         postDto.setTitle(post.getTitle());
         postDto.setBlocked(post.isBlocked());
         postDto.setTime(post.getTime());
-        postDto.setLikes(likes);
+        postDto.setCountLikes(likes);
         postDto.setAuthor(author);
         postDto.setComments(comments);
         postDto.setTags(tags);

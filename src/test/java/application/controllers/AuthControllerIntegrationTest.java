@@ -19,6 +19,7 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_C
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -46,21 +47,20 @@ public class AuthControllerIntegrationTest {
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(1))
-                .andExpect(jsonPath("$.data.first_name").value("Вася"))
-                .andExpect(jsonPath("$.data.last_name").value("Васичкин"))
-                .andExpect(jsonPath("$.data.reg_date").value(1625127990000L))
-                .andExpect(jsonPath("$.data.birth_date").value(964513590000L))
-                .andExpect(jsonPath("$.data.email").value("vasy@yandex.ru"))
-                .andExpect(jsonPath("$.data.phone").value("89998887744"))
-                .andExpect(jsonPath("$.data[0].recipient.photo").doesNotExist())
-                .andExpect(jsonPath("$.data.about").value("Я Вася"))
-                .andExpect(jsonPath("$.data.city").value("Москва"))
-                .andExpect(jsonPath("$.data.country").value("Россия"))
-                .andExpect(jsonPath("$.data.messages_permission").value("ALL"))
-                .andExpect(jsonPath("$.data.last_online_time").value(1627200965049L))
-                .andExpect(jsonPath("$.data.is_blocked").value(false))
-                .andExpect(jsonPath("$.data.token").isNotEmpty());
+                .andExpect(jsonPath("$.data.id", is(1)))
+                .andExpect(jsonPath("$.data.first_name", is("Вася")))
+                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(964513590000L)))
+                .andExpect(jsonPath("$.data.email", is("vasy@yandex.ru")))
+                .andExpect(jsonPath("$.data.phone", is("89998887744")))
+                .andExpect(jsonPath("$.data.about", is("Я Вася")))
+                .andExpect(jsonPath("$.data.city", is("Москва")))
+                .andExpect(jsonPath("$.data.country", is("Россия")))
+                .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
+                .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
+                .andExpect(jsonPath("$.data.is_blocked", is(false)))
+                .andExpect(jsonPath("$.data.token", notNullValue()));
     }
 
     @Test
@@ -71,8 +71,8 @@ public class AuthControllerIntegrationTest {
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("invalid_request"))
-                .andExpect(jsonPath("$.error_description").value("Invalid username or password"));
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
@@ -83,8 +83,8 @@ public class AuthControllerIntegrationTest {
         request.setPassword("87654321");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("invalid_request"))
-                .andExpect(jsonPath("$.error_description").value("Invalid username or password"));
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
@@ -92,8 +92,8 @@ public class AuthControllerIntegrationTest {
     public void logoutSuccess() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 }

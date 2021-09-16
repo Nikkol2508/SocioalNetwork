@@ -29,6 +29,7 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_C
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -56,12 +57,12 @@ public class DialogsControllerIntegrationTest {
 
     private static ResultMatcher matchPersonDialogsDto(String prefix, PersonDialogsDto person) {
         return ResultMatcher.matchAll(
-                jsonPath(prefix + ".id").value(person.getId()),
-                jsonPath(prefix + ".email").value(person.getEmail()),
+                jsonPath(prefix + ".id", is(person.getId())),
+                jsonPath(prefix + ".email", is(person.getEmail())),
                 jsonPath(prefix + ".photo").doesNotExist(),
-                jsonPath(prefix + ".first_name").value(person.getFirstName()),
-                jsonPath(prefix + ".last_name").value(person.getLastName()),
-                jsonPath(prefix + ".last_online_time").value(person.getLastOnlineTime())
+                jsonPath(prefix + ".first_name", is(person.getFirstName())),
+                jsonPath(prefix + ".last_name", is(person.getLastName())),
+                jsonPath(prefix + ".last_online_time", is(person.getLastOnlineTime()))
         );
     }
 
@@ -70,19 +71,19 @@ public class DialogsControllerIntegrationTest {
     public void getDialogsSuccess() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.total").value(2))
-                .andExpect(jsonPath("$.perPage").value(20))
-                .andExpect(jsonPath("$.offset").value(0))
-                .andExpect(jsonPath("$..data[0].unread_count").value(1))
-                .andExpect(jsonPath("$..data[0].id").value(1))
-                .andExpect(jsonPath("$..data[0].recipient.id").value(1))
-                .andExpect(jsonPath("$..data[0].recipient.email").value("vasy@yandex.ru"))
-                .andExpect(jsonPath("$..data[0].recipient.photo").doesNotExist())
-                .andExpect(jsonPath("$..data[0].recipient.first_name").value("Вася"))
-                .andExpect(jsonPath("$..data[0].recipient.last_name").value("Васичкин"))
-                .andExpect(jsonPath("$..data[0].recipient.last_online_time").value(1627200965049L));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.total", is(2)))
+                .andExpect(jsonPath("$.perPage", is(20)))
+                .andExpect(jsonPath("$.offset", is(0)))
+                .andExpect(jsonPath("$.data[0].unread_count", is(1)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].recipient.id", is(1)))
+                .andExpect(jsonPath("$.data[0].recipient.email", is("vasy@yandex.ru")))
+                .andExpect(jsonPath("$.data[0].recipient.photo").doesNotExist())
+                .andExpect(jsonPath("$.data[0].recipient.first_name", is("Вася")))
+                .andExpect(jsonPath("$.data[0].recipient.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data[0].recipient.last_online_time", is(1627200965049L)));
     }
 
     @Test
@@ -92,9 +93,9 @@ public class DialogsControllerIntegrationTest {
         request.setUsersIds(List.of(4));
         mockMvc.perform(post("/api/v1/dialogs").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.id").value(6));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.id", is(6)));
     }
 
     @Test
@@ -104,9 +105,9 @@ public class DialogsControllerIntegrationTest {
         request.setUsersIds(List.of(2));
         mockMvc.perform(post("/api/v1/dialogs").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.id").value(1));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.id", is(1)));
     }
 
     @Test
@@ -125,27 +126,27 @@ public class DialogsControllerIntegrationTest {
         person2.setEmail("homa@yandex.ru");
         person2.setLastOnlineTime(1627200965049L);
         mockMvc.perform(get("/api/v1/dialogs/1/messages")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.total").value(3))
-                .andExpect(jsonPath("$.perPage").value(20))
-                .andExpect(jsonPath("$.offset").value(0))
-                .andExpect(jsonPath("$..data[0].id").value(1))
-                .andExpect(jsonPath("$..data[0].time").value(1629463864000L))
-                .andExpect(matchPersonDialogsDto("$..data[0].author", person1))
-                .andExpect(matchPersonDialogsDto("$..data[0].recipient", person2))
-                .andExpect(jsonPath("$..data[0].isSentByMe").value(false))
-                .andExpect(jsonPath("$..data[0].message_text").value("Привет :)"))
-                .andExpect(jsonPath("$..data[0].read_status").value("READ"))
-                .andExpect(jsonPath("$..data[1].id").value(2))
-                .andExpect(jsonPath("$..data[1].time").value(1629463924000L))
-                .andExpect(matchPersonDialogsDto("$..data[1].author", person2))
-                .andExpect(matchPersonDialogsDto("$..data[1].recipient", person1))
-                .andExpect(jsonPath("$..data[1].isSentByMe").value(true))
-                .andExpect(jsonPath("$..data[1].message_text").value("Привет!"))
-                .andExpect(jsonPath("$..data[1].read_status").value("READ"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.total", is(3)))
+                .andExpect(jsonPath("$.perPage", is(20)))
+                .andExpect(jsonPath("$.offset", is(0)))
+                .andExpect(jsonPath("$.data[0].id", is(1)))
+                .andExpect(jsonPath("$.data[0].time", is(1629463864000L)))
+                .andExpect(matchPersonDialogsDto("$.data[0].author", person1))
+                .andExpect(matchPersonDialogsDto("$.data[0].recipient", person2))
+                .andExpect(jsonPath("$.data[0].isSentByMe", is(false)))
+                .andExpect(jsonPath("$.data[0].message_text", is("Привет :)")))
+                .andExpect(jsonPath("$.data[0].read_status", is("READ")))
+                .andExpect(jsonPath("$.data[1].id", is(2)))
+                .andExpect(jsonPath("$.data[1].time", is(1629463924000L)))
+                .andExpect(matchPersonDialogsDto("$.data[1].author", person2))
+                .andExpect(matchPersonDialogsDto("$.data[1].recipient", person1))
+                .andExpect(jsonPath("$.data[1].isSentByMe", is(true)))
+                .andExpect(jsonPath("$.data[1].message_text", is("Привет!")))
+                .andExpect(jsonPath("$.data[1].read_status", is("READ")));
         mockMvc.perform(get("/api/v1/dialogs/1/messages")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[2].read_status").value("READ"));
+                .andExpect(jsonPath("$.data[2].read_status", is("READ")));
     }
 
     @Test
@@ -153,9 +154,9 @@ public class DialogsControllerIntegrationTest {
     public void getCountUnreadedSuccess() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/unreaded")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.count").value(1));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.count", is(1)));
     }
 
     @Test
@@ -163,9 +164,9 @@ public class DialogsControllerIntegrationTest {
     public void deleteDialogSuccess() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/5")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.id").value(5));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.id", is(5)));
     }
 
     @Test
@@ -174,17 +175,17 @@ public class DialogsControllerIntegrationTest {
         UserIdsDto request = new UserIdsDto(List.of(3, 4));
         mockMvc.perform(put("/api/v1/dialogs/1/users").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.user_ids[0]").value(3))
-                .andExpect(jsonPath("$.data.user_ids[1]").value(4));
+                .andExpect(jsonPath("$.data.user_ids[0]", is(3)))
+                .andExpect(jsonPath("$.data.user_ids[1]", is(4)));
     }
 
     @Test
     public void deleteUsersInDialogSuccess() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/1/users/3,4,5")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.user_ids[0]").value(3))
-                .andExpect(jsonPath("$.data.user_ids[1]").value(4))
-                .andExpect(jsonPath("$.data.user_ids[2]").value(5));
+                .andExpect(jsonPath("$.data.user_ids[0]", is(3)))
+                .andExpect(jsonPath("$.data.user_ids[1]", is(4)))
+                .andExpect(jsonPath("$.data.user_ids[2]", is(5)));
     }
 
     @Test
@@ -206,14 +207,14 @@ public class DialogsControllerIntegrationTest {
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST");
         mockMvc.perform(post("/api/v1/dialogs/4/messages").content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
                 .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.time").isNotEmpty())
-                .andExpect(jsonPath("$.data.message_text").value("TEST"))
-                .andExpect(jsonPath("$.data.read_status").value("SENT"))
-                .andExpect(jsonPath("$.data.author_id").value(6))
-                .andExpect(jsonPath("$.data.recipient_id").value(7));
+                .andExpect(jsonPath("$.data.message_text", is("TEST")))
+                .andExpect(jsonPath("$.data.read_status", is("SENT")))
+                .andExpect(jsonPath("$.data.author_id", is(6)))
+                .andExpect(jsonPath("$.data.recipient_id", is(7)));
     }
 
     @Test
@@ -221,9 +222,9 @@ public class DialogsControllerIntegrationTest {
     public void deleteMessageSuccess() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/4/messages/6")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message_id").value(6));
+                .andExpect(jsonPath("$.data.message_id", is(6)));
     }
 
     @Test
@@ -233,14 +234,14 @@ public class DialogsControllerIntegrationTest {
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST3(2)");
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.id").value(7))
+                .andExpect(jsonPath("$.data.id", is(7)))
                 .andExpect(jsonPath("$.data.time").isNotEmpty())
-                .andExpect(jsonPath("$.data.message_text").value("TEST3(2)"))
-                .andExpect(jsonPath("$.data.read_status").value("SENT"))
-                .andExpect(jsonPath("$.data.author_id").value(7))
-                .andExpect(jsonPath("$.data.recipient_id").value(6));
+                .andExpect(jsonPath("$.data.message_text", is("TEST3(2)")))
+                .andExpect(jsonPath("$.data.read_status", is("SENT")))
+                .andExpect(jsonPath("$.data.author_id", is(7)))
+                .andExpect(jsonPath("$.data.recipient_id", is(6)));
     }
 
     @Test
@@ -248,26 +249,26 @@ public class DialogsControllerIntegrationTest {
     public void readMessageSuccess() throws Exception {
 
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7/read")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
     public void getActivitySuccess() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.last_activity").value(1627200965049L));
+                .andExpect(jsonPath("$.data.last_activity", is(1627200965049L)));
     }
 
     @Test
     public void changeTypingStatusSuccess() throws Exception {
 
         mockMvc.perform(post("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 }

@@ -24,6 +24,7 @@ import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_C
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -60,9 +61,9 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
@@ -77,9 +78,9 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("invalid_request"))
-                .andExpect(jsonPath("$.error_description")
-                        .value("The user with this email is already registered"));
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("The user with this email is already registered")));
     }
 
     @Test
@@ -94,9 +95,8 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("invalid_request"))
-                .andExpect(jsonPath("$.error_description")
-                        .value("Passwords are not equals"));
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description", is("Passwords are not equals")));
     }
 
 
@@ -109,9 +109,9 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(put("/api/v1/account/password/set").header("Referer", "=" + token)
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
@@ -123,9 +123,8 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(put("/api/v1/account/password/set").header("Referer", "=" + token)
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("invalid_request"))
-                .andExpect(jsonPath("$.error_description")
-                        .value("Password is not valid."));
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description", is("Password is not valid.")));
     }
 
     @Test
@@ -137,9 +136,9 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(put("/api/v1/account/email").header("Referer", "=" + token)
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
@@ -152,9 +151,9 @@ public class AccountControllerIntegrationTest {
                         .header("Referer", "").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
@@ -164,9 +163,9 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(put("/api/v1/account/shift-email")
                         .header("Request URL", "http://test.ru/"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 
     @Test
@@ -175,8 +174,8 @@ public class AccountControllerIntegrationTest {
 
         mockMvc.perform(get("/api/v1/account/notifications"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
                 .andExpect(jsonPath("$.data").isArray());
     }
 
@@ -188,8 +187,8 @@ public class AccountControllerIntegrationTest {
         request.setEnable(true);
         mockMvc.perform(put("/api/v1/account/notifications").content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
-                .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data.message").value("ok"));
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.message", is("ok")));
     }
 }
