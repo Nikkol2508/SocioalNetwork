@@ -1,29 +1,26 @@
 package application.controllers;
 
-import application.models.requests.RecoverPassDtoRequest;
-import application.models.requests.RegistrationDtoRequest;
-import application.models.requests.SetPasswordDtoRequest;
-import application.models.requests.ShiftEmailDtoRequest;
+import application.models.requests.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,8 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-@Sql(value = "/create-token-test-user.sql", executionPhase = BEFORE_TEST_METHOD)
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AccountControllerIntegrationTest {
 
     @Autowired
@@ -45,14 +40,19 @@ public class AccountControllerIntegrationTest {
     @Autowired
     private AccountController accountController;
 
-    @Autowired
-    private DataSource dataSource;
+    @BeforeAll
+    private static void setup(@Autowired DataSource dataSource) throws SQLException {
+
+        try (Connection conn = dataSource.getConnection()) {
+            ScriptUtils.executeSqlScript(conn, new ClassPathResource("test-data-for-account-controller-test.sql"));
+        }
+    }
 
     @Test
-    @Order(1)
     public void registerUserSuccess() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
-        request.setEmail("test@test.ru");
+        request.setEmail("test1@test.ru");
         request.setPasswd2("12345678");
         request.setPasswd1("12345678");
         request.setFirstName("First");
@@ -60,12 +60,14 @@ public class AccountControllerIntegrationTest {
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 
     @Test
-    @Order(2)
     public void registerUserEmailExistsFailed() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
         request.setPasswd2("12345678");
@@ -81,10 +83,10 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    @Order(3)
     public void registerPasswordsAreNotEqualsFailed() throws Exception {
+
         RegistrationDtoRequest request = new RegistrationDtoRequest();
-        request.setEmail("test@test.ru");
+        request.setEmail("test2@test.ru");
         request.setPasswd2("87654321");
         request.setPasswd1("12345678");
         request.setFirstName("First");
@@ -99,20 +101,22 @@ public class AccountControllerIntegrationTest {
 
 
     @Test
-    @Order(4)
     public void setPasswordSuccess() throws Exception {
+
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("87654321");
-        String token = "uniqueToken";
+        String token = "uniqueTokenForVasy";
         mockMvc.perform(put("/api/v1/account/password/set").header("Referer", "=" + token)
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 
     @Test
-    @Order(5)
     public void setPasswordNotValidFailed() throws Exception {
+
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("1");
         String token = "uniqueToken";
@@ -125,46 +129,67 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    @Order(6)
     public void setEmailSuccess() throws Exception {
+
         ShiftEmailDtoRequest request = new ShiftEmailDtoRequest();
-        request.setEmail("test@test.ru");
-        String token = "uniqueToken";
+        request.setEmail("homa@yandex.ru");
+        String token = "uniqueTokenForHoma";
         mockMvc.perform(put("/api/v1/account/email").header("Referer", "=" + token)
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 
     @Test
-    @Order(7)
     public void recoverPasswordSuccess() throws Exception {
+
         RecoverPassDtoRequest request = new RecoverPassDtoRequest();
-        request.setEmail("test@test.ru");
+        request.setEmail("ivan@yandex.ru");
         mockMvc.perform(put("/api/v1/account/password/recovery")
                         .header("Request URL", "http://test.ru/")
                         .header("Referer", "").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 
     @Test
-    @WithUserDetails("test@test.ru")
-    @Order(8)
+    @WithUserDetails("ivan@yandex.ru")
     public void changeEmailSuccess() throws Exception {
+
         mockMvc.perform(put("/api/v1/account/shift-email")
                         .header("Request URL", "http://test.ru/"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message").value("ok"));
     }
 
     @Test
-    @WithUserDetails("test@test.ru")
-    @Order(9)
-    public void getAccountNotifications() throws Exception {
+    @WithUserDetails("ivan@yandex.ru")
+    public void getAccountNotificationsSuccess() throws Exception {
+
         mockMvc.perform(get("/api/v1/account/notifications"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data").isArray());
+    }
+
+    @Test
+    @WithUserDetails("ivan@yandex.ru")
+    public void setAccountNotifications() throws Exception {
+        NotificationRequest request = new NotificationRequest();
+        request.setNotificationType("POST");
+        request.setEnable(true);
+        mockMvc.perform(put("/api/v1/account/notifications").content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.data.message").value("ok"));
     }
 }

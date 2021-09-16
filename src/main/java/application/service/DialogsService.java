@@ -8,6 +8,7 @@ import application.models.*;
 import application.models.dto.*;
 import application.models.requests.DialogCreateDtoRequest;
 import application.models.requests.MessageSendDtoRequest;
+import com.github.dockerjava.api.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class DialogsService {
     private final DaoNotification daoNotification;
     private final DaoDialog daoDialog;
 
-    private int getAuthorId() {
+    private int getActiveUserId() {
 
         Person person = daoPerson.getByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         return person.getId();
@@ -35,12 +36,12 @@ public class DialogsService {
 
         Message message = new Message();
         message.setMessageText(request.getMessageText());
-        message.setAuthorId(getAuthorId());
+        message.setAuthorId(getActiveUserId());
         Dialog dialog = daoDialog.getDialogById(dialogId);
         if (dialog == null) {
             throw new EntityNotFoundException("Dialog with id = " + dialogId + " is not exist");
         }
-        message.setRecipientId(dialog.getFirstUserId() == getAuthorId()
+        message.setRecipientId(dialog.getFirstUserId() == getActiveUserId()
                 ? dialog.getSecondUserId()
                 : dialog.getFirstUserId());
         message.setDialogId(dialogId);
@@ -54,8 +55,13 @@ public class DialogsService {
 
     public MessageDeleteDto deleteMessage(int messageId, int dialogId) {
 
-        daoMessage.deleteById(messageId, dialogId);
-        return new MessageDeleteDto(messageId);
+        Message messageDel = daoMessage.getById(messageId);
+        if (messageDel.getAuthorId() != getActiveUserId()) {
+            throw new UnauthorizedException("You can't delete this message");
+        } else {
+            daoMessage.deleteById(messageId, dialogId);
+            return new MessageDeleteDto(messageId);
+        }
     }
 
     public Message editMessage(int messageId, MessageSendDtoRequest request) {
@@ -64,8 +70,12 @@ public class DialogsService {
         if (message == null) {
             throw new EntityNotFoundException("Message with id = " + messageId + " is not exist");
         }
-        message.setMessageText(request.getMessageText());
-        return daoMessage.updateAndReturnMessage(message);
+        if (message.getAuthorId() != getActiveUserId()) {
+            throw new UnauthorizedException("You can't edit this message");
+        } else {
+            message.setMessageText(request.getMessageText());
+            return daoMessage.updateAndReturnMessage(message);
+        }
     }
 
     public MessageResponseDto readMessage(int dialogId, int messageId) {
@@ -74,8 +84,12 @@ public class DialogsService {
         if (message == null) {
             throw new EntityNotFoundException("Message with id = " + messageId + " is not exist");
         }
-        daoMessage.readMessage(messageId, dialogId);
-        return new MessageResponseDto();
+        if (message.getAuthorId() != getActiveUserId()) {
+            throw new UnauthorizedException("You can't make this message read");
+        } else {
+            daoMessage.readMessage(messageId, dialogId);
+            return new MessageResponseDto();
+        }
     }
 
     public DialogsActivityResponseDto getActivity(int dialogId, int userId) {
@@ -103,7 +117,7 @@ public class DialogsService {
                 .stream().map(message -> fromMessage(message, userId))
                 .collect(Collectors.toList());
         messageDtoList.stream().filter(messageDto -> messageDto.getReadStatus() == ReadStatus.SENT &&
-                messageDto.getRecipientId().getId() == userId).forEach(message -> daoMessage
+                messageDto.getRecipient().getId() == userId).forEach(message -> daoMessage
                 .readMessage(dialogId, message.getId()));
         return messageDtoList;
     }
@@ -126,8 +140,14 @@ public class DialogsService {
 
     public DialogIdDto deleteDialog(int id) {
 
-        daoDialog.deleteDialogById(id);
-        return new DialogIdDto(id);
+        int activeUserId = getActiveUserId();
+        Dialog dialogDel = daoDialog.getDialogById(id);
+        if (dialogDel.getFirstUserId() != activeUserId && dialogDel.getSecondUserId() != activeUserId) {
+            throw new UnauthorizedException("You can't delete this dialog");
+        } else {
+            daoDialog.deleteDialogById(id);
+            return new DialogIdDto(id);
+        }
     }
 
     public UserIdsDto addUserInDialog(UserIdsDto ids) {
@@ -158,8 +178,8 @@ public class DialogsService {
         messageDto.setId(message.getId());
         messageDto.setReadStatus(message.getReadStatus());
         messageDto.setTime(message.getTime());
-        messageDto.setAuthorId(PersonDialogsDto.fromPerson(daoPerson.getById(message.getAuthorId())));
-        messageDto.setRecipientId(PersonDialogsDto.fromPerson(daoPerson.getById(message.getRecipientId())));
+        messageDto.setAuthor(PersonDialogsDto.fromPerson(daoPerson.getById(message.getAuthorId())));
+        messageDto.setRecipient(PersonDialogsDto.fromPerson(daoPerson.getById(message.getRecipientId())));
         messageDto.setSentByMe(userId == message.getAuthorId());
         return messageDto;
     }

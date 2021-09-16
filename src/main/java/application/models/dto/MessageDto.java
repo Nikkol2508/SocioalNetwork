@@ -6,21 +6,18 @@ import lombok.Data;
 
 @Data
 public class MessageDto {
+
     private int id;
     private long time;
+    private PersonDialogsDto author;
+    private PersonDialogsDto recipient;
 
-    @JsonProperty("author")
-    private PersonDialogsDto authorId;
-
-    @JsonProperty("recipient")
-    private PersonDialogsDto recipientId;
+    @JsonProperty("isSentByMe")
+    private boolean isSentByMe;
 
     @JsonProperty("message_text")
     private String messageText;
 
     @JsonProperty("read_status")
     private ReadStatus readStatus;
-
-    @JsonProperty("isSentByMe")
-    private boolean isSentByMe;
 }

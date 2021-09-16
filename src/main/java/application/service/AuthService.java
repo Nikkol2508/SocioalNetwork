@@ -1,5 +1,6 @@
 package application.service;
 
+import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.Person;
 import application.models.dto.MessageResponseDto;
@@ -23,6 +24,7 @@ public class AuthService {
     private final DaoPerson daoPerson;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final DaoNotification daoNotification;
 
     public PersonDto login(@RequestBody AuthDtoRequest request)
             throws UsernameNotFoundException, BadCredentialsException {
@@ -59,5 +61,4 @@ public class AuthService {
 
         return daoPerson.getByEmail(email);
     }
-
 }

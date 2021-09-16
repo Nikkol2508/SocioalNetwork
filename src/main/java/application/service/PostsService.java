@@ -100,10 +100,10 @@ public class PostsService {
         postComment.setTime(System.currentTimeMillis());
         Person currentPerson = daoPerson.getAuthPerson();
         postComment.setAuthorId(currentPerson.getId());
-        daoComment.save(postComment);
+        int comId = daoComment.save(postComment);
         Person person = daoPerson.getById(daoPost.getById(postComment.getPostId()).getAuthorId());
         daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), postComment.getTime(),
-                postComment.getId(), person.getEmail(), postComment.getParentId() == null
+                comId, person.getEmail(), postComment.getParentId() == null
                         ? NotificationType.POST_COMMENT.toString() : NotificationType.COMMENT_COMMENT.toString(),
                 postComment.getCommentText());
         int likes = daoLike.getCountLike(postComment.getId(), "Comment");
@@ -147,6 +147,7 @@ public class PostsService {
     }
 
     public LikeResponseDto getLikes(int itemId, String type) {
+
         LikeResponseDto likeResponseDto = new LikeResponseDto();
         List<String> userList = daoLike.getUsersLike(itemId, type);
         likeResponseDto.setUsers(userList);
@@ -154,10 +155,11 @@ public class PostsService {
         return likeResponseDto;
     }
 
-    public Map<String, Boolean> getLiked(int user_id, int itemId, String type) {
+    public Map<String, Boolean> getLiked(int userId, int itemId, String type) {
+
         Map<String, Boolean> isLiked = new HashMap<>();
         List<String> usersList = daoLike.getUsersLike(itemId, type);
-        isLiked.put("likes", usersList.contains(String.valueOf(user_id)));
+        isLiked.put("likes", usersList.contains(String.valueOf(userId)));
 
         return isLiked;
     }
@@ -166,18 +168,18 @@ public class PostsService {
 
         Person currentPerson = daoPerson.getAuthPerson();
 
-        if (!getLiked(currentPerson.getId(), request.getItem_id(), request.getType()).get("likes")) {
+        if (!getLiked(currentPerson.getId(), request.getItemId(), request.getType()).get("likes")) {
             Like like = new Like();
-            like.setItemId(request.getItem_id());
+            like.setItemId(request.getItemId());
             like.setTime(System.currentTimeMillis());
             like.setPersonId(currentPerson.getId());
             like.setType(request.getType());
             daoLike.save(like);
         }
         undefinedPostId = request.getType().equals("Comment") ? String.valueOf(daoComment
-                .getPostIdByCommentId(request.getItem_id())) : String.valueOf(request.getItem_id());
+                .getPostIdByCommentId(request.getItemId())) : String.valueOf(request.getItemId());
         LikeResponseDto likeResponseDto = new LikeResponseDto();
-        List<String> userList = daoLike.getUsersLike(request.getItem_id(), request.getType());
+        List<String> userList = daoLike.getUsersLike(request.getItemId(), request.getType());
         likeResponseDto.setUsers(userList);
         likeResponseDto.setLikes(String.valueOf(userList.size()));
 

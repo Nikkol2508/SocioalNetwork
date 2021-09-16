@@ -54,14 +54,6 @@ CREATE TABLE IF NOT EXISTS friendship_status
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS notification_type
-(
-    id   SERIAL NOT NULL,
-    code TEXT   NOT NULL,
-    name TEXT   NOT NULL,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE IF NOT EXISTS tag
 (
     id  SERIAL NOT NULL,
@@ -156,15 +148,17 @@ CREATE TABLE IF NOT EXISTS post2tag
 
 CREATE TABLE IF NOT EXISTS notification
 (
-    id        SERIAL NOT NULL,
-    type_id   INT    NOT NULL,
-    send_time BIGINT NOT NULL,
-    person_id INT    NOT NULL,
-    entity_id INT    NOT NULL,
-    contact   TEXT   NOT NULL,
+    id            SERIAL NOT NULL,
+    send_time     BIGINT NOT NULL,
+    person_id     INT    NOT NULL,
+    entity_id     INT    NOT NULL,
+    contact       TEXT   NOT NULL,
+    src_person_id INT    NOT NULL,
+    type          TEXT   NOT NULL,
+    name          TEXT   NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (type_id) REFERENCES notification_type (id) ON DELETE RESTRICT
+    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE RESTRICT
 );
 
 CREATE TABLE IF NOT EXISTS notification_setting_type

@@ -1,5 +1,6 @@
 package application.exceptions;
 
+import com.github.dockerjava.api.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -48,6 +49,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handlePasswordNotValidException(PasswordNotValidException exception) {
         return buildError(exception, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException exception) {
+        return buildError(exception, HttpStatus.UNAUTHORIZED);
     }
 
     private ResponseEntity<ErrorResponse> buildError(Exception exception, HttpStatus httpStatus) {
