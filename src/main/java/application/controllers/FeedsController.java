@@ -26,8 +26,8 @@ public class FeedsController {
             @RequestParam(value = "itemPerPage", defaultValue = "5", required = false) int itemPerPage) {
 
         log.info("getFeed(): start():");
-        GeneralListResponse<PostDto> generalListResponse = new GeneralListResponse<>(feedsService.getFeed(), offset, itemPerPage);
         log.debug("getFeed(): name ={}", name);
+        GeneralListResponse<PostDto> generalListResponse = new GeneralListResponse<>(feedsService.getFeed(), offset, itemPerPage);
         log.debug("getFeed(): responseList = {}", generalListResponse);
         log.info("getFeed(): finish():");
         return ResponseEntity.ok(generalListResponse);

@@ -35,8 +35,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compile 'org.springframework.boot:spring-boot-starter-log4j2'
-}
     testImplementation 'org.springframework.security:spring-security-test:5.3.11.RELEASE'
+}
 
 configurations {
     all {
@@ -46,4 +46,6 @@ configurations {
 
 test {
     useJUnitPlatform()
+    environment "LC_CTYPE", "en_US.UTF-8"
+    environment "LC_ALL", "en_US.UTF-8"
 }

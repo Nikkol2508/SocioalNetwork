@@ -27,8 +27,8 @@ public class TagController {
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
         log.info("getTags(): start():");
-        GeneralListResponse<Tag> generalListResponse = new GeneralListResponse<>(postsService.getTags(), offset, itemPerPage);
         log.debug("getTags(): tag ={}", tag);
+        GeneralListResponse<Tag> generalListResponse = new GeneralListResponse<>(postsService.getTags(), offset, itemPerPage);
         log.debug("getTags(): responseList = {}", generalListResponse);
         log.info("getTags(): finish():");
         return ResponseEntity.ok(generalListResponse);
@@ -38,8 +38,8 @@ public class TagController {
     public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
 
         log.info("setTag(): start():");
-        GeneralResponse<Tag> response = new GeneralResponse<>(postsService.setTag(request));
         log.debug("setTag(): requestBody = {}", request);
+        GeneralResponse<Tag> response = new GeneralResponse<>(postsService.setTag(request));
         log.debug("setTag(): response = {}", response);
         log.info("setTag(): finish():");
         return ResponseEntity.ok(response);
@@ -49,8 +49,8 @@ public class TagController {
     public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
 
         log.info("deleteTag(): start():");
-        GeneralResponse <HashMap<String, String>> generalResponse = new GeneralResponse<>(postsService.deleteTag(id));
         log.debug("deleteTag(): tagId = {}", id);
+        GeneralResponse <HashMap<String, String>> generalResponse = new GeneralResponse<>(postsService.deleteTag(id));
         log.debug("deleteTag(): response = {}", generalResponse);
         log.info("deleteTag(): finish():");
         return ResponseEntity.ok(generalResponse);
