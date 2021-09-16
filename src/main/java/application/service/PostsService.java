@@ -239,10 +239,9 @@ public class PostsService {
         for (String tag : oldTagList) {
             daoTag.detachTag2Post(daoTag.findTagByName(tag).getId(), postId);
         }
-
         attachTags2Post(request.getTags(), postId);
         daoPost.update(post);
-        log.info("Edit post id " + postId + " user id " + post.getAuthorId());
+
         return getPostDto(postId);
     }
 
