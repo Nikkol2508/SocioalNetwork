@@ -34,15 +34,25 @@ public class PostsController {
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
-        return ResponseEntity.ok(new GeneralListResponse<>(postsService
-                .getPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage));
+        log.info("searchPosts(): start():");
+        log.debug("searchPosts(): text = {}, author = {}, dateFrom = {}, dateTo = {}, tags = {}",
+                text, author, dateFrom, dateTo, tags);
+        GeneralListResponse<PostDto> listResponse = new GeneralListResponse<>
+                (postsService.getPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage);
+        log.debug("searchPosts(): responseList = {}", listResponse);
+        log.info("searchPosts(): finish():");
+        return ResponseEntity.ok(listResponse);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GeneralResponse<PostDto>> getPost(@PathVariable int id) {
 
-        log.info("Get post {}");
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.getPostResponse(id)));
+        log.info("getPostById(): start():");
+        log.debug("getPostById(): postId = {}", id);
+        GeneralResponse<PostDto> generalResponse = new GeneralResponse<>(postsService.getPostResponse(id));
+        log.debug("getPostById(): response = {}", generalResponse);
+        log.info("getPostById(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 
     @GetMapping("/{id}/comments")
@@ -51,42 +61,67 @@ public class PostsController {
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
-        return ResponseEntity.ok(new GeneralListResponse<>(postsService.getCommentsResponse(id), offset, itemPerPage));
+        log.info("getComments(): start():");
+        log.debug("getComments(): commentId = {}", id);
+        GeneralListResponse<CommentDto> generalListResponse = new GeneralListResponse<>(postsService.getCommentsResponse(id), offset, itemPerPage);
+        log.debug("getComments(): responseList = {}", generalListResponse);
+        log.info("getComments(): finish():");
+        return ResponseEntity.ok(generalListResponse);
     }
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
                                                                    @RequestBody CommentRequest commentRequest) {
-
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.setComment(id, commentRequest)));
+        log.info("setComment(): start():");
+        log.debug("setComment(): commentId = {}, requestBody = {}", id, commentRequest);
+        GeneralResponse<CommentDto> generalResponse = new GeneralResponse<>(postsService.setComment(id, commentRequest));
+        log.debug("setComment(): response = {}", generalResponse);
+        log.info("setComment(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 
     @PutMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
                                                                    @PathVariable String id,
-                                                                   @PathVariable int comment_id) {
-
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.editComment(request, id, comment_id)));
+                                                                   @PathVariable int commentId) {
+        log.info("editComment(): start():");
+        log.debug("editComment(): commentId = {}, requestBody = {}", id, request);
+        GeneralResponse<CommentDto> generalResponse = new GeneralResponse<>(postsService.editComment(request, id, commentId));
+        log.debug("editComment(): response = {}", generalResponse);
+        log.info("editComment(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
                                                              @PathVariable int id) {
-
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.editPost(postRequest, id)));
+        log.info("editPost(): start():");
+        log.debug("editPost(): postId = {}, requestBody = {}", id, postRequest);
+        GeneralResponse<PostDto> generalResponse = new GeneralResponse<>(postsService.editPost(postRequest, id));
+        log.debug("editPost(): response = {}", generalResponse);
+        log.info("editPost(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deletePost(@PathVariable int id) {
 
-        log.info("Delete post {}", id);
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.deletePost(id)));
+        log.info("deletePost(): start():");
+        log.debug("deletePost(): postId = {}", id);
+        GeneralResponse<MessageResponseDto> generalResponse = new GeneralResponse<>(postsService.deletePost(id));
+        log.debug("deletePost(): response = {}", generalResponse);
+        log.info("deletePost(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 
     @DeleteMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<HashMap<String, Integer>>> deleteComment(@PathVariable String id,
-                                                                                   @PathVariable int comment_id) {
-
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.deleteComment(id, comment_id)));
+                                                                                   @PathVariable int commentId) {
+        log.info("deleteComment(): start():");
+        log.debug("deleteComment(): commentId = {}", commentId);
+        GeneralResponse<HashMap<String, Integer>> generalResponse = new GeneralResponse<>(postsService.deleteComment(id, commentId));
+        log.debug("deleteComment(): response = {}", generalResponse);
+        log.info("deleteComment(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 }

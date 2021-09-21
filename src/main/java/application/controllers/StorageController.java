@@ -4,6 +4,7 @@ import application.models.FileDescription;
 import application.models.responses.GeneralResponse;
 import application.service.StorageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class StorageController {
@@ -24,7 +26,13 @@ public class StorageController {
             @RequestParam("type") String type,
             @RequestPart("file") MultipartFile file) throws IOException {
 
-        return ResponseEntity.ok(new GeneralResponse<>(storageService.saveFileInStorage(type, file)));
+        log.info("saveFileInStorage(): start():");
+        log.debug("saveFileInStorage(): type = {}, file = {}", type, file);
+        GeneralResponse<FileDescription> response = new GeneralResponse<>(storageService.saveFileInStorage(type, file));
+        log.debug("saveFileInStorage(): response = {}", response);
+        log.info("saveFileInStorage(): finish():");
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("storage/{imageName}")

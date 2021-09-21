@@ -6,11 +6,13 @@ import application.models.responses.GeneralListResponse;
 import application.models.responses.GeneralResponse;
 import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -24,18 +26,33 @@ public class TagController {
             @RequestParam(value = "offset", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
-        return ResponseEntity.ok(new GeneralListResponse<>(postsService.getTags(), offset, itemPerPage));
+        log.info("getTags(): start():");
+        log.debug("getTags(): tag ={}", tag);
+        GeneralListResponse<Tag> generalListResponse = new GeneralListResponse<>(postsService.getTags(), offset, itemPerPage);
+        log.debug("getTags(): responseList = {}", generalListResponse);
+        log.info("getTags(): finish():");
+        return ResponseEntity.ok(generalListResponse);
     }
 
     @PostMapping("/tags")
     public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
 
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.setTag(request)));
+        log.info("setTag(): start():");
+        log.debug("setTag(): requestBody = {}", request);
+        GeneralResponse<Tag> response = new GeneralResponse<>(postsService.setTag(request));
+        log.debug("setTag(): response = {}", response);
+        log.info("setTag(): finish():");
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/tags")
     public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
 
-        return ResponseEntity.ok(new GeneralResponse<>(postsService.deleteTag(id)));
+        log.info("deleteTag(): start():");
+        log.debug("deleteTag(): tagId = {}", id);
+        GeneralResponse <HashMap<String, String>> generalResponse = new GeneralResponse<>(postsService.deleteTag(id));
+        log.debug("deleteTag(): response = {}", generalResponse);
+        log.info("deleteTag(): finish():");
+        return ResponseEntity.ok(generalResponse);
     }
 }
