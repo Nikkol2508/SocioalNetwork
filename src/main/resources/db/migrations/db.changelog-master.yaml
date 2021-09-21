@@ -38,3 +38,11 @@ databaseChangeLog:
   - include:
       file: notification-settings-data.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: city-name-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: create-country-data.sql
+      relativeToChangelogFile: true
