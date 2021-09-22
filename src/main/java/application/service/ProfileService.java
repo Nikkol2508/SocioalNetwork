@@ -19,6 +19,9 @@ import javax.persistence.EntityNotFoundException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,15 +71,18 @@ public class ProfileService {
         return postDtoList;
     }
 
-    public List<PersonDto> getPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
-                                                     Long ageTo, String country, String city)
-            throws EntityNotFoundException {
+    public List<PersonDto> searchPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
+                                         Long ageTo, String country, String city) throws EntityNotFoundException {
 
         if (firstOrLastName != null) {
-            return daoPerson.getPersonsByFirstNameSurname(firstOrLastName).stream().map(PersonDto::fromPerson)
+            return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
                     .collect(Collectors.toList());
         }
-        val listPersons = daoPerson.getPersons(firstName, lastName, ageFrom, ageTo, country, city);
+        ZonedDateTime zonedDateTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
+        ageFrom = ageFrom != null ? zonedDateTime.minusYears(ageFrom).toInstant().toEpochMilli() : null;
+        ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo).toInstant().toEpochMilli() : null;
+        val listPersons = daoPerson.searchPersons(
+                firstName, lastName, ageFrom, ageTo, country, city);
         return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
@@ -90,30 +96,33 @@ public class ProfileService {
         post.setAuthorId(authorId);
         int postId = daoPost.savePost(post).getId();
 
-            daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
-                    .map(Person::getId).collect(Collectors.toList()),
-                    daoPerson.getAuthPerson().getId(), post.getTime(),
-                    post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
-                    post.getTitle());
+        daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
+                        .map(Person::getId).collect(Collectors.toList()),
+                daoPerson.getAuthPerson().getId(), post.getTime(),
+                post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
+                post.getTitle());
 
         postsService.attachTags2Post(postRequest.getTags(), postId);
         return post;
     }
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Person person = daoPerson.getByEmail(authentication.getName());
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Person person = daoPerson.getByEmail(email);
         if (person == null) {
-            throw new EntityNotFoundException("Person with this token is not found.");
+            throw new EntityNotFoundException("Person with email " + email + " is not found.");
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
-        String firstName = request.getFirstName().isBlank() ? person.getFirstName() : request.getFirstName();
-        String lastName = request.getLastName().isBlank() ? person.getLastName() : request.getLastName();
-        daoPerson.updatePersonData(person.getId(), firstName, lastName, birthDate, request.getPhone(),
-                daoFile.getPath(Integer.parseInt(request.getPhotoId())), request.getCity(), request.getCountry(),
-                request.getAbout());
+        String firstName = request.getFirstName().isBlank() || request.getFirstName() == null ? person.getFirstName()
+                : request.getFirstName();
+        String lastName = request.getLastName().isBlank() || request.getLastName() == null ? person.getLastName()
+                : request.getLastName();
+        String photo = request.getPhotoId() == null ? person.getPhoto()
+                : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
+        daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
+                photo, request.getCity(), request.getCountry(), request.getAbout());
         return PersonDto.fromPerson(person);
     }
 

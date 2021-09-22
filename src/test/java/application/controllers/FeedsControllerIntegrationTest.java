@@ -1,8 +1,6 @@
 package application.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,10 +10,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,13 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
 @WithUserDetails("vasy@yandex.ru")
-public class FeedsControllerIntegrationTest {
+class FeedsControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private FeedsController feedsController;
@@ -55,7 +52,7 @@ public class FeedsControllerIntegrationTest {
                 .andExpect(jsonPath("$.data[0].author.first_name").value("Пётр"))
                 .andExpect(jsonPath("$.data[0].author.last_name").value("Петров"))
                 .andExpect(jsonPath("$.data[0].author.reg_date").value(1625127990000L))
-                .andExpect(jsonPath("$.data[0].author.birth_date").value(1625127990000L))
+                .andExpect(jsonPath("$.data[0].author.birth_date").value(901355190000L))
                 .andExpect(jsonPath("$.data[0].author.messages_permission").value("ALL"))
                 .andExpect(jsonPath("$.data[0].author.last_online_time").value(1627200965049L))
                 .andExpect(jsonPath("$.data[0].author.is_blocked").value(false))
@@ -63,6 +60,9 @@ public class FeedsControllerIntegrationTest {
                 .andExpect(jsonPath("$.data[0].likes").value(0))
                 .andExpect(jsonPath("$.data[0].my_like").value(0))
                 .andExpect(jsonPath("$.data[0].comments").isEmpty())
-                .andExpect(jsonPath("$.data[0].post_text", is("aa")));
+                .andExpect(jsonPath("$.data[0].post_text", containsString("Очень важно и нужно")))
+                .andExpect(jsonPath("$.data[0].is_blocked", is(false)))
+                .andExpect(jsonPath("$.data[0].tags", is(Arrays.asList("Bug", "Fix"))))
+                .andExpect(jsonPath("$.data.length()", is(15)));
     }
 }

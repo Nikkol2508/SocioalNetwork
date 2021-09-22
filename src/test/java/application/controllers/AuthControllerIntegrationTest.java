@@ -16,16 +16,16 @@ import javax.sql.DataSource;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-public class AuthControllerIntegrationTest {
+class AuthControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +40,7 @@ public class AuthControllerIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    public void loginSuccess() throws Exception {
+    void loginSuccess() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -64,7 +64,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void loginEmailNotExistsFailed() throws Exception {
+    void loginEmailNotExistsFailed() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("emailnotexist@ya.ru");
@@ -76,7 +76,7 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void loginWrongPasswordFailed() throws Exception {
+    void loginWrongPasswordFailed() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -89,7 +89,7 @@ public class AuthControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    public void logoutSuccess() throws Exception {
+    void logoutSuccess() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
