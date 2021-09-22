@@ -109,10 +109,14 @@ public class ProfileService {
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
+
+        String photo = request.getPhotoId() == null ?
+                person.getPhoto() : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
+
         String firstName = request.getFirstName().isBlank() ? person.getFirstName() : request.getFirstName();
         String lastName = request.getLastName().isBlank() ? person.getLastName() : request.getLastName();
         daoPerson.updatePersonData(person.getId(), firstName, lastName, birthDate, request.getPhone(),
-                daoFile.getPath(Integer.parseInt(request.getPhotoId())), request.getCity(), request.getCountry(),
+                photo, request.getCity(), request.getCountry(),
                 request.getAbout());
         return PersonDto.fromPerson(person);
     }
@@ -124,10 +128,6 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException("Person with this token is not found.");
         }
-        daoPerson.deleteFriendshipByPersonId(person.getId());
-        daoLike.deleteByPersonId(person.getId());
-        daoComment.deleteByAuthorId(person.getId());
-        daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person.getId());
         return new MessageResponseDto();
     }

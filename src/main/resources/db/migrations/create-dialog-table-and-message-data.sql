@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS dialog
     first_user_id  INT    NOT NULL,
     second_user_id INT    NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (first_user_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (second_user_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (first_user_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (second_user_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 INSERT INTO dialog(first_user_id, second_user_id)

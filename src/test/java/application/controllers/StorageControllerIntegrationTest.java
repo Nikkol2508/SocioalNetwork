@@ -56,12 +56,11 @@ public class StorageControllerIntegrationTest {
                 "file", "testImage.png", "image/png",
                 "src/test/resources/testImage.png".getBytes());
 
-        daoFile.deleteImage(1);
         mockMvc.perform(multipart("/api/v1/storage").file(file).param("type", "IMAGE"))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.ownerId").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.fileName")
+                .andExpect(jsonPath("$.data.fileName")
                         .value(containsString("testImagepng")))
                 .andExpect(jsonPath("$.data.relativeFilePath")
                         .value(containsString("storage/testImagepng")))
