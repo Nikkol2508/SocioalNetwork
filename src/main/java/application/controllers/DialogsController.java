@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Slf4j
@@ -20,10 +21,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DialogsController {
 
-    private final DialogsService dialogsService;
+    public final DialogsService dialogsService;
 
     @GetMapping
-    private ResponseEntity<GeneralListResponse<DialogDto>> getDialogs(
+    public ResponseEntity<GeneralListResponse<DialogDto>> getDialogs(
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
@@ -38,7 +39,7 @@ public class DialogsController {
     }
 
     @PostMapping
-    private ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(@RequestBody DialogCreateDtoRequest request) {
+    public ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(@RequestBody DialogCreateDtoRequest request) {
 
         log.info("createDialog(): start():");
         log.debug("createDialog(): requestBody = {}", request);
@@ -49,7 +50,7 @@ public class DialogsController {
     }
 
     @GetMapping("{id}/messages")
-    private ResponseEntity<GeneralListResponse<MessageDto>> getMessagesInDialog(
+    public ResponseEntity<GeneralListResponse<MessageDto>> getMessagesInDialog(
             @PathVariable("id") int dialogId,
             @RequestParam(value = "query", required = false) String query,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
@@ -65,7 +66,7 @@ public class DialogsController {
     }
 
     @GetMapping("/unreaded")
-    private ResponseEntity<GeneralResponse<UnreadedCountDto>> getCountUnreaded() {
+    public ResponseEntity<GeneralResponse<UnreadedCountDto>> getCountUnreaded() {
 
         log.info("getCountUnreaded(): start():");
         GeneralResponse<UnreadedCountDto> generalResponse = new GeneralResponse<>(dialogsService.getUnreadedCount());
@@ -75,20 +76,20 @@ public class DialogsController {
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<GeneralResponse<DialogIdDto>> deleteDialog(@PathVariable int id) {
+    public ResponseEntity<GeneralResponse<DialogIdDto>> deleteDialog(@PathVariable int id) {
 
         return ResponseEntity.ok(new GeneralResponse<>(dialogsService.deleteDialog(id)));
     }
 
     @PutMapping("/{id}/users")
-    private ResponseEntity<GeneralResponse<UserIdsDto>> addUserInDialog(@PathVariable int id,
-                                                                        @RequestBody UserIdsDto ids) {
+    public ResponseEntity<GeneralResponse<UserIdsDto>> addUserInDialog(@PathVariable int id,
+                                                                       @RequestBody UserIdsDto ids) {
 
         return ResponseEntity.ok(new GeneralResponse<>(dialogsService.addUserInDialog(ids)));
     }
 
     @DeleteMapping("/{id}/users/{ids}")
-    private ResponseEntity<GeneralResponse<UserIdsDto>> deleteUsersFromDialog(
+    public ResponseEntity<GeneralResponse<UserIdsDto>> deleteUsersFromDialog(
             @PathVariable(value = "id") int dialogId,
             @PathVariable(value = "ids") List<Integer> usersIds) {
 
@@ -96,20 +97,20 @@ public class DialogsController {
     }
 
     @GetMapping("/{id}/users/invite")
-    private ResponseEntity<GeneralResponse<InviteLinkDto>> getLinkToJoinDialog(@PathVariable int id) {
+    public ResponseEntity<GeneralResponse<InviteLinkDto>> getLinkToJoinDialog(@PathVariable int id) {
 
         return ResponseEntity.ok(new GeneralResponse<>(new InviteLinkDto()));
     }
 
     @PutMapping("/{id}/users/join")
-    private ResponseEntity<GeneralResponse<UserIdsDto>> joinDialogByLink(@PathVariable int id) {
+    public ResponseEntity<GeneralResponse<UserIdsDto>> joinDialogByLink(@PathVariable int id) {
 
         return ResponseEntity.ok(new GeneralResponse<>(new UserIdsDto()));
     }
 
     @PostMapping("/{id}/messages")
-    private ResponseEntity<GeneralResponse<Message>> sendMessage(@PathVariable int id,
-                                                                 @RequestBody MessageSendDtoRequest request) {
+    public ResponseEntity<GeneralResponse<Message>> sendMessage(@PathVariable int id,
+                                                                @Valid @RequestBody MessageSendDtoRequest request) {
         log.info("sendMessage(): start():");
         log.debug("sendMessage(): messageId = {}, requestBody = {}", id, request);
         GeneralResponse<Message> generalResponse = new GeneralResponse<>(dialogsService.sendMessage(id, request));
@@ -119,8 +120,8 @@ public class DialogsController {
     }
 
     @DeleteMapping("/{dialog_id}/messages/{message_id}")
-    private ResponseEntity<GeneralResponse<MessageDeleteDto>> deleteMessage(@PathVariable("dialog_id") int dialogId,
-                                                                            @PathVariable("message_id") int messageId) {
+    public ResponseEntity<GeneralResponse<MessageDeleteDto>> deleteMessage(@PathVariable("dialog_id") int dialogId,
+                                                                           @PathVariable("message_id") int messageId) {
         log.info("deleteMessage(): start():");
         log.debug("deleteMessage(): dialogId = {}, messageId = {}", dialogId, messageId);
         GeneralResponse<MessageDeleteDto> generalResponse = new GeneralResponse<>(dialogsService.deleteMessage(messageId, dialogId));
@@ -130,9 +131,9 @@ public class DialogsController {
     }
 
     @PutMapping("/{dialog_id}/messages/{message_id}")
-    private ResponseEntity<GeneralResponse<Message>> editMessage(@PathVariable("dialog_id") int dialogId,
-                                                                 @PathVariable("message_id") int messageId,
-                                                                 @RequestBody MessageSendDtoRequest request) {
+    public ResponseEntity<GeneralResponse<Message>> editMessage(@PathVariable("dialog_id") int dialogId,
+                                                                @PathVariable("message_id") int messageId,
+                                                                @RequestBody MessageSendDtoRequest request) {
         log.info("editMessage(): start():");
         log.debug("editMessage(): dialogId = {}, messageId = {}, requestBody = {}", dialogId, messageId, request);
         GeneralResponse<Message> generalResponse = new GeneralResponse<>(dialogsService.editMessage(messageId, request));
@@ -142,8 +143,8 @@ public class DialogsController {
     }
 
     @PutMapping("/{dialog_id}/messages/{message_id}/read")
-    private ResponseEntity<GeneralResponse<MessageResponseDto>> readMessage(@PathVariable("dialog_id") int dialogId,
-                                                                            @PathVariable("message_id") int messageId) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> readMessage(@PathVariable("dialog_id") int dialogId,
+                                                                           @PathVariable("message_id") int messageId) {
 
         log.info("readMessage(): start():");
         log.debug("readMessage(): dialogId = {}, messageId = {}", dialogId, messageId);
@@ -154,7 +155,7 @@ public class DialogsController {
     }
 
     @GetMapping("/{id}/activity/{user_id}")
-    private ResponseEntity<GeneralResponse<DialogsActivityResponseDto>> getActivity(
+    public ResponseEntity<GeneralResponse<DialogsActivityResponseDto>> getActivity(
             @PathVariable("id") int dialogId, @PathVariable("user_id") int userId) {
 
         log.info("getActivity(): start():");
@@ -166,7 +167,7 @@ public class DialogsController {
     }
 
     @PostMapping("{id}/activity/{user_id}")
-    private ResponseEntity<GeneralResponse<MessageResponseDto>> changeTypingStatus(
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> changeTypingStatus(
             @PathVariable("id") int dialogId, @PathVariable("user_id") int userId) {
 
         log.info("changeTypingStatus(): start():");

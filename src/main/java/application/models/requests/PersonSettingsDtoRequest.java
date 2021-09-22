@@ -3,6 +3,8 @@ package application.models.requests;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Pattern;
+
 @Data
 public class PersonSettingsDtoRequest {
 
@@ -21,5 +23,6 @@ public class PersonSettingsDtoRequest {
     private String firstName;
 
     @JsonProperty("birth_date")
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}'T'00:00:00$")
     private String birthDate;
 }

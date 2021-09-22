@@ -36,7 +36,7 @@ public class StorageService {
         return fileDto;
     }
 
-    public FileDescription getImage(String photoId) throws IOException {
+    public FileDescription getImage(String photoId) {
         return daoFile.getByImageName(photoId);
     }
 }

@@ -1,7 +1,6 @@
 package application.controllers;
 
 import application.exceptions.EmailAlreadyExistsException;
-import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.NotificationsSettingsDto;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
 
 @RestController
@@ -28,26 +28,28 @@ public class AccountController {
     private static final Logger logger = LogManager.getLogger("app");
 
     @PostMapping("/register")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> register(@RequestBody RegistrationDtoRequest request)
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> register(
+            @Valid @RequestBody RegistrationDtoRequest request)
             throws EmailAlreadyExistsException, PasswordsNotEqualsException {
-        GeneralResponse generalResponse = new GeneralResponse<>(accountService.register(request));
+
+        GeneralResponse<MessageResponseDto> generalResponse = new GeneralResponse<>(accountService.register(request));
         //Реализовать сокрытие данных пользователя
         logger.info("Register(): start(): request = {}, response = {}", " ", generalResponse);
         return ResponseEntity.ok(generalResponse);
     }
 
     @PutMapping("/password/set")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(HttpServletRequest servletRequest,
-                                                                           @RequestBody SetPasswordDtoRequest request)
-            throws PasswordNotValidException {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setPassword(
+            HttpServletRequest servletRequest,
+            @Valid @RequestBody SetPasswordDtoRequest request) {
 
         request.setToken(AccountService.getCode(servletRequest));
         return ResponseEntity.ok(new GeneralResponse<>(accountService.setPassword(request)));
     }
 
     @PutMapping("/email")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setEmail(HttpServletRequest servletRequest,
-                                                                        @RequestBody ShiftEmailDtoRequest request) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setEmail(
+            HttpServletRequest servletRequest, @Valid @RequestBody ShiftEmailDtoRequest request) {
 
         return ResponseEntity.ok(new GeneralResponse<>(accountService.setEmail(request,
                 AccountService.getCode(servletRequest))));
@@ -55,7 +57,7 @@ public class AccountController {
 
     @PutMapping("/password/recovery")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> recoverPassword(
-            HttpServletRequest servletRequest, @RequestBody RecoverPassDtoRequest request)
+            HttpServletRequest servletRequest, @Valid @RequestBody RecoverPassDtoRequest request)
             throws MessagingException, UnsupportedEncodingException {
 
         return ResponseEntity.ok(new GeneralResponse<>(accountService.recoverPassword(servletRequest, request)));
@@ -69,7 +71,7 @@ public class AccountController {
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotifications(
+    public ResponseEntity<GeneralListResponse<NotificationsSettingsDto>> getAccountNotificationsSettings(
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
@@ -78,7 +80,7 @@ public class AccountController {
     }
 
     @PutMapping("/notifications")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setAccountNotifications(
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setAccountNotificationsSettings(
             @RequestBody NotificationRequest notificationRequest) {
 
         return ResponseEntity.ok(new GeneralResponse<>(accountService.setNotificationSettings(notificationRequest)));

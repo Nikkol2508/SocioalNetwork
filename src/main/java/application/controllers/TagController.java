@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -46,11 +46,11 @@ public class TagController {
     }
 
     @DeleteMapping("/tags")
-    public ResponseEntity<GeneralResponse<HashMap<String, String>>> deleteTag(@RequestParam int id) {
+    public ResponseEntity<GeneralResponse<Map<String, String>>> deleteTag(@RequestParam int id) {
 
         log.info("deleteTag(): start():");
         log.debug("deleteTag(): tagId = {}", id);
-        GeneralResponse <HashMap<String, String>> generalResponse = new GeneralResponse<>(postsService.deleteTag(id));
+        GeneralResponse <Map<String, String>> generalResponse = new GeneralResponse<>(postsService.deleteTag(id));
         log.debug("deleteTag(): response = {}", generalResponse);
         log.info("deleteTag(): finish():");
         return ResponseEntity.ok(generalResponse);

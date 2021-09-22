@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.models.NotificationType;
 import application.models.requests.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
@@ -21,16 +22,17 @@ import java.sql.SQLException;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-public class AccountControllerIntegrationTest {
+class AccountControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,7 +52,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    public void registerUserSuccess() throws Exception {
+    void registerUserSuccess() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test1@test.ru");
@@ -58,6 +60,7 @@ public class AccountControllerIntegrationTest {
         request.setPasswd1("12345678");
         request.setFirstName("First");
         request.setLastName("Last");
+        request.setCode("1234");
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -67,7 +70,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    public void registerUserEmailExistsFailed() throws Exception {
+    void registerUserEmailExistsFailed() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
@@ -75,6 +78,7 @@ public class AccountControllerIntegrationTest {
         request.setPasswd1("12345678");
         request.setFirstName("First");
         request.setLastName("Last");
+        request.setCode("1234");
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -84,7 +88,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    public void registerPasswordsAreNotEqualsFailed() throws Exception {
+    void registerPasswordsAreNotEqualsFailed() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test2@test.ru");
@@ -92,6 +96,7 @@ public class AccountControllerIntegrationTest {
         request.setPasswd1("12345678");
         request.setFirstName("First");
         request.setLastName("Last");
+        request.setCode("1234");
         mockMvc.perform(post("/api/v1/account/register").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
@@ -101,7 +106,7 @@ public class AccountControllerIntegrationTest {
 
 
     @Test
-    public void setPasswordSuccess() throws Exception {
+    void setPasswordSuccess() throws Exception {
 
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("87654321");
@@ -115,7 +120,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    public void setPasswordNotValidFailed() throws Exception {
+    void setPasswordNotValidFailed() throws Exception {
 
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("1");
@@ -124,11 +129,12 @@ public class AccountControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
-                .andExpect(jsonPath("$.error_description", is("Password is not valid.")));
+                .andExpect(jsonPath("$.error_description",
+                        is("Validation error. Check 'errors' field for details")));
     }
 
     @Test
-    public void setEmailSuccess() throws Exception {
+    void setEmailSuccess() throws Exception {
 
         ShiftEmailDtoRequest request = new ShiftEmailDtoRequest();
         request.setEmail("homa@yandex.ru");
@@ -142,7 +148,7 @@ public class AccountControllerIntegrationTest {
     }
 
     @Test
-    public void recoverPasswordSuccess() throws Exception {
+    void recoverPasswordSuccess() throws Exception {
 
         RecoverPassDtoRequest request = new RecoverPassDtoRequest();
         request.setEmail("ivan@yandex.ru");
@@ -158,7 +164,7 @@ public class AccountControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    public void changeEmailSuccess() throws Exception {
+    void changeEmailSuccess() throws Exception {
 
         mockMvc.perform(put("/api/v1/account/shift-email")
                         .header("Request URL", "http://test.ru/"))
@@ -170,20 +176,31 @@ public class AccountControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    public void getAccountNotificationsSuccess() throws Exception {
+    void getAccountNotificationsSuccess() throws Exception {
 
         mockMvc.perform(get("/api/v1/account/notifications"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp", not(0)))
-                .andExpect(jsonPath("$.data").isArray());
+                .andExpect(jsonPath("$.data[0].enable", is(true)))
+                .andExpect(jsonPath("$.data[0].type", is("POST")))
+                .andExpect(jsonPath("$.data[1].enable", is(true)))
+                .andExpect(jsonPath("$.data[1].type", is("POST_COMMENT")))
+                .andExpect(jsonPath("$.data[2].enable", is(true)))
+                .andExpect(jsonPath("$.data[2].type", is("COMMENT_COMMENT")))
+                .andExpect(jsonPath("$.data[3].enable", is(true)))
+                .andExpect(jsonPath("$.data[3].type", is("FRIEND_REQUEST")))
+                .andExpect(jsonPath("$.data[4].enable", is(true)))
+                .andExpect(jsonPath("$.data[4].type", is("MESSAGE")))
+                .andExpect(jsonPath("$.data[5].enable", is(true)))
+                .andExpect(jsonPath("$.data[5].type", is("FRIEND_BIRTHDAY")));
     }
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    public void setAccountNotifications() throws Exception {
+    void setAccountNotifications() throws Exception {
         NotificationRequest request = new NotificationRequest();
-        request.setNotificationType("POST");
+        request.setNotificationType(NotificationType.POST);
         request.setEnable(true);
         mockMvc.perform(put("/api/v1/account/notifications").content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())

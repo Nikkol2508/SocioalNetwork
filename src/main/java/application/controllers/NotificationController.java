@@ -19,7 +19,7 @@ public class NotificationController {
     private final NotificationService notificationService;
 
     @GetMapping("/notifications")
-    private ResponseEntity<GeneralListResponse<NotificationDto>> getNotifications(
+    public ResponseEntity<GeneralListResponse<NotificationDto>> getNotifications(
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "20", required = false) int itemPerPage) {
 
@@ -31,8 +31,8 @@ public class NotificationController {
     }
 
     @PutMapping("/notifications")
-    private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications(
-            @RequestParam(required = false) boolean all) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> readNotifications(
+            @RequestParam(required = false) boolean all) throws InterruptedException {
 
         log.info("readNotifications(): start():");
         GeneralResponse<MessageResponseDto> generalResponse = new GeneralResponse<>(notificationService.readNotifications());
@@ -42,7 +42,7 @@ public class NotificationController {
     }
 
     @PutMapping("/notifications/{id}")
-    private ResponseEntity<GeneralResponse<MessageResponseDto>> readNotificationForId
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> readNotificationForId
             (@RequestParam(value = "id") int id) {
         return ResponseEntity.ok(new GeneralResponse<>(notificationService.readNotificationForId(id)));
     }

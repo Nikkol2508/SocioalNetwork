@@ -40,5 +40,13 @@ databaseChangeLog:
       relativeToChangelogFile: true
 
   - include:
+      file: city-name-data.sql
+      relativeToChangelogFile: true
+
+  - include:
+      file: create-country-data.sql
+      relativeToChangelogFile: true
+
+  - include:
       file: create-indexes.sql
       relativeToChangelogFile: true
