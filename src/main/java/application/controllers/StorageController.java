@@ -36,7 +36,7 @@ public class StorageController {
     }
 
     @GetMapping("storage/{imageName}")
-    public ResponseEntity<Object> show(@PathVariable("imageName") String imageName) throws IOException {
+    public ResponseEntity<Object> show(@PathVariable("imageName") String imageName) {
         FileDescription image = storageService.getImage(imageName);
         return ResponseEntity.ok().contentType(MediaType.valueOf(image.getFileFormat())).body(image.getData());
     }

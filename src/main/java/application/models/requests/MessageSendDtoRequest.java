@@ -13,6 +13,6 @@ import javax.validation.constraints.NotBlank;
 public class MessageSendDtoRequest {
 
     @JsonProperty("message_text")
-    @NotBlank
+    @NotBlank(message = "{message.text.blank}")
     private String messageText;
 }

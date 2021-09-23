@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class PostsController {
 
     @GetMapping
     public ResponseEntity<GeneralListResponse<PostDto>> searchPosts(
-            @RequestParam(value = "text") @Size(min = 2) String text,
+            @RequestParam(value = "text") @Size(min = 2) @NotBlank String text,
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "date_from", required = false) Long dateFrom,
             @RequestParam(value = "date_to", required = false) Long dateTo,
@@ -96,7 +98,7 @@ public class PostsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
+    public ResponseEntity<GeneralResponse<PostDto>> editPost(@Valid @RequestBody PostRequest postRequest,
                                                              @PathVariable int id) {
         log.info("editPost(): start():");
         log.debug("editPost(): postId = {}, requestBody = {}", id, postRequest);

@@ -40,7 +40,7 @@ class AuthControllerIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    void loginSuccess() throws Exception {
+    void testLogin1() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -64,7 +64,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    void loginEmailNotExistsFailed() throws Exception {
+    void testLogin2() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("emailnotexist@ya.ru");
@@ -76,7 +76,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    void loginWrongPasswordFailed() throws Exception {
+    void testLogin3() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -89,7 +89,7 @@ class AuthControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void logoutSuccess() throws Exception {
+    void testLogout() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))

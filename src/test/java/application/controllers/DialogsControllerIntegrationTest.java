@@ -26,8 +26,7 @@ import java.util.List;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,7 +68,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("homa@yandex.ru")
-    void getDialogsSuccess() throws Exception {
+    void testGetDialogs() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -77,7 +76,7 @@ class DialogsControllerIntegrationTest {
                 .andExpect(jsonPath("$.total", is(2)))
                 .andExpect(jsonPath("$.perPage", is(20)))
                 .andExpect(jsonPath("$.offset", is(0)))
-                .andExpect(jsonPath("$.data[0].unread_count", is(1)))
+                .andExpect(jsonPath("$.data[0].unread_count", is(in(new Integer[]{0, 1}))))
                 .andExpect(jsonPath("$.data[0].id", is(1)))
                 .andExpect(jsonPath("$.data[0].recipient.id", is(1)))
                 .andExpect(jsonPath("$.data[0].recipient.email", is("vasy@yandex.ru")))
@@ -88,7 +87,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void createDialogSuccess() throws Exception {
+    void testCreateDialog1() throws Exception {
 
         DialogCreateDtoRequest request = new DialogCreateDtoRequest();
         request.setUsersIds(List.of(4));
@@ -100,7 +99,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void createExistingDialogSuccess() throws Exception {
+    void testCreateDialog2() throws Exception {
 
         DialogCreateDtoRequest request = new DialogCreateDtoRequest();
         request.setUsersIds(List.of(2));
@@ -113,7 +112,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("homa@yandex.ru")
-    void getMessagesInDialogSuccess() throws Exception {
+    void testGetMessagesInDialog() throws Exception {
         PersonDialogsDto person1 = new PersonDialogsDto();
         person1.setLastName("Васичкин");
         person1.setFirstName("Вася");
@@ -152,7 +151,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void getCountUnreadedSuccess() throws Exception {
+    void testGetCountUnreaded() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/unreaded")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -162,7 +161,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ilia@yandex.ru")
-    void deleteDialogSuccess() throws Exception {
+    void testDeleteDialog() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/5")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -171,7 +170,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void addUserInDialogSuccess() throws Exception {
+    void testAddUserInDialog() throws Exception {
 
         UserIdsDto request = new UserIdsDto(List.of(3, 4));
         mockMvc.perform(put("/api/v1/dialogs/1/users").content(objectMapper.writeValueAsString(request))
@@ -181,7 +180,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void deleteUsersInDialogSuccess() throws Exception {
+    void testDeleteUsersInDialog() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/1/users/3,4,5")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.user_ids[0]", is(3)))
@@ -190,20 +189,20 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void getLinkToJoinDialogSuccess() throws Exception {
+    void testGetLinkToJoinDialog() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/1/users/invite")).andExpect(status().isOk());
     }
 
     @Test
-    void joinDialogByLinkSuccess() throws Exception {
+    void testJoinDialogByLink() throws Exception {
 
         mockMvc.perform(put("/api/v1/dialogs/1/users/join")).andExpect(status().isOk());
     }
 
     @Test
     @WithUserDetails("nik@yandex.ru")
-    void sendMessageSuccess() throws Exception {
+    void testSendMessage() throws Exception {
 
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST");
         mockMvc.perform(post("/api/v1/dialogs/4/messages").content(objectMapper.writeValueAsString(request))
@@ -220,7 +219,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("nik@yandex.ru")
-    void deleteMessageSuccess() throws Exception {
+    void testDeleteMessage() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/4/messages/6")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -230,7 +229,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("dmitriy@yandex.ru")
-    void editMessageSuccess() throws Exception {
+    void testEditMessage() throws Exception {
 
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST3(2)");
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7").content(objectMapper.writeValueAsString(request))
@@ -247,7 +246,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("dmitriy@yandex.ru")
-    void readMessageSuccess() throws Exception {
+    void testReadMessage() throws Exception {
 
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7/read")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -256,7 +255,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void getActivitySuccess() throws Exception {
+    void testGetActivity() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -265,7 +264,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void changeTypingStatusSuccess() throws Exception {
+    void testChangeTypingStatus() throws Exception {
 
         mockMvc.perform(post("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))

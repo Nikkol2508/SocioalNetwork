@@ -9,6 +9,6 @@ public class SetPasswordDtoRequest {
 
     private String token;
 
-    @Size(min = 8, message = "The password length must not be less than 8 characters")
+    @Size(min = 8, message = "{password.not.valid}")
     private String password;
 }

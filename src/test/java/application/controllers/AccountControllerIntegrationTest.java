@@ -52,7 +52,7 @@ class AccountControllerIntegrationTest {
     }
 
     @Test
-    void registerUserSuccess() throws Exception {
+    void testRegister1() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test1@test.ru");
@@ -70,7 +70,7 @@ class AccountControllerIntegrationTest {
     }
 
     @Test
-    void registerUserEmailExistsFailed() throws Exception {
+    void testRegister2() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test@test.ru");
@@ -88,7 +88,7 @@ class AccountControllerIntegrationTest {
     }
 
     @Test
-    void registerPasswordsAreNotEqualsFailed() throws Exception {
+    void testRegister3() throws Exception {
 
         RegistrationDtoRequest request = new RegistrationDtoRequest();
         request.setEmail("test2@test.ru");
@@ -106,7 +106,7 @@ class AccountControllerIntegrationTest {
 
 
     @Test
-    void setPasswordSuccess() throws Exception {
+    void testSetPassword1() throws Exception {
 
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("87654321");
@@ -120,7 +120,7 @@ class AccountControllerIntegrationTest {
     }
 
     @Test
-    void setPasswordNotValidFailed() throws Exception {
+    void testSetPassword2() throws Exception {
 
         SetPasswordDtoRequest request = new SetPasswordDtoRequest();
         request.setPassword("1");
@@ -130,11 +130,11 @@ class AccountControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description",
-                        is("Validation error. Check 'errors' field for details")));
+                        is("The password length must not be less than 8 characters")));
     }
 
     @Test
-    void setEmailSuccess() throws Exception {
+    void testSetEmail() throws Exception {
 
         ShiftEmailDtoRequest request = new ShiftEmailDtoRequest();
         request.setEmail("homa@yandex.ru");
@@ -148,7 +148,7 @@ class AccountControllerIntegrationTest {
     }
 
     @Test
-    void recoverPasswordSuccess() throws Exception {
+    void testRecoverPassword() throws Exception {
 
         RecoverPassDtoRequest request = new RecoverPassDtoRequest();
         request.setEmail("ivan@yandex.ru");
@@ -164,7 +164,7 @@ class AccountControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void changeEmailSuccess() throws Exception {
+    void testChangeEmail() throws Exception {
 
         mockMvc.perform(put("/api/v1/account/shift-email")
                         .header("Request URL", "http://test.ru/"))
@@ -176,29 +176,29 @@ class AccountControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void getAccountNotificationsSuccess() throws Exception {
+    void testGetAccountNotificationsSettings() throws Exception {
 
         mockMvc.perform(get("/api/v1/account/notifications"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp", not(0)))
                 .andExpect(jsonPath("$.data[0].enable", is(true)))
-                .andExpect(jsonPath("$.data[0].type", is("POST")))
+                .andExpect(jsonPath("$.data[0].type", is("POST_COMMENT")))
                 .andExpect(jsonPath("$.data[1].enable", is(true)))
-                .andExpect(jsonPath("$.data[1].type", is("POST_COMMENT")))
+                .andExpect(jsonPath("$.data[1].type", is("COMMENT_COMMENT")))
                 .andExpect(jsonPath("$.data[2].enable", is(true)))
-                .andExpect(jsonPath("$.data[2].type", is("COMMENT_COMMENT")))
+                .andExpect(jsonPath("$.data[2].type", is("FRIEND_REQUEST")))
                 .andExpect(jsonPath("$.data[3].enable", is(true)))
-                .andExpect(jsonPath("$.data[3].type", is("FRIEND_REQUEST")))
+                .andExpect(jsonPath("$.data[3].type", is("MESSAGE")))
                 .andExpect(jsonPath("$.data[4].enable", is(true)))
-                .andExpect(jsonPath("$.data[4].type", is("MESSAGE")))
+                .andExpect(jsonPath("$.data[4].type", is("FRIEND_BIRTHDAY")))
                 .andExpect(jsonPath("$.data[5].enable", is(true)))
-                .andExpect(jsonPath("$.data[5].type", is("FRIEND_BIRTHDAY")));
+                .andExpect(jsonPath("$.data[5].type", is("POST")));
     }
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void setAccountNotifications() throws Exception {
+    void testSetAccountNotificationsSettings() throws Exception {
         NotificationRequest request = new NotificationRequest();
         request.setNotificationType(NotificationType.POST);
         request.setEnable(true);
