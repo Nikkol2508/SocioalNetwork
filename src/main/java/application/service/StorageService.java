@@ -30,13 +30,11 @@ public class StorageService {
             fileDto.setFileType(type);
             fileDto.setData(file.getBytes());
             fileDto = daoFile.saveAndReturn(fileDto);
-            return fileDto;
-        } else {
-            return fileDto;
         }
+        return fileDto;
     }
 
-    public FileDescription getImage(String photoId) throws IOException {
+    public FileDescription getImage(String photoId) {
         return daoFile.getByImageName(photoId);
     }
 }

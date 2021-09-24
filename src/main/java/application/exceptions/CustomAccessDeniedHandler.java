@@ -18,7 +18,8 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest httpServletRequest,
                        HttpServletResponse httpServletResponse,
                        AccessDeniedException e) throws IOException, ServletException {
-        ErrorResponse error = new ErrorResponse(Error.UNAUTHORIZED.getError(), e.getMessage());
+        ErrorResponse error = new ErrorResponse(Error.UNAUTHORIZED.getErrorName(), e.getMessage(),
+                httpServletRequest.getPathInfo());
         httpServletResponse.setStatus(401);
         httpServletResponse.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(error));

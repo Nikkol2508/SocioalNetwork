@@ -1,8 +1,6 @@
 package application.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -12,10 +10,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -25,13 +25,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
 @WithUserDetails("vasy@yandex.ru")
-public class FeedsControllerIntegrationTest {
+class FeedsControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private FeedsController feedsController;
@@ -40,29 +37,32 @@ public class FeedsControllerIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    void getFeedSuccess() throws Exception {
+    void testGetFeed() throws Exception {
         mockMvc.perform(get("/api/v1/feeds")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.error").value("Error"))
+                .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.data[0].id").value(15))
-                .andExpect(jsonPath("$.data[0].time").value(1627200965000L))
-                .andExpect(jsonPath("$.data[0].author.id").value(4))
-                .andExpect(jsonPath("$.data[0].author.email").value("petr@yandex.ru"))
-                .andExpect(jsonPath("$.data[0].author.phone").value("89998887744"))
-                .andExpect(jsonPath("$.data[0].author.about").value("Немного обо мне"))
-                .andExpect(jsonPath("$.data[0].author.city").value("Омск"))
-                .andExpect(jsonPath("$.data[0].author.country").value("Россия"))
-                .andExpect(jsonPath("$.data[0].author.first_name").value("Пётр"))
-                .andExpect(jsonPath("$.data[0].author.last_name").value("Петров"))
-                .andExpect(jsonPath("$.data[0].author.reg_date").value(1625127990000L))
-                .andExpect(jsonPath("$.data[0].author.birth_date").value(1625127990000L))
-                .andExpect(jsonPath("$.data[0].author.messages_permission").value("ALL"))
-                .andExpect(jsonPath("$.data[0].author.last_online_time").value(1627200965049L))
-                .andExpect(jsonPath("$.data[0].author.is_blocked").value(false))
-                .andExpect(jsonPath("$.data[0].title").value("Логирование"))
-                .andExpect(jsonPath("$.data[0].likes").value(0))
-                .andExpect(jsonPath("$.data[0].my_like").value(0))
+                .andExpect(jsonPath("$.data[0].id", is(15)))
+                .andExpect(jsonPath("$.data[0].time", is(1627200965000L)))
+                .andExpect(jsonPath("$.data[0].author.id", is(4)))
+                .andExpect(jsonPath("$.data[0].author.email", is("petr@yandex.ru")))
+                .andExpect(jsonPath("$.data[0].author.phone", is("89998887744")))
+                .andExpect(jsonPath("$.data[0].author.about", is("Немного обо мне")))
+                .andExpect(jsonPath("$.data[0].author.city", is("Омск")))
+                .andExpect(jsonPath("$.data[0].author.country", is("Россия")))
+                .andExpect(jsonPath("$.data[0].author.first_name", is("Пётр")))
+                .andExpect(jsonPath("$.data[0].author.last_name", is("Петров")))
+                .andExpect(jsonPath("$.data[0].author.reg_date", is(1625127990000L)))
+                .andExpect(jsonPath("$.data[0].author.birth_date", is(901355190000L)))
+                .andExpect(jsonPath("$.data[0].author.messages_permission", is("ALL")))
+                .andExpect(jsonPath("$.data[0].author.last_online_time", is(1627200965049L)))
+                .andExpect(jsonPath("$.data[0].author.is_blocked", is(false)))
+                .andExpect(jsonPath("$.data[0].title", is("Логирование")))
+                .andExpect(jsonPath("$.data[0].likes", is(0)))
+                .andExpect(jsonPath("$.data[0].my_like", is(0)))
                 .andExpect(jsonPath("$.data[0].comments").isEmpty())
-                .andExpect(jsonPath("$.data[0].post_text", is("aa")));
+                .andExpect(jsonPath("$.data[0].post_text", containsString("Очень важно и нужно")))
+                .andExpect(jsonPath("$.data[0].is_blocked", is(false)))
+                .andExpect(jsonPath("$.data[0].tags", is(Arrays.asList("Bug", "Fix"))))
+                .andExpect(jsonPath("$.data.length()", is(15)));
     }
 }

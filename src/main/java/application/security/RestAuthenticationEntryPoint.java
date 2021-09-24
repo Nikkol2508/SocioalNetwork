@@ -15,8 +15,10 @@ import java.io.IOException;
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
-    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException, ServletException {
-        ErrorResponse error = new ErrorResponse(Error.UNAUTHORIZED.getError(), e.getMessage());
+    public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+                         AuthenticationException e) throws IOException, ServletException {
+        ErrorResponse error = new ErrorResponse(Error.UNAUTHORIZED.getErrorName(), e.getMessage(),
+                httpServletRequest.getPathInfo());
         httpServletResponse.setStatus(401);
         httpServletResponse.setContentType(MimeTypeUtils.APPLICATION_JSON_VALUE);
         httpServletResponse.getWriter().write(new ObjectMapper().writeValueAsString(error));

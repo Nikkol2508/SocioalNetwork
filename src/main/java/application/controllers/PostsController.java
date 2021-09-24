@@ -11,12 +11,16 @@ import application.service.PostsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/v1/post")
 @RequiredArgsConstructor
@@ -26,7 +30,7 @@ public class PostsController {
 
     @GetMapping
     public ResponseEntity<GeneralListResponse<PostDto>> searchPosts(
-            @RequestParam(value = "text") String text,
+            @RequestParam(value = "text") @Size(min = 2, message = "{search.text.not.valid}") String text,
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "date_from", required = false) Long dateFrom,
             @RequestParam(value = "date_to", required = false) Long dateTo,
@@ -38,7 +42,7 @@ public class PostsController {
         log.debug("searchPosts(): text = {}, author = {}, dateFrom = {}, dateTo = {}, tags = {}",
                 text, author, dateFrom, dateTo, tags);
         GeneralListResponse<PostDto> listResponse = new GeneralListResponse<>
-                (postsService.getPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage);
+                (postsService.searchPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage);
         log.debug("searchPosts(): responseList = {}", listResponse);
         log.info("searchPosts(): finish():");
         return ResponseEntity.ok(listResponse);
@@ -83,7 +87,7 @@ public class PostsController {
     @PutMapping("/{id}/comments/{comment_id}")
     public ResponseEntity<GeneralResponse<CommentDto>> editComment(@RequestBody CommentRequest request,
                                                                    @PathVariable String id,
-                                                                   @PathVariable int commentId) {
+                                                                   @PathVariable("comment_id") int commentId) {
         log.info("editComment(): start():");
         log.debug("editComment(): commentId = {}, requestBody = {}", id, request);
         GeneralResponse<CommentDto> generalResponse = new GeneralResponse<>(postsService.editComment(request, id, commentId));
@@ -93,7 +97,7 @@ public class PostsController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<GeneralResponse<PostDto>> editPost(@RequestBody PostRequest postRequest,
+    public ResponseEntity<GeneralResponse<PostDto>> editPost(@Valid @RequestBody PostRequest postRequest,
                                                              @PathVariable int id) {
         log.info("editPost(): start():");
         log.debug("editPost(): postId = {}, requestBody = {}", id, postRequest);
@@ -115,11 +119,12 @@ public class PostsController {
     }
 
     @DeleteMapping("/{id}/comments/{comment_id}")
-    public ResponseEntity<GeneralResponse<HashMap<String, Integer>>> deleteComment(@PathVariable String id,
-                                                                                   @PathVariable int commentId) {
+    public ResponseEntity<GeneralResponse<Map<String, Integer>>> deleteComment(@PathVariable String id,
+                                                                               @PathVariable("comment_id") int commentId) {
         log.info("deleteComment(): start():");
         log.debug("deleteComment(): commentId = {}", commentId);
-        GeneralResponse<HashMap<String, Integer>> generalResponse = new GeneralResponse<>(postsService.deleteComment(id, commentId));
+        GeneralResponse<Map<String, Integer>> generalResponse = new GeneralResponse<>(
+                postsService.deleteComment(id, commentId));
         log.debug("deleteComment(): response = {}", generalResponse);
         log.info("deleteComment(): finish():");
         return ResponseEntity.ok(generalResponse);
