@@ -27,7 +27,8 @@ public class LikeController {
 
         log.info("getLiked(): start():");
         log.debug("getLiked(): userId = {}, itemId = {}, type = {}", userId, itemId, type);
-        GeneralResponse<Map<String, Boolean>> generalResponse = new GeneralResponse<>(postsService.getLiked(userId, itemId, type));
+        GeneralResponse<Map<String, Boolean>> generalResponse = new GeneralResponse<>(
+                postsService.getLiked(userId, itemId, type));
         log.debug("getLiked(): response = {}", generalResponse);
         log.info("getLiked(): finish():");
         return ResponseEntity.ok(generalResponse);
@@ -38,7 +39,7 @@ public class LikeController {
                                                                      @RequestParam(value = "type") String type) {
         log.info("getLikes(): start():");
         log.debug("getLikes(): itemId = {}, type = {}", itemId, type);
-        GeneralResponse <LikeResponseDto> generalResponse = new GeneralResponse<>(postsService.getLikes(itemId, type));
+        GeneralResponse<LikeResponseDto> generalResponse = new GeneralResponse<>(postsService.getLikes(itemId, type));
         log.debug("getLikes(): response = {}", generalResponse);
         log.info("getLikes(): finish():");
         return ResponseEntity.ok(generalResponse);

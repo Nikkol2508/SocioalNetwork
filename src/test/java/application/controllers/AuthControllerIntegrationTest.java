@@ -40,7 +40,7 @@ class AuthControllerIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    void loginSuccess() throws Exception {
+    void testLogin1() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -64,32 +64,36 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
-    void loginEmailNotExistsFailed() throws Exception {
+    void testLogin2() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("emailnotexist@ya.ru");
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
-    void loginWrongPasswordFailed() throws Exception {
+    void testLogin3() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
         request.setPassword("87654321");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void logoutSuccess() throws Exception {
+    void testLogout() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))

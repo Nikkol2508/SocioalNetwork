@@ -26,8 +26,7 @@ import java.util.List;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -69,7 +68,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("homa@yandex.ru")
-    void getDialogsSuccess() throws Exception {
+    void testGetDialogs() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -77,7 +76,7 @@ class DialogsControllerIntegrationTest {
                 .andExpect(jsonPath("$.total", is(2)))
                 .andExpect(jsonPath("$.perPage", is(20)))
                 .andExpect(jsonPath("$.offset", is(0)))
-                .andExpect(jsonPath("$.data[0].unread_count", is(1)))
+                .andExpect(jsonPath("$.data[0].unread_count", is(in(new Integer[]{0, 1}))))
                 .andExpect(jsonPath("$.data[0].id", is(1)))
                 .andExpect(jsonPath("$.data[0].recipient.id", is(1)))
                 .andExpect(jsonPath("$.data[0].recipient.email", is("vasy@yandex.ru")))
@@ -88,7 +87,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void createDialogSuccess() throws Exception {
+    void testCreateDialog1() throws Exception {
 
         DialogCreateDtoRequest request = new DialogCreateDtoRequest();
         request.setUsersIds(List.of(4));
@@ -96,11 +95,11 @@ class DialogsControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp", not(0)))
-                .andExpect(jsonPath("$.data.id", is(6)));
+                .andExpect(jsonPath("$.data.id", is(7)));
     }
 
     @Test
-    void createExistingDialogSuccess() throws Exception {
+    void testCreateDialog2() throws Exception {
 
         DialogCreateDtoRequest request = new DialogCreateDtoRequest();
         request.setUsersIds(List.of(2));
@@ -113,7 +112,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("homa@yandex.ru")
-    void getMessagesInDialogSuccess() throws Exception {
+    void testGetMessagesInDialog() throws Exception {
         PersonDialogsDto person1 = new PersonDialogsDto();
         person1.setLastName("Васичкин");
         person1.setFirstName("Вася");
@@ -152,7 +151,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void getCountUnreadedSuccess() throws Exception {
+    void testGetCountUnreaded() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/unreaded")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -162,7 +161,7 @@ class DialogsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ilia@yandex.ru")
-    void deleteDialogSuccess() throws Exception {
+    void testDeleteDialog1() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/5")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -171,7 +170,19 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void addUserInDialogSuccess() throws Exception {
+    @WithUserDetails("vasy@yandex.ru")
+    void testDeleteDialog2() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/dialogs/3")).andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/3")))
+                .andExpect(jsonPath("$.error", is("unauthorized")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("You can't delete this dialog")));
+    }
+
+    @Test
+    void testAddUserInDialog() throws Exception {
 
         UserIdsDto request = new UserIdsDto(List.of(3, 4));
         mockMvc.perform(put("/api/v1/dialogs/1/users").content(objectMapper.writeValueAsString(request))
@@ -181,7 +192,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void deleteUsersInDialogSuccess() throws Exception {
+    void testDeleteUsersInDialog() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/1/users/3,4,5")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.user_ids[0]", is(3)))
@@ -190,24 +201,24 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void getLinkToJoinDialogSuccess() throws Exception {
+    void testGetLinkToJoinDialog() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/1/users/invite")).andExpect(status().isOk());
     }
 
     @Test
-    void joinDialogByLinkSuccess() throws Exception {
+    void testJoinDialogByLink() throws Exception {
 
         mockMvc.perform(put("/api/v1/dialogs/1/users/join")).andExpect(status().isOk());
     }
 
     @Test
     @WithUserDetails("nik@yandex.ru")
-    void sendMessageSuccess() throws Exception {
+    void testSendMessage1() throws Exception {
 
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST");
         mockMvc.perform(post("/api/v1/dialogs/4/messages").content(objectMapper.writeValueAsString(request))
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp", not(0)))
                 .andExpect(jsonPath("$.data.id").isNumber())
@@ -219,8 +230,41 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
+    @WithUserDetails("robert@yandex.ru")
+    void testSendMessage2() throws Exception {
+
+        MessageSendDtoRequest request = new MessageSendDtoRequest("TEST");
+        mockMvc.perform(post("/api/v1/dialogs/6/messages").content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error", is("Error")))
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.id").isNumber())
+                .andExpect(jsonPath("$.data.time").isNotEmpty())
+                .andExpect(jsonPath("$.data.message_text", is("TEST")))
+                .andExpect(jsonPath("$.data.read_status", is("SENT")))
+                .andExpect(jsonPath("$.data.author_id", is(10)))
+                .andExpect(jsonPath("$.data.recipient_id", is(9)));
+    }
+
+    @Test
     @WithUserDetails("nik@yandex.ru")
-    void deleteMessageSuccess() throws Exception {
+    void testSendMessage3() throws Exception {
+
+        MessageSendDtoRequest request = new MessageSendDtoRequest("TEST");
+        mockMvc.perform(post("/api/v1/dialogs/20/messages").content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/20/messages")))
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("Dialog with id = 20 is not exist")));
+    }
+
+    @Test
+    @WithUserDetails("nik@yandex.ru")
+    void testDeleteMessage1() throws Exception {
 
         mockMvc.perform(delete("/api/v1/dialogs/4/messages/6")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -229,8 +273,20 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
+    @WithUserDetails("vasy@yandex.ru")
+    void testDeleteMessage2() throws Exception {
+
+        mockMvc.perform(delete("/api/v1/dialogs/3/messages/5")).andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/3/messages/5")))
+                .andExpect(jsonPath("$.error", is("unauthorized")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("You can't delete this message")));
+    }
+
+    @Test
     @WithUserDetails("dmitriy@yandex.ru")
-    void editMessageSuccess() throws Exception {
+    void testEditMessage1() throws Exception {
 
         MessageSendDtoRequest request = new MessageSendDtoRequest("TEST3(2)");
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7").content(objectMapper.writeValueAsString(request))
@@ -246,8 +302,36 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
+    @WithUserDetails("vasy@yandex.ru")
+    void testEditMessage2() throws Exception {
+
+        MessageSendDtoRequest request = new MessageSendDtoRequest("TEST3(2)");
+        mockMvc.perform(put("/api/v1/dialogs/3/messages/5").content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/3/messages/5")))
+                .andExpect(jsonPath("$.error", is("unauthorized")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("You can't edit this message")));
+    }
+
+    @Test
     @WithUserDetails("dmitriy@yandex.ru")
-    void readMessageSuccess() throws Exception {
+    void testEditMessage3() throws Exception {
+
+        MessageSendDtoRequest request = new MessageSendDtoRequest("TEST3(2)");
+        mockMvc.perform(put("/api/v1/dialogs/4/messages/20").content(objectMapper.writeValueAsString(request))
+                        .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/4/messages/20")))
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("Message with id = 20 is not exist")));
+    }
+
+    @Test
+    @WithUserDetails("dmitriy@yandex.ru")
+    void testReadMessage1() throws Exception {
 
         mockMvc.perform(put("/api/v1/dialogs/4/messages/7/read")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -256,7 +340,31 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void getActivitySuccess() throws Exception {
+    @WithUserDetails("vasy@yandex.ru")
+    void testReadMessage2() throws Exception {
+
+        mockMvc.perform(put("/api/v1/dialogs/3/messages/5/read")).andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/3/messages/5/read")))
+                .andExpect(jsonPath("$.error", is("unauthorized")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("You can't make this message read")));
+    }
+
+    @Test
+    @WithUserDetails("dmitriy@yandex.ru")
+    void testReadMessage3() throws Exception {
+
+        mockMvc.perform(put("/api/v1/dialogs/4/messages/20/read")).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/dialogs/4/messages/20/read")))
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        containsString("Message with id = 20 is not exist")));
+    }
+
+    @Test
+    void testGetActivity() throws Exception {
 
         mockMvc.perform(get("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
@@ -265,7 +373,7 @@ class DialogsControllerIntegrationTest {
     }
 
     @Test
-    void changeTypingStatusSuccess() throws Exception {
+    void testChangeTypingStatus() throws Exception {
 
         mockMvc.perform(post("/api/v1/dialogs/1/activity/1")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))

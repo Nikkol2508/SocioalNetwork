@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.text.ParseException;
 
@@ -41,7 +39,8 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(@PathVariable @Min(1) int id) {
+    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(
+            @PathVariable int id) {
 
         log.info("getPerson(id): start():");
         log.debug("getPerson(id), id = {}", id);
@@ -53,7 +52,7 @@ public class ProfileController {
 
     @GetMapping("/{id}/wall")
     public ResponseEntity<GeneralListResponse<PostDto>> getWall(
-            @PathVariable @Min(1) int id,
+            @PathVariable int id,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
             @RequestParam(value = "itemPerPage", defaultValue = "5", required = false) int itemPerPage) {
 
@@ -69,11 +68,12 @@ public class ProfileController {
 
     @GetMapping("/search")
     public ResponseEntity<GeneralListResponse<PersonDto>> searchPersons(
-            @RequestParam(value = "first_or_last_name", required = false) @Size(min = 2) String firstOrLastName,
+            @RequestParam(value = "first_or_last_name", required = false) @Size(min = 2,
+                    message = "{search.text.not.valid}") String firstOrLastName,
             @RequestParam(value = "first_name", required = false) String firstName,
             @RequestParam(value = "last_name", required = false) String lastName,
-            @RequestParam(value = "age_from", required = false) @Min(18) @Max(85) Long ageFrom,
-            @RequestParam(value = "age_to", required = false) @Min(18) @Max(85) Long ageTo,
+            @RequestParam(value = "age_from", required = false) Long ageFrom,
+            @RequestParam(value = "age_to", required = false) Long ageTo,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "city", required = false) String city,
             @RequestParam(value = "offset", defaultValue = "0", required = false) int offset,
@@ -106,7 +106,7 @@ public class ProfileController {
 
     @PostMapping("/{id}/wall")
     public ResponseEntity<GeneralResponse<Post>> addPost(
-            @PathVariable @Min(1) int id,
+            @PathVariable int id,
             @RequestParam(value = "publish_date", required = false) Long publishDate,
             @RequestBody PostRequest postRequest) {
 

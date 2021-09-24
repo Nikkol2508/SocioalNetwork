@@ -8,20 +8,20 @@ import javax.validation.constraints.Size;
 @Data
 public class RegistrationDtoRequest {
 
-    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "Email is not valid")
+    @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$", message = "{email.not.valid}")
     private String email;
 
-    @Size(min = 8, message = "The password length must not be less than 8 characters")
+    @Size(min = 8, message = "{password.not.valid}")
     private String passwd1;
 
     private String passwd2;
 
-    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "First name has invalid characters")
+    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "{first.name.not.valid}")
     private String firstName;
 
-    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "Second name has invalid characters")
+    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "{last.name.not.valid}")
     private String lastName;
 
-    @Size(min = 4)
+    @Pattern(regexp = "^\\d{4}$", message = "{code.not.valid}")
     private String code;
 }

@@ -38,22 +38,22 @@ public class PlatformController {
 
     @GetMapping("/cities")
     public ResponseEntity<GeneralListResponse<City>> getLCity(@RequestParam Integer countryId,
-                                                               @RequestParam String country,
-                                                               @RequestParam Integer offset,
-                                                               @RequestParam Integer itemPerPage) {
+                                                              @RequestParam String country,
+                                                              @RequestParam Integer offset,
+                                                              @RequestParam Integer itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(platformService
                 .getCity(countryId, country), offset, itemPerPage));
     }
 
     @PostMapping("/cities")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam(value = "city") String city) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam String city) {
         return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city)));
     }
 
     @PostMapping("/countries")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry
-            (@RequestParam(value = "country") String country){
+            (@RequestParam String country) {
         return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country)));
     }
 }

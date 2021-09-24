@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 
 @Slf4j
@@ -35,7 +36,7 @@ public class TagController {
     }
 
     @PostMapping("/tags")
-    public ResponseEntity<GeneralResponse<Tag>> setTag(@RequestBody TagRequest request) {
+    public ResponseEntity<GeneralResponse<Tag>> setTag(@Valid @RequestBody TagRequest request) {
 
         log.info("setTag(): start():");
         log.debug("setTag(): requestBody = {}", request);

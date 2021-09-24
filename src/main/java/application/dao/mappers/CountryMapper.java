@@ -1,6 +1,5 @@
 package application.dao.mappers;
 
-import application.models.City;
 import application.models.Country;
 import org.springframework.jdbc.core.RowMapper;
 
