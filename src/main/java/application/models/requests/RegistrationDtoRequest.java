@@ -16,12 +16,12 @@ public class RegistrationDtoRequest {
 
     private String passwd2;
 
-    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "${first.name.not.valid}")
+    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "{first.name.not.valid}")
     private String firstName;
 
-    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "${second.name.not.valid}")
+    @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$", message = "{last.name.not.valid}")
     private String lastName;
 
-    @Pattern(regexp = "^\\d{4}$", message = "${code.not.valid}")
+    @Pattern(regexp = "^\\d{4}$", message = "{code.not.valid}")
     private String code;
 }

@@ -71,6 +71,8 @@ class AuthControllerIntegrationTest {
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
@@ -83,6 +85,8 @@ class AuthControllerIntegrationTest {
         request.setPassword("87654321");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
