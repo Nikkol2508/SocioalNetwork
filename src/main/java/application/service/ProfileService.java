@@ -73,11 +73,12 @@ public class ProfileService {
     public List<PersonDto> searchPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
                                          Long ageTo, String country, String city) throws EntityNotFoundException {
 
-        if ((firstName == null || firstName.isBlank()) && (lastName == null || lastName.isBlank()) && ageFrom == null
-                && ageTo == null && country == null && city == null) {
+        if ((firstOrLastName == null) && (firstName == null || firstName.isBlank())
+                && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null && country == null
+                && city == null) {
             return new ArrayList<>();
         }
-        if (firstOrLastName != null) {
+        if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
                     .collect(Collectors.toList());
         }

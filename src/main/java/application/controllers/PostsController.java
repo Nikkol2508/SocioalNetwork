@@ -31,7 +31,7 @@ public class PostsController {
 
     @GetMapping
     public ResponseEntity<GeneralListResponse<PostDto>> searchPosts(
-            @RequestParam(value = "text") @Size(min = 2) @NotBlank String text,
+            @RequestParam(value = "text") @Size(min = 2, message = "{search.text.not.valid}") String text,
             @RequestParam(value = "author", required = false) String author,
             @RequestParam(value = "date_from", required = false) Long dateFrom,
             @RequestParam(value = "date_to", required = false) Long dateTo,
@@ -43,7 +43,7 @@ public class PostsController {
         log.debug("searchPosts(): text = {}, author = {}, dateFrom = {}, dateTo = {}, tags = {}",
                 text, author, dateFrom, dateTo, tags);
         GeneralListResponse<PostDto> listResponse = new GeneralListResponse<>
-                (postsService.getPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage);
+                (postsService.searchPosts(text, author, dateFrom, dateTo, tags), offset, itemPerPage);
         log.debug("searchPosts(): responseList = {}", listResponse);
         log.info("searchPosts(): finish():");
         return ResponseEntity.ok(listResponse);

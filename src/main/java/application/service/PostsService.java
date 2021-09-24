@@ -224,7 +224,7 @@ public class PostsService {
         return response;
     }
 
-    public List<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
+    public List<PostDto> searchPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
 
         List<Post> posts = daoPost.getPosts(text, author, dateFrom, dateTo, tags);
         return posts.stream().map(item -> getPostDto(item.getId())).collect(Collectors.toList());
