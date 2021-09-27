@@ -33,8 +33,14 @@ public class StorageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("storage/{imageName}")
-    public ResponseEntity<Object> getImage(@PathVariable("imageName") String imageName) throws IOException {
+    @GetMapping("/storage/{imageName}")
+    public ResponseEntity<Object> getImage(@PathVariable("imageName") String imageName) {
+        FileDescription image = storageService.getImage(imageName);
+        return ResponseEntity.ok().contentType(MediaType.valueOf(image.getFileFormat())).body(image.getData());
+    }
+
+    @GetMapping("/profile/storage/{imageName}")
+    public ResponseEntity<Object> getImageInProfile(@PathVariable("imageName") String imageName) {
         FileDescription image = storageService.getImage(imageName);
         return ResponseEntity.ok().contentType(MediaType.valueOf(image.getFileFormat())).body(image.getData());
     }
