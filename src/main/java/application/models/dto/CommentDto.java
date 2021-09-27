@@ -35,6 +35,7 @@ public class CommentDto {
         author.setId(person.getId());
         author.setFirstName(person.getFirstName());
         author.setLastName(person.getLastName());
+        author.setPhoto(person.getPhoto());
         commentDto.setAuthor(author);
 
         commentDto.setBlocked(comment.isBlocked());

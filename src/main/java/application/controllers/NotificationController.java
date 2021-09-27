@@ -42,8 +42,7 @@ public class NotificationController {
     }
 
     @PutMapping("/notifications/{id}")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> readNotificationForId
-            (@RequestParam(value = "id") int id) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> readNotificationForId(@PathVariable int id) {
         return ResponseEntity.ok(new GeneralResponse<>(notificationService.readNotificationForId(id)));
     }
 }

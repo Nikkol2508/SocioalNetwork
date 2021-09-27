@@ -29,7 +29,7 @@ public class PlatformService {
         return daoCity.getAllCountry();
     }
 
-    public List<City> getCity(Integer countryId, String country) {
+    public List<City> getCity() {
 
         return daoCity.getAllCity();
     }

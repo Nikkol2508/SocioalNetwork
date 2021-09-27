@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -21,10 +22,11 @@ public class StorageService {
         if (!file.isEmpty()) {
             daoFile.deleteImage(daoPerson.getAuthPerson().getId());
             fileDto.setOwnerId(daoPerson.getAuthPerson().getId());
-            String fileName = file.getOriginalFilename().replace(".", "") + System.currentTimeMillis();
+            String fileName = Objects.requireNonNull(file.getOriginalFilename())
+                    .replace(".", "") + System.currentTimeMillis();
             fileDto.setFileName(fileName);
             fileDto.setRelativeFilePath("storage/" + fileName);
-            fileDto.setRawFileURL("какой то урл");
+            fileDto.setRawFileURL(null);
             fileDto.setFileFormat(file.getContentType());
             fileDto.setBytes(file.getBytes().length);
             fileDto.setFileType(type);

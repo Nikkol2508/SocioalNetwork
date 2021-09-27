@@ -46,3 +46,7 @@ databaseChangeLog:
   - include:
       file: create-country-data.sql
       relativeToChangelogFile: true
+
+  - include:
+      file: create-indexes.sql
+      relativeToChangelogFile: true
