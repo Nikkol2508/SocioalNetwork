@@ -11,7 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
+@Validated
 public class DaoPerson {
 
     private final JdbcTemplate jdbcTemplate;
@@ -70,11 +73,15 @@ public class DaoPerson {
                 person.getEmail(), System.currentTimeMillis(), PermissionMessagesType.ALL.toString(), person.getPhoto());
     }
 
-    public void updatePersonData(int id, String firstName,String lastName, long birthDate, String phone, String photo,
-                                 String city, String country, String about){
+    public void updatePersonData(int id,
+                                 @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
+                                         message = "First name has invalid characters") String firstName,
+                                 @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
+                                         message = "Second name has invalid characters") String lastName,
+                                 long birthDate, String phone, String photo, String city, String country, String about) {
 
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
+                        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
                 birthDate, phone, photo, city, country, about, id);
     }
 
@@ -95,7 +102,7 @@ public class DaoPerson {
         jdbcTemplate.update("DELETE FROM person where id = ?", id);
     }
 
-    public void deleteFriendshipByPersonId(int id){
+    public void deleteFriendshipByPersonId(int id) {
 
         jdbcTemplate.update("DELETE FROM friendship_status WHERE id = (SELECT status_id FROM friendship " +
                 "WHERE src_person_id = ?)", id);
@@ -169,7 +176,7 @@ public class DaoPerson {
         String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId},
-                    Integer.class);
+                Integer.class);
         jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
         jdbcTemplate.update(deleteFriendshipStatus, selectedId);
     }
@@ -206,12 +213,12 @@ public class DaoPerson {
                 new PersonMapper());
     }
 
-    public List<Person> getPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country,
-                                   String city) {
+    public List<Person> searchPersons(String firstName, String lastName, Long ageFrom, Long ageTo, String country,
+                                      String city) {
 
         String query = "SELECT * FROM person WHERE (first_name ILIKE ? OR ?::text IS NULL)" +
-                "AND (last_name ILIKE ? OR ?::text IS NULL) AND (birth_date >= ? OR ?::bigint IS NULL) " +
-                "AND (birth_date <= ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
+                "AND (last_name ILIKE ? OR ?::text IS NULL) AND (birth_date <= ? OR ?::bigint IS NULL) " +
+                "AND (birth_date >= ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
                 "AND (city ILIKE ? OR ?::text IS NULL)";
 
         return new ArrayList<>(jdbcTemplate.query(query, new Object[]{prepareParam(firstName), firstName,

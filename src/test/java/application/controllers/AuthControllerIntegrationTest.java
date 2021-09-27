@@ -16,16 +16,16 @@ import javax.sql.DataSource;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.hamcrest.Matchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-public class AuthControllerIntegrationTest {
+class AuthControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,7 +40,7 @@ public class AuthControllerIntegrationTest {
     private DataSource dataSource;
 
     @Test
-    public void loginSuccess() throws Exception {
+    void testLogin1() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
@@ -64,32 +64,36 @@ public class AuthControllerIntegrationTest {
     }
 
     @Test
-    public void loginEmailNotExistsFailed() throws Exception {
+    void testLogin2() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("emailnotexist@ya.ru");
         request.setPassword("12345678");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
-    public void loginWrongPasswordFailed() throws Exception {
+    void testLogin3() throws Exception {
 
         AuthDtoRequest request = new AuthDtoRequest();
         request.setEmail("vasy@yandex.ru");
         request.setPassword("87654321");
         mockMvc.perform(post("/api/v1/auth/login").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.timestamp", notNullValue()))
+                .andExpect(jsonPath("$.path", is("/api/v1/auth/login")))
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Invalid username or password")));
     }
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    public void logoutSuccess() throws Exception {
+    void testLogout() throws Exception {
 
         mockMvc.perform(post("/api/v1/auth/logout")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))

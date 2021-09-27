@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.3.12.RELEASE'
     id "io.spring.dependency-management" version "1.0.11.RELEASE"
+    id 'org.sonarqube' version '3.3'
+    id 'jacoco'
 }
 
 java {
@@ -23,6 +25,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.projectlombok:lombok:1.18.16'
     implementation 'org.liquibase:liquibase-core:4.4.1'
     implementation 'org.yaml:snakeyaml:1.29'
@@ -30,11 +33,11 @@ dependencies {
     implementation 'io.springfox:springfox-swagger-ui:2.9.2'
     implementation 'io.springfox:springfox-swagger2:2.9.2'
     implementation 'io.zonky.test:embedded-database-spring-test:2.1.0'
+    implementation 'org.springframework.boot:spring-boot-starter-log4j2'
     testImplementation 'com.opentable.components:otj-pg-embedded:0.13.4'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    compile 'org.springframework.boot:spring-boot-starter-log4j2'
     testImplementation 'org.springframework.security:spring-security-test:5.3.11.RELEASE'
 }
 
@@ -44,8 +47,23 @@ configurations {
     }
 }
 
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'http://localhost:9000'
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
+}
+
+test.finalizedBy jacocoTestReport
+tasks.named('sonarqube').configure {
+    dependsOn test
+}
+
 test {
     useJUnitPlatform()
-    environment "LC_CTYPE", "en_US.UTF-8"
-    environment "LC_ALL", "en_US.UTF-8"
 }

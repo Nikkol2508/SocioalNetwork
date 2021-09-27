@@ -3,7 +3,6 @@ package application.service;
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.exceptions.EmailAlreadyExistsException;
-import application.exceptions.PasswordNotValidException;
 import application.exceptions.PasswordsNotEqualsException;
 import application.models.PermissionMessagesType;
 import application.models.Person;
@@ -57,19 +56,14 @@ public class AccountService {
         return new MessageResponseDto();
     }
 
-    public MessageResponseDto setPassword(SetPasswordDtoRequest request) throws PasswordNotValidException {
+    public MessageResponseDto setPassword(SetPasswordDtoRequest request) {
 
-        //проверка валидности пароля (не короче 8 символов)
-        if (request.getPassword().length() < 8) {
-            throw new PasswordNotValidException();
-        }
         updatePassword(getPersonByConfirmationCode(request.getToken()), request.getPassword());
         return new MessageResponseDto();
     }
 
     public MessageResponseDto setEmail(ShiftEmailDtoRequest request, String code) {
 
-        // Здесь можно добавить проверку на валидность email (request.getEmail())
         updateEmail(getPersonByConfirmationCode(code), request.getEmail());
         return new MessageResponseDto();
     }
@@ -83,8 +77,8 @@ public class AccountService {
         updateConfirmationCode(code, email);
         String siteURL = servletRequest.getRequestURL().toString()
                 .replace(servletRequest.getServletPath(), "");
-        String urn = servletRequest.getHeader("Referer")
-                .indexOf("settings") > 0 ? "/shift-password" : "/change-password";
+        String urn = servletRequest.getHeader("Referer").contains("settings") ? "/shift-password"
+                : "/change-password";
         String resetPasswordLink = siteURL + urn + "?code=" + code;
         sendEmailToRecoverPassword(email, resetPasswordLink);
         return new MessageResponseDto();

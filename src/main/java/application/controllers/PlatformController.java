@@ -45,14 +45,15 @@ public class PlatformController {
                 .getCity(), offset, itemPerPage));
     }
 
+
     @PostMapping("/cities")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestBody City city) {
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city.getTitle())));
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam String city) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city)));
     }
 
     @PostMapping("/countries")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry
-            (@RequestBody Country country) {
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country.getTitle())));
+            (@RequestParam String country) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country)));
     }
 }

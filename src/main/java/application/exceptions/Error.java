@@ -4,13 +4,13 @@ public enum Error {
     INVALID_REQUEST("invalid_request"),
     UNAUTHORIZED("unauthorized");
 
-    private final String error;
+    private final String errorName;
 
     Error(String error) {
-        this.error = error;
+        this.errorName = error;
     }
 
-    public String getError() {
-        return error;
+    public String getErrorName() {
+        return errorName;
     }
 }

@@ -59,7 +59,7 @@ public class PostsService {
         List<Comment> subComments = daoComment.getSubComment(parentId);
         List<CommentDto> subCommentsList = new ArrayList<>();
 
-        if (subComments.size() > 0) {
+        if (!subComments.isEmpty()) {
             for (Comment subComment : subComments) {
                 Person person = daoPerson.getById(subComment.getAuthorId());
                 int myLike = daoLike.getMyLike(subComment.getId(), "Comment", daoPerson.getAuthPerson().getId());
@@ -108,9 +108,9 @@ public class PostsService {
         return CommentDto.fromComment(postComment, currentPerson, getSubComments(commentRequest.getParentId()), likes);
     }
 
-    public CommentDto editComment(CommentRequest commentRequest, String postId, int comment_id) {
+    public CommentDto editComment(CommentRequest commentRequest, String postId, int commentId) {
 
-        Comment postComment = daoComment.getById(comment_id);
+        Comment postComment = daoComment.getById(commentId);
         postComment.setCommentText(commentRequest.getCommentText());
         if (postComment.getParentId() == 0) {
             postComment.setParentId(null);
@@ -125,21 +125,21 @@ public class PostsService {
                 likes);
     }
 
-    public HashMap<String, Integer> deleteComment(String postId, int comment_id) {
+    public Map<String, Integer> deleteComment(String postId, int commentId) {
 
-        List<CommentDto> subComments = getSubComments(comment_id);
-        if (subComments.size() != 0) {
+        List<CommentDto> subComments = getSubComments(commentId);
+        if (!subComments.isEmpty()) {
             for (CommentDto subComment : subComments) {
                 daoComment.delete(subComment.getId());
             }
         }
         if (postId.equals("undefined")) {
-            postId = String.valueOf(daoComment.getPostIdByCommentId(comment_id));
+            postId = String.valueOf(daoComment.getPostIdByCommentId(commentId));
             undefinedPostId = postId;
         }
         HashMap<String, Integer> response = new HashMap<>();
-        response.put("id", comment_id);
-        daoComment.delete(comment_id);
+        response.put("id", commentId);
+        daoComment.delete(commentId);
         return response;
     }
 
@@ -216,7 +216,7 @@ public class PostsService {
         return daoTag.findTagByName(request.getTag());
     }
 
-    public HashMap<String, String> deleteTag(int tagId) {
+    public Map<String, String> deleteTag(int tagId) {
 
         daoTag.delete(tagId);
         HashMap<String, String> response = new HashMap<>();
@@ -224,7 +224,7 @@ public class PostsService {
         return response;
     }
 
-    public List<PostDto> getPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
+    public List<PostDto> searchPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
 
         List<Post> posts = daoPost.getPosts(text, author, dateFrom, dateTo, tags);
         return posts.stream().map(item -> getPostDto(item.getId())).collect(Collectors.toList());
@@ -245,7 +245,7 @@ public class PostsService {
         return getPostDto(postId);
     }
 
-    public void attachTags2Post(List tags, int postId) {
+    public void attachTags2Post(List<String> tags, int postId) {
         Set<String> setTags = new HashSet<>(tags);
         for (String tag : setTags) {
             saveTag(tag);
@@ -262,10 +262,10 @@ public class PostsService {
             daoLike.delete(postId, "Post", like.getPersonId());
         }
         List<Comment> comments = daoComment.getCommentsByPostId(postId);
-        if (comments.size() != 0) {
+        if (!comments.isEmpty()) {
             for (Comment comment : comments) {
                 List<Comment> subComments = daoComment.getSubComment(comment.getId());
-                if (subComments.size() != 0) {
+                if (!subComments.isEmpty()) {
                     for (Comment subComment : subComments) {
                         for (Like likeOnSubComment : daoLike.getLikeByPost(subComment.getId(), "Comment")) {
                             daoLike.delete(subComment.getId(), "Comment", likeOnSubComment.getPersonId());

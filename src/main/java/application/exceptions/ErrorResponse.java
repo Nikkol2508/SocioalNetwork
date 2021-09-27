@@ -1,15 +1,38 @@
 package application.exceptions;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
-@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-    private String error;
+    private String timestamp;
+    private final String path;
+    private final String error;
 
     @JsonProperty("error_description")
-    private String errorDescription;
+    private final String errorDescription;
+
+    public ErrorResponse(String error, String errorDescription, String path) {
+        this.path = path;
+        this.error = error;
+        this.errorDescription = errorDescription;
+        timestamp = LocalDateTime.now().toString();
+    }
+//    private ValidationError validationError;
+//
+//    @Data
+//    @RequiredArgsConstructor
+//    private static class ValidationError {
+//        private final String field;
+//        private final String message;
+//    }
+//
+//    public void addValidationError(String field, String message){
+//        validationError = new ValidationError(field, message);
+//    }
 }

@@ -12,11 +12,14 @@ import application.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Size;
 import java.text.ParseException;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
@@ -36,12 +39,13 @@ public class ProfileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(@PathVariable int id) {
+    public ResponseEntity<GeneralResponse<PersonDto>> getPerson(
+            @PathVariable int id) {
 
         log.info("getPerson(id): start():");
         log.debug("getPerson(id), id = {}", id);
         GeneralResponse<PersonDto> profile = new GeneralResponse<>(profileService.getPerson(id));
-        log.debug("getPerson(id): , response = {}", id, profile);
+        log.debug("getPerson({}): , response = {}", id, profile);
         log.info("getPerson(id = {}): finish():", id);
         return ResponseEntity.ok(profile);
     }
@@ -63,8 +67,9 @@ public class ProfileController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<GeneralListResponse<PersonDto>> getPersons(
-            @RequestParam(value = "first_or_last_name", required = false) String firstOrLastName,
+    public ResponseEntity<GeneralListResponse<PersonDto>> searchPersons(
+            @RequestParam(value = "first_or_last_name", required = false) @Size(min = 2,
+                    message = "{search.text.not.valid}") String firstOrLastName,
             @RequestParam(value = "first_name", required = false) String firstName,
             @RequestParam(value = "last_name", required = false) String lastName,
             @RequestParam(value = "age_from", required = false) Long ageFrom,
@@ -79,7 +84,7 @@ public class ProfileController {
                 "ageFrom = {}, ageTo = {}, country = {}, city = {}", firstOrLastName, firstName, lastName,
                 ageFrom, ageTo, country, city);
         GeneralListResponse<PersonDto> response = new GeneralListResponse<>
-                (profileService.getPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city),
+                (profileService.searchPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city),
                         offset, itemPerPage);
         log.debug("searchPerson: response = {}", response);
         log.info("searchPerson: finish():");
@@ -88,7 +93,7 @@ public class ProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(
-            @RequestBody PersonSettingsDtoRequest request) throws ParseException, InterruptedException {
+            @RequestBody PersonSettingsDtoRequest request) throws ParseException {
 
         log.info("changeProfile: start():");
         log.debug("changeProfile: request = {}", request);

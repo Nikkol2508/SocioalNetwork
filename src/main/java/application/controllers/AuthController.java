@@ -22,14 +22,14 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    private ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
+    public ResponseEntity<GeneralResponse<PersonDto>> login(@RequestBody AuthDtoRequest request)
             throws UsernameNotFoundException, BadCredentialsException {
 
         return ResponseEntity.ok(new GeneralResponse<>(authService.login(request)));
     }
 
     @PostMapping("/logout")
-    private ResponseEntity<GeneralResponse<MessageResponseDto>> logout() {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> logout() {
 
         return ResponseEntity.ok(new GeneralResponse<>(authService.getLogout()));
     }
