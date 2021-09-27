@@ -48,6 +48,8 @@ public class ProfileController {
         GeneralResponse<PersonDto> profile = new GeneralResponse<>(profileService.getPerson(id));
         log.debug("getPerson({}): , response = {}", id, profile);
         log.info("getPerson(id = {}): finish():", id);
+
+        System.out.println(profile);
         return ResponseEntity.ok(profile);
     }
 
@@ -101,7 +103,6 @@ public class ProfileController {
         GeneralResponse<PersonDto> response = new GeneralResponse<>(profileService.changeProfile(request));
         log.debug("changeProfile: response = {}", response);
         log.info("changeProfile: finish():");
-
         return ResponseEntity.ok(response);
     }
 

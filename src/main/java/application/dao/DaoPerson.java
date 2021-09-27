@@ -78,10 +78,10 @@ public class DaoPerson {
                                          message = "First name has invalid characters") String firstName,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
                                          message = "Second name has invalid characters") String lastName,
-                                 long birthDate, String phone, String photo, String city, String country, String about) {
+                                 Long birthDate, String phone, String photo, String city, String country, String about) {
 
-        jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-                        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
+        jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?, birth_date = COALESCE(?, birth_date), " +
+                        " phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
                 birthDate, phone, photo, city, country, about, id);
     }
 

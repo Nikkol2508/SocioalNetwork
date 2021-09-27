@@ -41,6 +41,9 @@ public class ProfileService {
     public PersonDto getPerson(int id) {
 
         Person person = daoPerson.getById(id);
+        if (person == null) {
+            throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
+        }
         return PersonDto.fromPerson(person);
     }
 
@@ -73,11 +76,12 @@ public class ProfileService {
     public List<PersonDto> searchPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
                                          Long ageTo, String country, String city) throws EntityNotFoundException {
 
-        if ((firstOrLastName == null) && (firstName == null || firstName.isBlank())
-                && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null && country == null
-                && city == null) {
+        if ((firstOrLastName == null || firstOrLastName.isBlank()) && (firstName == null || firstName.isBlank())
+                && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null
+                && (country == null || country.isBlank()) && (city == null || city.isBlank())) {
             return new ArrayList<>();
         }
+
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
                     .collect(Collectors.toList());
@@ -98,7 +102,7 @@ public class ProfileService {
         post.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
         post.setBlocked(false);
         post.setAuthorId(authorId);
-        int postId = daoPost.savePost(post).getId();
+        post.setId(daoPost.savePost(post).getId());
 
         daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
                         .map(Person::getId).collect(Collectors.toList()),
@@ -106,7 +110,7 @@ public class ProfileService {
                 post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                 post.getTitle());
 
-        postsService.attachTags2Post(postRequest.getTags(), postId);
+        postsService.attachTags2Post(postRequest.getTags(), post.getId());
         return post;
     }
 
@@ -118,16 +122,17 @@ public class ProfileService {
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
-        String firstName = request.getFirstName().isBlank() || request.getFirstName() == null ? person.getFirstName()
+        Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
+        String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
                 : request.getFirstName();
-        String lastName = request.getLastName().isBlank() || request.getLastName() == null ? person.getLastName()
+        String lastName = request.getLastName() == null || request.getLastName().isBlank() ? person.getLastName()
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
+
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
                 photo, request.getCity(), request.getCountry(), request.getAbout());
-        return PersonDto.fromPerson(person);
+        return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 
 
