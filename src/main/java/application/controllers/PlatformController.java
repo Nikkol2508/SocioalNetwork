@@ -37,14 +37,14 @@ public class PlatformController {
     }
 
     @GetMapping("/cities")
-    public ResponseEntity<GeneralListResponse<City>> getLCity(@RequestParam Integer countryId,
-                                                              @RequestParam String country,
-                                                              @RequestParam Integer offset,
-                                                              @RequestParam Integer itemPerPage) {
+    public ResponseEntity<GeneralListResponse<City>> getAllCity(
+            @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+            @RequestParam(value = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(platformService
-                .getCity(countryId, country), offset, itemPerPage));
+                .getCity(), offset, itemPerPage));
     }
+
 
     @PostMapping("/cities")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam String city) {
