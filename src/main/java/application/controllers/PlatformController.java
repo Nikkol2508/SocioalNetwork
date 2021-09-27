@@ -37,23 +37,22 @@ public class PlatformController {
     }
 
     @GetMapping("/cities")
-    public ResponseEntity<GeneralListResponse<City>> getLCity(@RequestParam Integer countryId,
-                                                               @RequestParam String country,
-                                                               @RequestParam Integer offset,
-                                                               @RequestParam Integer itemPerPage) {
+    public ResponseEntity<GeneralListResponse<City>> getAllCity(
+            @RequestParam(value = "offset", required = false, defaultValue = "0") Integer offset,
+            @RequestParam(value = "itemPerPage", required = false, defaultValue = "20") Integer itemPerPage) {
 
         return ResponseEntity.ok(new GeneralListResponse<>(platformService
-                .getCity(countryId, country), offset, itemPerPage));
+                .getCity(), offset, itemPerPage));
     }
 
     @PostMapping("/cities")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam(value = "city") String city) {
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city)));
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestBody City city) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city.getTitle())));
     }
 
     @PostMapping("/countries")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry
-            (@RequestParam(value = "country") String country){
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country)));
+            (@RequestBody Country country) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country.getTitle())));
     }
 }
