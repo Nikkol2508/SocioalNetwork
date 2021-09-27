@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.text.ParseException;
 
@@ -48,8 +47,6 @@ public class ProfileController {
         GeneralResponse<PersonDto> profile = new GeneralResponse<>(profileService.getPerson(id));
         log.debug("getPerson({}): , response = {}", id, profile);
         log.info("getPerson(id = {}): finish():", id);
-
-        System.out.println(profile);
         return ResponseEntity.ok(profile);
     }
 
@@ -65,7 +62,6 @@ public class ProfileController {
                 (profileService.getWall(id), offset, itemPerPage);
         log.debug("getWall(id = {}), response = {}", id, response);
         log.info("getPWall(id = {}): finish():", id);
-
         return ResponseEntity.ok(response);
     }
 
@@ -117,7 +113,6 @@ public class ProfileController {
         GeneralResponse<Post> response = new GeneralResponse<>(profileService.setPost(id, publishDate, postRequest));
         log.debug("setPost: response = {}", response);
         log.info("setPost: finish():");
-
         return ResponseEntity.ok(response);
     }
 
@@ -129,7 +124,6 @@ public class ProfileController {
         GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.deleteProfile());
         log.debug("deleteProfile: response = {}", response);
         log.info("deleteProfile: finish():");
-
         return ResponseEntity.ok(new GeneralResponse<>(profileService.deleteProfile()));
     }
 }

@@ -53,7 +53,6 @@ public class ProfileService {
         Person person = daoPerson.getByEmail(authentication.getName());
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
-
         return personDto;
     }
 
@@ -109,18 +108,17 @@ public class ProfileService {
                 daoPerson.getAuthPerson().getId(), post.getTime(),
                 post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                 post.getTitle());
-
         postsService.attachTags2Post(postRequest.getTags(), post.getId());
         return post;
     }
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
+
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
         }
-
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
         String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
@@ -137,6 +135,7 @@ public class ProfileService {
 
 
     public MessageResponseDto deleteProfile() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
