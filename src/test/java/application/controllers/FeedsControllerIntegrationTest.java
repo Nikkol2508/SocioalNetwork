@@ -38,6 +38,7 @@ class FeedsControllerIntegrationTest {
 
     @Test
     void testGetFeed() throws Exception {
+
         mockMvc.perform(get("/api/v1/feeds")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())

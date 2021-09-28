@@ -41,6 +41,10 @@ public class ProfileService {
     public PersonDto getPerson(int id) {
 
         Person person = daoPerson.getById(id);
+        if (!person.isBlocked()) {
+            Person activePerson = daoPerson.getAuthPerson();
+            person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
+        }
         return PersonDto.fromPerson(person);
     }
 
@@ -73,7 +77,7 @@ public class ProfileService {
     public List<PersonDto> searchPersons(String firstOrLastName, String firstName, String lastName, Long ageFrom,
                                          Long ageTo, String country, String city) throws EntityNotFoundException {
 
-        if ((firstOrLastName == null) && (firstName == null || firstName.isBlank())
+        if ((firstOrLastName == null || firstOrLastName.isBlank()) && (firstName == null || firstName.isBlank())
                 && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null && country == null
                 && city == null) {
             return new ArrayList<>();
