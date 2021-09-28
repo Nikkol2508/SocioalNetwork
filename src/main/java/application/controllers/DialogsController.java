@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.exceptions.UserIsBlockedException;
 import application.models.Message;
 import application.models.dto.*;
 import application.models.requests.DialogCreateDtoRequest;
@@ -39,7 +40,8 @@ public class DialogsController {
     }
 
     @PostMapping
-    public ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(@Valid @RequestBody DialogCreateDtoRequest request) {
+    public ResponseEntity<GeneralResponse<DialogIdDto>> createDialog(@Valid @RequestBody DialogCreateDtoRequest request)
+            throws UserIsBlockedException {
 
         log.info("createDialog(): start():");
         log.debug("createDialog(): requestBody = {}", request);
@@ -111,7 +113,7 @@ public class DialogsController {
 
     @PostMapping("/{id}/messages")
     public ResponseEntity<GeneralResponse<Message>> sendMessage(
-            @PathVariable int id, @Valid @RequestBody MessageSendDtoRequest request) {
+            @PathVariable int id, @Valid @RequestBody MessageSendDtoRequest request) throws UserIsBlockedException {
 
         log.info("sendMessage(): start():");
         log.debug("sendMessage(): messageId = {}, requestBody = {}", id, request);
