@@ -66,6 +66,11 @@ public class DaoPerson {
                 new PersonMapper());
     }
 
+    public List<Integer> getBlockId(int id) {
+        String query = "SELECT blocked_person_id FROM blocking_persons WHERE blocking_person_id = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
+    }
+
     public void save(Person person) {
 
         String sqlInsertPerson = "INSERT INTO person (first_name, last_name, password," +
@@ -255,5 +260,15 @@ public class DaoPerson {
     public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {
         String query = "SELECT count(*) FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{blockingPerson, blockedPerson}, Integer.class) != 0;
+    }
+
+    public void blockPersonForId(int blockId, int personId) {
+        String query = "INSERT INTO blocking_persons (blocking_person_id, blocked_person_id) VALUES (?, ?)";
+        jdbcTemplate.update(query, personId, blockId);
+    }
+
+    public void unblockUser(int blockUserId, int userId) {
+        String query = "DELETE FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
+        jdbcTemplate.update(query, userId, blockUserId);
     }
 }

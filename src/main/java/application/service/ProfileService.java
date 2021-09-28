@@ -144,4 +144,15 @@ public class ProfileService {
         daoPerson.delete(person.getId());
         return new MessageResponseDto();
     }
+
+    public MessageResponseDto blockPersonForId(int id) {
+        daoPerson.blockPersonForId(id, daoPerson.getAuthPerson().getId());
+        daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+        return new MessageResponseDto();
+    }
+
+    public MessageResponseDto unlockUser(int id) {
+        daoPerson.unblockUser(id, daoPerson.getAuthPerson().getId());
+        return new MessageResponseDto();
+    }
 }

@@ -12,6 +12,8 @@ import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,11 +38,21 @@ public class FriendsService {
 
     public List<PersonDto> getUserFriendsRecommendations() {
         Person currentPerson = daoPerson.getAuthPerson();
+
+        List<Integer> listBlockPerson;
         val personList = daoPerson.getRecommendations(currentPerson.getId());
 
+        try {
+            listBlockPerson = daoPerson.getBlockId(currentPerson.getId());
+        } catch (EmptyResultDataAccessException e) {
+            listBlockPerson = Collections.emptyList();
+        }
+
+        List<Integer> finalListBlockPerson = listBlockPerson;
         return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
+                .filter(person -> !finalListBlockPerson.contains(person.getId()))
                 .map(PersonDto::fromPerson).collect(Collectors.toList()) :
-                daoPerson.getRecommendations(currentPerson.getId()).stream().map(PersonDto::fromPerson)
+                personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId())).map(PersonDto::fromPerson)
                         .collect(Collectors.toList());
     }
 
