@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @WithUserDetails("vasy@yandex.ru")
-public class StorageControllerIntegrationTest {
+class StorageControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -48,7 +48,7 @@ public class StorageControllerIntegrationTest {
     private DaoFile daoFile;
 
     @Test
-    public void testPutImageSuccess() throws Exception {
+    void testPutImage() throws Exception {
         MockMultipartFile file
                 = new MockMultipartFile(
                 "file", "testImage.png", "image/png",
@@ -68,7 +68,7 @@ public class StorageControllerIntegrationTest {
     }
 
     @Test
-    public void testGetImageSuccess() throws Exception {
+    void testGetImage() throws Exception {
         MockMultipartFile file
                 = new MockMultipartFile(
                 "file", "testImage.png", "image/png",

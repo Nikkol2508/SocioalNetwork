@@ -4,6 +4,7 @@ import application.dao.DaoDialog;
 import application.dao.DaoMessage;
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
+import application.exceptions.UserIsBlockedException;
 import application.models.*;
 import application.models.dto.*;
 import application.models.requests.DialogCreateDtoRequest;
@@ -32,7 +33,7 @@ public class DialogsService {
         return person.getId();
     }
 
-    public Message sendMessage(int dialogId, MessageSendDtoRequest request) {
+    public Message sendMessage(int dialogId, MessageSendDtoRequest request) throws UserIsBlockedException {
 
         Message message = new Message();
         message.setMessageText(request.getMessageText());
@@ -40,6 +41,16 @@ public class DialogsService {
         Dialog dialog = daoDialog.getDialogById(dialogId);
         if (dialog == null) {
             throw new EntityNotFoundException("Dialog with id = " + dialogId + " is not exist");
+        }
+        if (dialog.getFirstUserId() != getActiveUserId() && dialog.getSecondUserId() != getActiveUserId()) {
+            throw new UnauthorizedException("You can't send message in this dialog");
+        }
+        if (daoPerson.isPersonBlockedByAnotherPerson(dialog.getFirstUserId(), dialog.getSecondUserId())
+                || daoPerson.isPersonBlockedByAnotherPerson(dialog.getSecondUserId(), dialog.getFirstUserId())
+                || daoPerson.getById(dialog.getFirstUserId()).isBlocked()
+                || daoPerson.getById(dialog.getSecondUserId()).isBlocked()) {
+
+            throw new UserIsBlockedException();
         }
         message.setRecipientId(dialog.getFirstUserId() == getActiveUserId()
                 ? dialog.getSecondUserId()
@@ -122,7 +133,7 @@ public class DialogsService {
         return messageDtoList;
     }
 
-    public DialogIdDto createDialog(DialogCreateDtoRequest request) {
+    public DialogIdDto createDialog(DialogCreateDtoRequest request) throws UserIsBlockedException {
 
         int activeUserId = daoPerson.getByEmail(SecurityContextHolder.getContext()
                 .getAuthentication().getName()).getId();
