@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.*;
+import application.models.FriendshipStatus;
 import application.models.NotificationType;
 import application.models.Person;
 import application.models.Post;
@@ -146,8 +147,14 @@ public class ProfileService {
     }
 
     public MessageResponseDto blockPersonForId(int id) {
-        daoPerson.blockPersonForId(id, daoPerson.getAuthPerson().getId());
-        daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+        Person currentPerson = daoPerson.getAuthPerson();
+        daoPerson.blockPersonForId(id, currentPerson.getId());
+        String friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
+        if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
+            daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+        } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
+            daoPerson.deleteRequest(id, currentPerson.getId());
+        }
         return new MessageResponseDto();
     }
 

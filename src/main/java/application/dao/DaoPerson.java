@@ -271,4 +271,14 @@ public class DaoPerson {
         String query = "DELETE FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
         jdbcTemplate.update(query, userId, blockUserId);
     }
+
+    public void deleteRequest(int id, int id1) {
+        String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
+                "AND dst_person_id IN (?, ?)";
+        int statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
+        String queryForDeleteStatus = "DELETE FROM friendship_status WHERE id = ?";
+        String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+        jdbcTemplate.update(deleteFriendship, id, id1, id1, id);
+        jdbcTemplate.update(queryForDeleteStatus, statusId);
+    }
 }
