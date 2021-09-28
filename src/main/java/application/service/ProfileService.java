@@ -12,6 +12,7 @@ import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -149,13 +150,18 @@ public class ProfileService {
     public MessageResponseDto blockPersonForId(int id) {
         Person currentPerson = daoPerson.getAuthPerson();
         daoPerson.blockPersonForId(id, currentPerson.getId());
-        String friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
-        if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
-            daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
-        } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
-            daoPerson.deleteRequest(id, currentPerson.getId());
+        String friendshipStatus = "";
+        try {
+            friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
+            if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
+                daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+            } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
+                daoPerson.deleteRequest(id, currentPerson.getId());
+            }
+            return new MessageResponseDto();
+        } catch (EmptyResultDataAccessException exception) {
+            return new MessageResponseDto();
         }
-        return new MessageResponseDto();
     }
 
     public MessageResponseDto unlockUser(int id) {

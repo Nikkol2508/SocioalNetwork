@@ -52,8 +52,7 @@ public class PlatformController {
     }
 
     @PostMapping("/countries")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry(
-            @RequestBody Country country) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry(@RequestBody Country country) {
         return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country.getTitle())));
     }
 }

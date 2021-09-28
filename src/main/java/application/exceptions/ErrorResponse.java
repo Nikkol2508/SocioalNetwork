@@ -23,16 +23,4 @@ public class ErrorResponse {
         this.errorDescription = errorDescription;
         timestamp = LocalDateTime.now().toString();
     }
-//    private ValidationError validationError;
-//
-//    @Data
-//    @RequiredArgsConstructor
-//    private static class ValidationError {
-//        private final String field;
-//        private final String message;
-//    }
-//
-//    public void addValidationError(String field, String message){
-//        validationError = new ValidationError(field, message);
-//    }
 }
