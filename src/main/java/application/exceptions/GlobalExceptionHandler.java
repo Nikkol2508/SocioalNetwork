@@ -81,6 +81,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(UserIsBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleUserIsBlockedException(
+            UserIsBlockedException exception, HttpServletRequest request) {
+
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(

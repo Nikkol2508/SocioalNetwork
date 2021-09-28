@@ -360,6 +360,7 @@ class AccountControllerIntegrationTest {
     @Test
     @WithUserDetails("ivan@yandex.ru")
     void testSetAccountNotificationsSettings() throws Exception {
+
         NotificationRequest request = new NotificationRequest();
         request.setNotificationType(NotificationType.POST);
         request.setEnable(true);

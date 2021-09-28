@@ -56,6 +56,7 @@ class DialogsControllerIntegrationTest {
     }
 
     private static ResultMatcher matchPersonDialogsDto(String prefix, PersonDialogsDto person) {
+
         return ResultMatcher.matchAll(
                 jsonPath(prefix + ".id", is(person.getId())),
                 jsonPath(prefix + ".email", is(person.getEmail())),
@@ -113,6 +114,7 @@ class DialogsControllerIntegrationTest {
     @Test
     @WithUserDetails("homa@yandex.ru")
     void testGetMessagesInDialog() throws Exception {
+
         PersonDialogsDto person1 = new PersonDialogsDto();
         person1.setLastName("Васичкин");
         person1.setFirstName("Вася");

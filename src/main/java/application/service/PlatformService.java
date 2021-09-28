@@ -24,7 +24,7 @@ public class PlatformService {
         return languageList;
     }
 
-    public List<Country> getCountry(String country) {
+    public List<Country> getCountry() {
 
         return daoCity.getAllCountry();
     }

@@ -51,7 +51,7 @@ public class NotificationsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void getNotifications() throws Exception {
+    void testGetNotifications() throws Exception {
         mockMvc.perform(get("/api/v1/notifications")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].id", is(1)))
                 .andExpect(jsonPath("$.data[0].sent_time", is(1629464930000L)))
@@ -61,7 +61,7 @@ public class NotificationsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("petr@yandex.ru")
-    void readNotification() throws Exception {
+    void testReadNotification() throws Exception {
         mockMvc.perform(put("/api/v1/notifications/2")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -70,7 +70,7 @@ public class NotificationsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("ivan@yandex.ru")
-    void readAllNotifications() throws Exception {
+    void testReadAllNotifications() throws Exception {
         mockMvc.perform(put("/api/v1/notifications")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())

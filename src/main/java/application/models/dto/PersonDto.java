@@ -55,7 +55,7 @@ public class PersonDto {
         personDto.setAbout(person.getAbout());
         personDto.setCity(person.getCity());
         personDto.setCountry(person.getCountry());
-        personDto.setMessagesPermission(person.getMessagesPermission().toString());
+        personDto.setMessagesPermission(person.getMessagesPermission());
         personDto.setLastOnlineTime(person.getLastOnlineTime());
         personDto.setBlocked(person.isBlocked());
         return personDto;

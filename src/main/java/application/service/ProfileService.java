@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.*;
+import application.models.FriendshipStatus;
 import application.models.NotificationType;
 import application.models.Person;
 import application.models.Post;
@@ -11,6 +12,7 @@ import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,10 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
+        if (!person.isBlocked()) {
+            Person activePerson = daoPerson.getAuthPerson();
+            person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
+        }
         return PersonDto.fromPerson(person);
     }
 
@@ -53,6 +59,7 @@ public class ProfileService {
         Person person = daoPerson.getByEmail(authentication.getName());
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
+
         return personDto;
     }
 
@@ -80,7 +87,6 @@ public class ProfileService {
                 && (country == null || country.isBlank()) && (city == null || city.isBlank())) {
             return new ArrayList<>();
         }
-
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
                     .collect(Collectors.toList());
@@ -101,41 +107,40 @@ public class ProfileService {
         post.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
         post.setBlocked(false);
         post.setAuthorId(authorId);
-        post.setId(daoPost.savePost(post).getId());
+        int postId = daoPost.savePost(post).getId();
 
         daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
                         .map(Person::getId).collect(Collectors.toList()),
                 daoPerson.getAuthPerson().getId(), post.getTime(),
                 post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                 post.getTitle());
-        postsService.attachTags2Post(postRequest.getTags(), post.getId());
+
+        postsService.attachTags2Post(postRequest.getTags(), postId);
         return post;
     }
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
-
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
         }
+
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
+        long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
         String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
                 : request.getFirstName();
         String lastName = request.getLastName() == null || request.getLastName().isBlank() ? person.getLastName()
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
-
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
                 photo, request.getCity(), request.getCountry(), request.getAbout());
-        return PersonDto.fromPerson(daoPerson.getById(person.getId()));
+        return PersonDto.fromPerson(person);
     }
 
 
     public MessageResponseDto deleteProfile() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
         if (person == null) {
@@ -146,6 +151,28 @@ public class ProfileService {
         daoComment.deleteByAuthorId(person.getId());
         daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person.getId());
+        return new MessageResponseDto();
+    }
+
+    public MessageResponseDto blockPersonForId(int id) {
+        Person currentPerson = daoPerson.getAuthPerson();
+        daoPerson.blockPersonForId(id, currentPerson.getId());
+        String friendshipStatus = "";
+        try {
+            friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
+            if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
+                daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+            } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
+                daoPerson.deleteRequest(id, currentPerson.getId());
+            }
+            return new MessageResponseDto();
+        } catch (EmptyResultDataAccessException exception) {
+            return new MessageResponseDto();
+        }
+    }
+
+    public MessageResponseDto unlockUser(int id) {
+        daoPerson.unblockUser(id, daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }
 }
