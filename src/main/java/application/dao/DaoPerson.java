@@ -5,6 +5,7 @@ import application.models.FriendshipStatus;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.Authentication;
@@ -75,9 +76,9 @@ public class DaoPerson {
 
     public void updatePersonData(int id,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
-                                         message = "First name has invalid characters") String firstName,
+                                         message = "{first.name.not.valid}") String firstName,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
-                                         message = "Second name has invalid characters") String lastName,
+                                         message = "{last.name.not.valid}") String lastName,
                                  long birthDate, String phone, String photo, String city, String country, String about) {
 
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
@@ -249,5 +250,10 @@ public class DaoPerson {
 
         String query = "SELECT last_online_time FROM person WHERE id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{id}, Long.class);
+    }
+
+    public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {
+        String query = "SELECT count(*) FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{blockingPerson, blockedPerson}, Integer.class) != 0;
     }
 }

@@ -27,6 +27,7 @@ public class PersonMapper implements RowMapper<Person> {
         person.setApproved(rs.getBoolean("is_approved"));
         person.setLastOnlineTime(rs.getLong("last_online_time"));
         person.setMessagesPermission(rs.getString("messages_permission"));
+        person.setBlocked(rs.getBoolean("is_blocked"));
         return person;
     }
 }
