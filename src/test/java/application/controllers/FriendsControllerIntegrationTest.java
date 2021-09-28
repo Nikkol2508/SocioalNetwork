@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-public class FriendsControllerIntegrationTest {
+class FriendsControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -51,7 +51,7 @@ public class FriendsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void getFriends() throws Exception {
+    void testGetFriends() throws Exception {
         FriendsDtoRequest request = new FriendsDtoRequest();
         mockMvc.perform(get("/api/v1/friends").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -71,7 +71,7 @@ public class FriendsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void getRequests() throws Exception {
+    void testGetRequests() throws Exception {
         FriendsDtoRequest request = new FriendsDtoRequest();
         mockMvc.perform(get("/api/v1/friends/request").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
@@ -91,7 +91,7 @@ public class FriendsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void addFriendForId() throws Exception {
+    void testAddFriendForId() throws Exception {
         mockMvc.perform(post("/api/v1/friends/5")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -100,7 +100,7 @@ public class FriendsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void deleteFriendForId() throws Exception {
+    void testDeleteFriendForId() throws Exception {
         mockMvc.perform(delete("/api/v1/friends/2")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -109,7 +109,7 @@ public class FriendsControllerIntegrationTest {
 
     @Test
     @WithUserDetails("petr@yandex.ru")
-    void getRecommendations() throws Exception {
+    void testGetRecommendations() throws Exception {
         FriendsDtoRequest request = new FriendsDtoRequest();
         mockMvc.perform(get("/api/v1/friends/recommendations").content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())

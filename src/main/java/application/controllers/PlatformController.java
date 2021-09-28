@@ -47,13 +47,12 @@ public class PlatformController {
 
 
     @PostMapping("/cities")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestParam String city) {
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city)));
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCity(@RequestBody City city) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setUserCity(city.getTitle())));
     }
 
     @PostMapping("/countries")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry
-            (@RequestParam String country) {
-        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country)));
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> setCountry(@RequestBody Country country) {
+        return ResponseEntity.ok(new GeneralResponse<>(platformService.setCountry(country.getTitle())));
     }
 }

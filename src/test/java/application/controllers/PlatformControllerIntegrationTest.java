@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-public class PlatformControllerIntegrationTest {
+class PlatformControllerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -36,14 +36,14 @@ public class PlatformControllerIntegrationTest {
     private NotificationController notificationController;
 
     @Test
-    void getLanguages() throws Exception {
+    void testGetLanguages() throws Exception {
         mockMvc.perform(get("/api/v1/platform/languages"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title", is("Русский")));
     }
 
     @Test
-    void getCountry() throws Exception {
+    void testGetCountry() throws Exception {
         mockMvc.perform(get("/api/v1/platform/countries"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title", is("Россия")));
@@ -51,7 +51,7 @@ public class PlatformControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void getCity() throws Exception {
+    void testGetCity() throws Exception {
         mockMvc.perform(get("/api/v1/platform/cities"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].title", is("Абакан")));
@@ -59,7 +59,7 @@ public class PlatformControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void setCity() throws Exception {
+    void testSetCity() throws Exception {
         City request = new City();
         request.setTitle("cerfon");
         mockMvc.perform(post("/api/v1/platform/cities").content(objectMapper.writeValueAsString(request))
@@ -69,7 +69,7 @@ public class PlatformControllerIntegrationTest {
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
-    void setCountry() throws Exception {
+    void testSetCountry() throws Exception {
         Country request = new Country();
         request.setTitle("resc");
         mockMvc.perform(post("/api/v1/platform/countries").content(objectMapper.writeValueAsString(request))
