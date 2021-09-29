@@ -1,22 +1,27 @@
 package application.controllers;
 
+import application.models.Notification;
 import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -35,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
+//@Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 public class ProfileControllerIntegrationTest {
 
     @Autowired
@@ -48,6 +54,14 @@ public class ProfileControllerIntegrationTest {
 
     @Autowired
     private DataSource dataSource;
+
+    @BeforeAll
+    private static void setup(@Autowired DataSource dataSource) throws SQLException {
+
+        try (Connection conn = dataSource.getConnection()) {
+            ScriptUtils.executeSqlScript(conn, new ClassPathResource("/test-data-for-profile-controller-test.sql"));
+        }
+    }
 
     @Test
     @WithUserDetails("vasy@yandex.ru")
@@ -656,11 +670,24 @@ public class ProfileControllerIntegrationTest {
     @WithUserDetails("robert@yandex.ru")
     void searchPersonByAgeFromTest1() throws Exception {
 
-        isContainsHoma(validateResultCorrectSearchPersonOrSetPost(
+        validateResultCorrectSearchPersonOrSetPost(
                 mockMvc.perform(get("/api/v1/users/search")
-                        .param("age_from", "23")))
-                .andExpect(jsonPath("$.total", is(9)))
-                .andExpect(jsonPath("$.data.length()", is(9))));
+                        .param("age_from", "100")))
+                .andExpect(jsonPath("$.total", is(1)))
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data[0].id", is(15)))
+                .andExpect(jsonPath("$.data[0].email", is("test31@yandex.ru")))
+                .andExpect(jsonPath("$.data[0].phone", is("89998881044")))
+                .andExpect(jsonPath("$.data[0].about", is("I am Jon")))
+                .andExpect(jsonPath("$.data[0].city", is("Sidney")))
+                .andExpect(jsonPath("$.data[0].country", is("Australia")))
+                .andExpect(jsonPath("$.data[0].first_name", is("Jon")))
+                .andExpect(jsonPath("$.data[0].last_name", is("Dow")))
+                .andExpect(jsonPath("$.data[0].reg_date", is(1625127990000L)))
+                .andExpect(jsonPath("$.data[0].birth_date", is(-1577934000000L)))
+                .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
+                .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
+                .andExpect(jsonPath("$.data[0].is_blocked", is(false)));
     }
 
     @Test
@@ -745,7 +772,7 @@ public class ProfileControllerIntegrationTest {
 
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(get("/api/v1/users/search")
                 .param("age_from", "25")
-                .param("age_to", "70")))
+                .param("age_to", "60")))
                 .andExpect(jsonPath("$.total", is(2)))
                 .andExpect(jsonPath("$.data[0].id", is(2)))
                 .andExpect(jsonPath("$.data[0].email", is("homa@yandex.ru")))
@@ -782,7 +809,7 @@ public class ProfileControllerIntegrationTest {
 
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(get("/api/v1/users/search")
                 .param("age_from", "1")
-                .param("age_to", "150")))
+                .param("age_to", "60")))
                 .andExpect(jsonPath("$.total", is(10)))
                 .andExpect(jsonPath("$.data[1].id", is(2)))
                 .andExpect(jsonPath("$.data[1].email", is("homa@yandex.ru")))
@@ -878,41 +905,61 @@ public class ProfileControllerIntegrationTest {
     void searchPersonByAgeFromAndAgeToTest8() throws Exception {
 
         mockMvc.perform(get("/api/v1/users/search")
-                        .param("age_from", "23")
+                        .param("age_from", "100")
                         .param("age_to", ""))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
-                .andExpect(jsonPath("$.total", is(9)))
-                .andExpect(jsonPath("$.data[0].id", is(2)))
-                .andExpect(jsonPath("$.data[0].email", is("homa@yandex.ru")))
-                .andExpect(jsonPath("$.data[0].phone", is("89998887744")))
-                .andExpect(jsonPath("$.data[0].about", is("Я Хомяков")))
-                .andExpect(jsonPath("$.data[0].city", is("Москва")))
-                .andExpect(jsonPath("$.data[0].country", is("Россия")))
-                .andExpect(jsonPath("$.data[0].first_name", is("Хома")))
-                .andExpect(jsonPath("$.data[0].last_name", is("Хомяков")))
+                .andExpect(jsonPath("$.total", is(1)))
+                .andExpect(jsonPath("$.data.length()", is(1)))
+                .andExpect(jsonPath("$.data[0].id", is(15)))
+                .andExpect(jsonPath("$.data[0].email", is("test31@yandex.ru")))
+                .andExpect(jsonPath("$.data[0].phone", is("89998881044")))
+                .andExpect(jsonPath("$.data[0].about", is("I am Jon")))
+                .andExpect(jsonPath("$.data[0].city", is("Sidney")))
+                .andExpect(jsonPath("$.data[0].country", is("Australia")))
+                .andExpect(jsonPath("$.data[0].first_name", is("Jon")))
+                .andExpect(jsonPath("$.data[0].last_name", is("Dow")))
                 .andExpect(jsonPath("$.data[0].reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data[0].birth_date", is(806660790000L)))
+                .andExpect(jsonPath("$.data[0].birth_date", is(-1577934000000L)))
                 .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
-                .andExpect(jsonPath("$.data[0].is_blocked", is(false)))
-                .andExpect(jsonPath("$.data[2].id", is(4)))
-                .andExpect(jsonPath("$.data[2].email", is("petr@yandex.ru")))
-                .andExpect(jsonPath("$.data[2].phone", is("89998887744")))
-                .andExpect(jsonPath("$.data[2].about", is("Немного обо мне")))
-                .andExpect(jsonPath("$.data[2].city", is("Омск")))
-                .andExpect(jsonPath("$.data[2].country", is("Россия")))
-                .andExpect(jsonPath("$.data[2].first_name", is("Пётр")))
-                .andExpect(jsonPath("$.data[2].last_name", is("Петров")))
-                .andExpect(jsonPath("$.data[2].reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data[2].birth_date", is(901355190000L)))
-                .andExpect(jsonPath("$.data[2].messages_permission", is("ALL")))
-                .andExpect(jsonPath("$.data[2].last_online_time", is(1627200965049L)))
-                .andExpect(jsonPath("$.data[2].is_blocked", is(false)))
-                .andExpect(jsonPath("$.data.length()", is(9)));
+                .andExpect(jsonPath("$.data[0].is_blocked", is(false)));
+//                .andExpect(status().isOk())
+//                .andExpect(header().string("Content-Type", "application/json"))
+//                .andExpect(authenticated())
+//                .andExpect(jsonPath("$.error", is("Error")))
+//                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+//                .andExpect(jsonPath("$.total", is(9)))
+//                .andExpect(jsonPath("$.data[0].id", is(2)))
+//                .andExpect(jsonPath("$.data[0].email", is("homa@yandex.ru")))
+//                .andExpect(jsonPath("$.data[0].phone", is("89998887744")))
+//                .andExpect(jsonPath("$.data[0].about", is("Я Хомяков")))
+//                .andExpect(jsonPath("$.data[0].city", is("Москва")))
+//                .andExpect(jsonPath("$.data[0].country", is("Россия")))
+//                .andExpect(jsonPath("$.data[0].first_name", is("Хома")))
+//                .andExpect(jsonPath("$.data[0].last_name", is("Хомяков")))
+//                .andExpect(jsonPath("$.data[0].reg_date", is(1625127990000L)))
+//                .andExpect(jsonPath("$.data[0].birth_date", is(806660790000L)))
+//                .andExpect(jsonPath("$.data[0].messages_permission", is("ALL")))
+//                .andExpect(jsonPath("$.data[0].last_online_time", is(1627200965049L)))
+//                .andExpect(jsonPath("$.data[0].is_blocked", is(false)))
+//                .andExpect(jsonPath("$.data[2].id", is(4)))
+//                .andExpect(jsonPath("$.data[2].email", is("petr@yandex.ru")))
+//                .andExpect(jsonPath("$.data[2].phone", is("89998887744")))
+//                .andExpect(jsonPath("$.data[2].about", is("Немного обо мне")))
+//                .andExpect(jsonPath("$.data[2].city", is("Омск")))
+//                .andExpect(jsonPath("$.data[2].country", is("Россия")))
+//                .andExpect(jsonPath("$.data[2].first_name", is("Пётр")))
+//                .andExpect(jsonPath("$.data[2].last_name", is("Петров")))
+//                .andExpect(jsonPath("$.data[2].reg_date", is(1625127990000L)))
+//                .andExpect(jsonPath("$.data[2].birth_date", is(901355190000L)))
+//                .andExpect(jsonPath("$.data[2].messages_permission", is("ALL")))
+//                .andExpect(jsonPath("$.data[2].last_online_time", is(1627200965049L)))
+//                .andExpect(jsonPath("$.data[2].is_blocked", is(false)))
+//                .andExpect(jsonPath("$.data.length()", is(9)));
     }
 
     @Test
@@ -1172,6 +1219,7 @@ public class ProfileControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("publish_date", String.valueOf(postDate)))
+                .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.time", is(postDate)))
                 .andExpect(jsonPath("$.data.authorId", is(1)))
                 .andExpect(jsonPath("$.data.title", is("Some title")))
@@ -1195,6 +1243,7 @@ public class ProfileControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("publish_date", String.valueOf(postDate)))
+                .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.time", is(postDate)))
                 .andExpect(jsonPath("$.data.authorId", is(1)))
                 .andExpect(jsonPath("$.data.title", is("Some title")))
@@ -1220,7 +1269,7 @@ public class ProfileControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .param("publish_date", String.valueOf(postDate)))
-                .andExpect(jsonPath("$.data.id", is(18)))
+                .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.time", is(postDate)))
                 .andExpect(jsonPath("$.data.authorId", is(1)))
                 .andExpect(jsonPath("$.data.title", is("Some title")))
@@ -1229,36 +1278,30 @@ public class ProfileControllerIntegrationTest {
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test@yandex.ru")
+    @WithUserDetails("test11@yandex.ru")
     void updateProfileTest1() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setLastName("");
         request.setFirstName("");
-        request.setCity("Зеленоград");
-        request.setBirthDate("2000-01-01T00:00:00+03:00");
+        request.setCity("Zelenograd");
+        request.setBirthDate("1940-01-01T00:00:00+03:00");
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.data.email", is("test@yandex.ru")))
-                .andExpect(jsonPath("$.data.city", is("Зеленоград")))
-                .andExpect(jsonPath("$.data.first_name", is("Вася")))
-                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.email", is("test11@yandex.ru")))
+                .andExpect(jsonPath("$.data.city", is("Zelenograd")))
+                .andExpect(jsonPath("$.data.first_name", is("Alex")))
+                .andExpect(jsonPath("$.data.last_name", is("Bloh")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data.birth_date", is(946674000000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(-946782000000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
                 .andExpect(jsonPath("$.data.is_blocked", is(false))));
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test2@yandex.ru")
+    @WithUserDetails("test21@yandex.ru")
     void updateProfileTest2() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
@@ -1269,6 +1312,7 @@ public class ProfileControllerIntegrationTest {
         mockMvc.perform(put("/api/v1/users/me")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
                 .andExpect(jsonPath("$.error_description", is("Unparseable date: \"09.06.1988\"")))
@@ -1276,23 +1320,20 @@ public class ProfileControllerIntegrationTest {
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test2@yandex.ru")
+    @WithUserDetails("test22@yandex.ru")
     void updateProfileTest3() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setFirstName("");
         request.setLastName("");
-        request.setCity("Зеленоград");
+        request.setCity("Boston");
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.data.email", is("test2@yandex.ru")))
-                .andExpect(jsonPath("$.data.city", is("Зеленоград")))
-                .andExpect(jsonPath("$.data.first_name", is("Вася")))
-                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.email", is("test22@yandex.ru")))
+                .andExpect(jsonPath("$.data.city", is("Boston")))
+                .andExpect(jsonPath("$.data.first_name", is("Alex")))
+                .andExpect(jsonPath("$.data.last_name", is("Bloh")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
                 .andExpect(jsonPath("$.data.birth_date", is(0)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
@@ -1301,237 +1342,214 @@ public class ProfileControllerIntegrationTest {
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test@yandex.ru")
+
+    @WithUserDetails("test12@yandex.ru")
     void updateProfileTest4() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setLastName("");
-        request.setBirthDate("2000-01-01T00:00:00+03:00");
+        request.setBirthDate("1950-01-01T00:00:00+03:00");
 
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.data.email", is("test@yandex.ru")))
+                .andExpect(jsonPath("$.data.email", is("test12@yandex.ru")))
                 .andExpect(jsonPath("$.data.city").doesNotExist()))
-                .andExpect(jsonPath("$.data.first_name", is("Вася")))
-                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.country").doesNotExist())
+                .andExpect(jsonPath("$.data.phone").doesNotExist())
+                .andExpect(jsonPath("$.data.photo").doesNotExist())
+                .andExpect(jsonPath("$.data.first_name", is("Alex")))
+                .andExpect(jsonPath("$.data.last_name", is("Bloh")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data.birth_date", is(946674000000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(-631162800000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
                 .andExpect(jsonPath("$.data.is_blocked", is(false)));
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test2@yandex.ru")
+    @WithUserDetails("test23@yandex.ru")
     void updateProfileTest5() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         request.setFirstName("");
-        request.setBirthDate("2000-01-01T00:00:00+03:00");
+        request.setBirthDate("1948-01-01T00:00:00+03:00");
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
                         .content(objectMapper.writeValueAsString(request))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.data.email", is("test2@yandex.ru")))
-                .andExpect(jsonPath("$.data.first_name", is("Вася")))
-                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.email", is("test23@yandex.ru")))
+                .andExpect(jsonPath("$.data.first_name", is("Alex")))
+                .andExpect(jsonPath("$.data.last_name", is("Bloh")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data.birth_date", is(946674000000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(-694321200000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
                 .andExpect(jsonPath("$.data.is_blocked", is(false))));
     }
 
     @Test
-    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithUserDetails("test@yandex.ru")
+    @WithUserDetails("test13@yandex.ru")
     void updateProfileTest6() throws Exception {
 
         PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)))
-                .andExpect(jsonPath("$.data.email", is("test@yandex.ru")))
+                .andExpect(jsonPath("$.data.email", is("test13@yandex.ru")))
                 .andExpect(jsonPath("$.data.city").doesNotExist())
                 .andExpect(jsonPath("$.data.country").doesNotExist())
                 .andExpect(jsonPath("$.data.about").doesNotExist())
                 .andExpect(jsonPath("$.data.phone").doesNotExist())
-                .andExpect(jsonPath("$.data.first_name", is("Вася")))
-                .andExpect(jsonPath("$.data.last_name", is("Васичкин")))
+                .andExpect(jsonPath("$.data.first_name", is("Alex")))
+                .andExpect(jsonPath("$.data.last_name", is("Bloh")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
-                .andExpect(jsonPath("$.data.birth_date", is(964513590000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(-606798000000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
                 .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
                 .andExpect(jsonPath("$.data.is_blocked", is(false)));
     }
 
-//    @Test
-//    @Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-//    @Sql(value = {"/delete-test-data-for-profile-controller-test.sql"},
-//            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-//    @WithUserDetails("test2@yandex.ru")
-//    void updateProfileTest7() throws Exception {
-//
-//        MockMultipartFile file
-//                = new MockMultipartFile(
-//                "file", "testImage.png", "image/png",
-//                "src/test/resources/testImage.png".getBytes());
-//
-//        mockMvc.perform(multipart("/api/v1/storage").file(file).param("type", "IMAGE"));
-//
-//
-//        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
-//        request.setFirstName("Some name");
-//        request.setLastName("Some surname");
-//        request.setBirthDate("1988-10-10T00:00:00+03:00");
-//        request.setCity("Бобруйск");
-//        request.setCountry("Беларусь");
-//        request.setAbout("Какая-то информация");
-//        request.setPhone("89774743685");
-//        request.setPhotoId("1");
-//
-//        validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
-//                .content(objectMapper.writeValueAsString(request))
-//                .contentType(MediaType.APPLICATION_JSON)))
-//                .andExpect(jsonPath("$.data.email", is("test2@yandex.ru")))
-//                .andExpect(jsonPath("$.data.city", is("Бобруйск")))
-//                .andExpect(jsonPath("$.data.country", is("Беларусь")))
-//                .andExpect(jsonPath("$.data.about", is("Какая-то информация")))
-//                .andExpect(jsonPath("$.data.phone", is("89774743685")))
-//                .andExpect(jsonPath("$.data.first_name", is("Some name")))
-//                .andExpect(jsonPath("$.data.last_name", is("Some surname")))
-//                .andExpect(jsonPath("$.data.photo_id", is(1)))
-//                .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
-//                .andExpect(jsonPath("$.data.birth_date", is(592434000000L)))
-//                .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
-//                .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
-//                .andExpect(jsonPath("$.data.is_blocked", is(false)));
-//    }
+    @Test
+    @WithUserDetails("test24@yandex.ru")
+    void updateProfileTest7() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "testImage.png", "image/png",
+                "src/test/resources/testImage.png".getBytes());
+        mockMvc.perform(multipart("/api/v1/storage").file(file).param("type", "IMAGE"));
+
+
+        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
+        request.setFirstName("Some name");
+        request.setLastName("Some surname");
+        request.setBirthDate("1950-10-10T00:00:00+03:00");
+        request.setCity("Bobryisk");
+        request.setCountry("Belarus");
+        request.setAbout("Some information");
+        request.setPhone("89774743685");
+        request.setPhotoId("1");
+
+        validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON)))
+                .andExpect(jsonPath("$.data.email", is("test24@yandex.ru")))
+                .andExpect(jsonPath("$.data.city", is("Bobryisk")))
+                .andExpect(jsonPath("$.data.country", is("Belarus")))
+                .andExpect(jsonPath("$.data.about", is("Some information")))
+                .andExpect(jsonPath("$.data.phone", is("89774743685")))
+                .andExpect(jsonPath("$.data.first_name", is("Some name")))
+                .andExpect(jsonPath("$.data.last_name", is("Some surname")))
+                .andExpect(jsonPath("$.data.photo", containsString("storage/testImagepng")))
+                .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
+                .andExpect(jsonPath("$.data.birth_date", is(-606798000000L)))
+                .andExpect(jsonPath("$.data.messages_permission", is("ALL")))
+                .andExpect(jsonPath("$.data.last_online_time", is(1627200965049L)))
+                .andExpect(jsonPath("$.data.is_blocked", is(false)));
+    }
 
     @Test
-    @WithUserDetails("vasy@yandex.ru")
+    @WithUserDetails("test25@yandex.ru")
     void updateProfileTest8() throws Exception {
 
+        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
+        request.setFirstName("S");
+        mockMvc.perform(put("/api/v1/users/me")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("First name has invalid characters or length is not between 2 and 50")))
+                .andExpect(jsonPath("$.data").doesNotExist());
+
     }
 
     @Test
-    @WithUserDetails("vasy@yandex.ru")
+    @WithUserDetails("test26@yandex.ru")
     void updateProfileTest9() throws Exception {
 
+        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
+        request.setLastName("S");
+       mockMvc.perform(put("/api/v1/users/me")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+               .andExpect(header().string("Content-Type", "application/json"))
+               .andExpect(authenticated())
+               .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("Last name has invalid characters or length is not between 2 and 50")))
+                .andExpect(jsonPath("$.data").doesNotExist());
     }
 
     @Test
-    @WithUserDetails("vasy@yandex.ru")
+    @WithUserDetails("test27@yandex.ru")
     void updateProfileTest10() throws Exception {
 
+        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
+        request.setFirstName("Sooooooooooooooooooooooooooooooome naaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaame");
+        mockMvc.perform(put("/api/v1/users/me")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("First name has invalid characters or length is not between 2 and 50")))
+                .andExpect(jsonPath("$.data").doesNotExist());
     }
 
     @Test
-    @WithUserDetails("vasy@yandex.ru")
+    @WithUserDetails("test28@yandex.ru")
     void updateProfileTest11() throws Exception {
 
+        PersonSettingsDtoRequest request = new PersonSettingsDtoRequest();
+        request.setLastName("Sooooooooooooooooooooooooooooooome surnaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaame");
+        mockMvc.perform(put("/api/v1/users/me")
+                .content(objectMapper.writeValueAsString(request))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("Last name has invalid characters or length is not between 2 and 50")))
+                .andExpect(jsonPath("$.data").doesNotExist());
     }
 
     @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest12() throws Exception {
+    @WithUserDetails("test14@yandex.ru")
+    void deleteProfileTest1() throws Exception {
 
+        mockMvc.perform(delete("/api/v1/users/me"))
+                .andDo(print());
+
+        mockMvc.perform(get("/api/v1/users/me"))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Content-Type", "application/json"))
+                .andExpect(authenticated())
+                .andExpect(jsonPath("$.path", is("/api/v1/users/me")))
+                .andExpect(jsonPath("$.error", is("invalid_request")))
+                .andExpect(jsonPath("$.error_description",
+                        is("Person with email: test14@yandex.ru is not found.")))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.data").doesNotExist());
     }
 
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest13() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest14() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest15() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest16() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest17() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest18() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest19() throws Exception {
-
-    }
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileTest20() throws Exception {
-
-    }
-
-    //PersonSettingsDtoRequest(phone=, about=null, city=null, country=null, photoId=11, lastName=Лакеев, firstName=Николай, birthDate=1988-06-09T00:00:00+04:00)
-
-    @Test
-    @WithUserDetails("vasy@yandex.ru")
-    void updateProfileFailTest() throws Exception {
-
-//        PersonSettingsDtoRequest request1 = new PersonSettingsDtoRequest();
-//        request1.setFirstName("");
-//        request1.setBirthDate("2000-01-01T00:00:00+03:00");
-//        validateResultInvalidRequestException(mockMvc.perform(put("/api/v1/users/me")
-//                .content(objectMapper.writeValueAsString(request1))
-//                .contentType(MediaType.APPLICATION_JSON)));
-//
-//        PersonSettingsDtoRequest request2 = new PersonSettingsDtoRequest();
-//        request2.setLastName("");
-//        request2.setBirthDate("2000-01-01T00:00:00+03:00");
-//        validateResultInvalidRequestException(mockMvc.perform(put("/api/v1/users/me")
-//                .content(objectMapper.writeValueAsString(request2))
-//                .contentType(MediaType.APPLICATION_JSON)));
-
-
-    }
-
-    //
-//    @Test
-//    @WithUserDetails("petr@yandex.ru")
-//    void deleteProfileTest() throws Exception {
-//
-//        mockMvc.perform(delete("/api/v1/users/me"))
-//                .andDo(print());
-//    }
-//
-//
-//
     private ResultActions validateResultCorrectSearchPersonOrSetPost(ResultActions resultActions) throws Exception {
 
         return resultActions
-                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
@@ -1543,7 +1561,6 @@ public class ProfileControllerIntegrationTest {
             ResultActions resultActions, String path, String errorDescription) throws Exception {
 
         resultActions
-                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(header().string("Content-Type", "application/json"))
                 .andExpect(authenticated())
@@ -1564,15 +1581,5 @@ public class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data").isEmpty());
-    }
-
-    private void validateResultInvalidRequestException(ResultActions resultActions) throws Exception {
-
-        resultActions
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error", is("invalid_request")))
-                .andExpect(jsonPath("$.error_description",
-                        is("Fields firstName, lastName and birthDate cannot be null.")))
-                .andExpect(jsonPath("$.data").doesNotExist());
     }
 }

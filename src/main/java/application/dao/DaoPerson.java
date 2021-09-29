@@ -82,9 +82,10 @@ public class DaoPerson {
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
                                          message = "{first.name.not.valid}") String firstName,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
-                                         message = "Second name has invalid characters") String lastName,
+                                         message = "{last.name.not.valid}") String lastName,
                                  Long birthDate, String phone, String photo, String city, String country, String about) {
 
+        System.out.println(city);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?, birth_date = COALESCE(?, birth_date), " +
                         " phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
                 birthDate, phone, photo, city, country, about, id);
