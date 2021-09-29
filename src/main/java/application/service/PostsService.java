@@ -78,8 +78,9 @@ public class PostsService {
     public List<CommentDto> getCommentsResponse(String postId) {
 
         if (postId.equals("undefined")) {
+            undefinedPostId = "0";
             postId = undefinedPostId;
-            undefinedPostId = null;
+
         }
         return getComments(Integer.valueOf(postId));
     }
