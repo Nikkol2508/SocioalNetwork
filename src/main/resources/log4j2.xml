@@ -54,14 +54,20 @@
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
 
+        <Rewrite name="rewrite">
+            <LogRewritePolicy/>
+            <AppenderRef ref="debugLog"/>
+        </Rewrite>
+
     </Appenders>
 
     <Loggers>
 
         <Logger name="application" additivity="false" level="debug" includeLocation="true">
-            <AppenderRef ref="debugLog" level="debug"/>
+<!--            <AppenderRef ref="debugLog" level="debug"/>-->
             <AppenderRef ref="errorLog" level="error"/>
             <AppenderRef ref="infoLog" level="info"/>
+            <AppenderRef ref="rewrite" level="debug"/>
         </Logger>
 
         <Root level="info">
