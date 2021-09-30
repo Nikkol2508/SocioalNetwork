@@ -16,6 +16,6 @@ public class PostRequest {
     private String postText;
 
     private List<@NotBlank(message = "{tag.blank}")
-    @Pattern(regexp = "^[A-Za-zА-ЯЁа-яё ]+$", message = "{tag.not.valid}") String> tags;
+    @Pattern(regexp = "^[A-Za-zА-ЯЁа-яё 0-9]+$", message = "{tag.not.valid}") String> tags;
 
 }
