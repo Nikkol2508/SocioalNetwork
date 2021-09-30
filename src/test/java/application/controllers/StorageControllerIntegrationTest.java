@@ -68,6 +68,26 @@ class StorageControllerIntegrationTest {
     }
 
     @Test
+    void testPutEmptyImage() throws Exception {
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file", "testImage.png", "image/png", (byte[]) null);
+
+        mockMvc.perform(multipart("/api/v1/storage").file(file).param("type", "IMAGE"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.timestamp", not(0)))
+                .andExpect(jsonPath("$.data.id",is(0)))
+                .andExpect(jsonPath("$.data.ownerId", is(0)))
+                .andExpect(jsonPath("$.data.fileName").isEmpty())
+                .andExpect(jsonPath("$.data.relativeFilePath").isEmpty())
+                .andExpect(jsonPath("$.data.rawFileURL").isEmpty())
+                .andExpect(jsonPath("$.data.bytes",is(0)))
+                .andExpect(jsonPath("$.data.fileType").isEmpty())
+                .andExpect(jsonPath("$.data.data").isEmpty())
+                .andExpect(jsonPath("$.data.createdAt",is(0)));
+    }
+
+    @Test
     void testGetImage() throws Exception {
         MockMultipartFile file
                 = new MockMultipartFile(
@@ -86,6 +106,28 @@ class StorageControllerIntegrationTest {
         daoFile.saveAndReturn(fileDescription);
 
         mockMvc.perform(get("/storage/testImage")).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG));
+    }
+
+    @Test
+    public void testGetImageProfileSuccess() throws Exception {
+        MockMultipartFile file
+                = new MockMultipartFile(
+                "file", "testProfileImage.png", "image/png",
+                "src/test/resources/testProfileImage.png".getBytes());
+
+        FileDescription fileDescription = new FileDescription();
+        fileDescription.setOwnerId(1);
+        fileDescription.setFileName("testProfileImage2");
+        fileDescription.setRelativeFilePath("storage/testProfileImage2");
+        fileDescription.setRawFileURL("url");
+        fileDescription.setFileFormat(file.getContentType());
+        fileDescription.setBytes(file.getBytes().length);
+        fileDescription.setFileType("IMAGE");
+        fileDescription.setData(file.getBytes());
+        daoFile.saveAndReturn(fileDescription);
+
+        mockMvc.perform(get("/profile/storage/testProfileImage2")).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_PNG));
     }
 }

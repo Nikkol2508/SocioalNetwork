@@ -4,10 +4,12 @@ import application.dao.DaoNotification;
 import application.dao.DaoPerson;
 import application.models.NotificationType;
 import application.models.Person;
+import com.dropbox.core.DbxException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -32,5 +34,15 @@ public class ScheduledService {
 
         daoNotification.addFriendBirthdateNotification(System.currentTimeMillis(), currentPerson.getId(),
                 idList, currentPerson.getEmail(), NotificationType.FRIEND_BIRTHDAY);
+    }
+
+    @Scheduled(cron = "${scheduled.time.dropbox.save}")
+    private static void saveInDropbox() throws IOException, DbxException {
+        DropboxService.saveInDropbox();
+    }
+
+    @Scheduled(cron = "${scheduled.time.dropbox.save}")
+    private static void deleteFromDropbox() {
+        DropboxService.deleteFromDropbox();
     }
 }

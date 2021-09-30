@@ -6,6 +6,7 @@
         <Property name="LOG_PATTERN_CONSOLE">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %logger{36} - %msg%n</Property>
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
         <Property name="APP_LOG_ROOT">logs</Property>
+        <Property name="SCHEDULE">0 0 2 * * ?</Property>
     </Properties>
 
     <Appenders>
@@ -17,27 +18,29 @@
         </Console>
 
         <RollingFile name="infoLog" fileName="${APP_LOG_ROOT}/app-info.log"
-                     filePattern="${APP_LOG_ROOT}/app-info-%d{yyyy-MM-dd}-%i.log" >
+                     filePattern="${APP_LOG_ROOT}/toDropbox/app-info-%d{yyyy-MM-dd HH:mm}-%i.log" >
             <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
-                <SizeBasedTriggeringPolicy size="19500KB" />
+                <CronTriggeringPolicy schedule="${SCHEDULE}"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
 
         <RollingFile name="errorLog" fileName="${APP_LOG_ROOT}/app-error.log"
-                     filePattern="${APP_LOG_ROOT}/app-error-%d{yyyy-MM-dd}-%i.log" >
+                     filePattern="${APP_LOG_ROOT}/toDropbox/app-error-%d{yyyy-MM-dd HH:mm}-%i.log" >
             <LevelRangeFilter minLevel="ERROR" maxLevel="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
-                <SizeBasedTriggeringPolicy size="19500KB" />
+                <CronTriggeringPolicy schedule="${SCHEDULE}"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
 
         <RollingFile name="debugLog" fileName="${APP_LOG_ROOT}/app-debug.log"
-                     filePattern="${APP_LOG_ROOT}/app-debug-%d{yyyy-MM-dd}-%i.log" >
+                     filePattern="${APP_LOG_ROOT}/toDropbox/app-debug-%d{yyyy-MM-dd HH:mm}-%i.log" >
             <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Filters>
@@ -45,23 +48,29 @@
                 <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
             </Filters>
             <Policies>
-                <SizeBasedTriggeringPolicy size="19500KB" />
+                <CronTriggeringPolicy schedule="${SCHEDULE}"/>
+                <SizeBasedTriggeringPolicy size="50 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
+
+        <Rewrite name="rewrite">
+            <LogRewritePolicy/>
+            <AppenderRef ref="debugLog"/>
+        </Rewrite>
 
     </Appenders>
 
     <Loggers>
 
         <Logger name="application" additivity="false" level="debug" includeLocation="true">
-            <AppenderRef ref="debugLog"/>
+<!--            <AppenderRef ref="debugLog" level="debug"/>-->
             <AppenderRef ref="errorLog" level="error"/>
-            <AppenderRef ref="infoLog"/>
+            <AppenderRef ref="infoLog" level="info"/>
+            <AppenderRef ref="rewrite" level="debug"/>
         </Logger>
 
         <Root level="info">
-            <!--            <AppenderRef ref="debugLog" level="debug"/>-->
             <AppenderRef ref="Console"/>
         </Root>
 

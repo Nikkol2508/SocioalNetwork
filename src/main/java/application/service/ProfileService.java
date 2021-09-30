@@ -43,6 +43,9 @@ public class ProfileService {
     public PersonDto getPerson(int id) {
 
         Person person = daoPerson.getById(id);
+        if (person == null) {
+            throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
+        }
         if (!person.isBlocked()) {
             Person activePerson = daoPerson.getAuthPerson();
             person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
@@ -50,10 +53,14 @@ public class ProfileService {
         return PersonDto.fromPerson(person);
     }
 
-    public PersonDto getProfile() {
+    public PersonDto getProfile() throws EntityNotFoundException{
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
+        if (person == null) {
+            throw new EntityNotFoundException(String.format("Person with email: %s is not found.",
+                    authentication.getName()));
+        }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
 
@@ -80,8 +87,8 @@ public class ProfileService {
                                          Long ageTo, String country, String city) throws EntityNotFoundException {
 
         if ((firstOrLastName == null || firstOrLastName.isBlank()) && (firstName == null || firstName.isBlank())
-                && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null && country == null
-                && city == null) {
+                && (lastName == null || lastName.isBlank()) && ageFrom == null && ageTo == null
+                && (country == null || country.isBlank()) && (city == null || city.isBlank())) {
             return new ArrayList<>();
         }
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
@@ -104,7 +111,7 @@ public class ProfileService {
         post.setTime(publishDate == null ? System.currentTimeMillis() : publishDate);
         post.setBlocked(false);
         post.setAuthorId(authorId);
-        int postId = daoPost.savePost(post).getId();
+        post.setId(daoPost.savePost(post).getId());
 
         daoNotification.addNotificationsForFriends(daoPerson.getFriends(authorId).stream()
                         .map(Person::getId).collect(Collectors.toList()),
@@ -112,8 +119,9 @@ public class ProfileService {
                 post.getId(), daoPerson.getById(post.getAuthorId()).getEmail(), NotificationType.POST.toString(),
                 post.getTitle());
 
-        postsService.attachTags2Post(postRequest.getTags(), postId);
+        postsService.attachTags2Post(postRequest.getTags(), post.getId());
         return post;
+
     }
 
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
@@ -124,7 +132,7 @@ public class ProfileService {
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        long birthDate = dateFormat.parse(request.getBirthDate()).getTime();
+        Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
         String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
                 : request.getFirstName();
         String lastName = request.getLastName() == null || request.getLastName().isBlank() ? person.getLastName()
@@ -133,7 +141,7 @@ public class ProfileService {
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
                 photo, request.getCity(), request.getCountry(), request.getAbout());
-        return PersonDto.fromPerson(person);
+        return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 
 
@@ -143,6 +151,10 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException("Person with this token is not found.");
         }
+        daoPerson.deleteFriendshipByPersonId(person.getId());
+        daoLike.deleteByPersonId(person.getId());
+        daoComment.deleteByAuthorId(person.getId());
+        daoPost.deleteByAuthorId(person.getId());
         daoPerson.delete(person.getId());
         return new MessageResponseDto();
     }
