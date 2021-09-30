@@ -12,7 +12,6 @@ import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,6 +58,9 @@ public class FriendsService {
     public MessageResponseDto addFriendForId(int id) {
 
         Person currentPerson = daoPerson.getAuthPerson();
+        if (currentPerson.getId() == id) {
+            throw new IllegalArgumentException("You can't add yourself as friend");
+        }
         String friendStatus;
         try {
             friendStatus = daoPerson.getFriendStatus(currentPerson.getId(), id);

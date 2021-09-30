@@ -1,12 +1,10 @@
 package application.models.dto;
 
 import application.models.Person;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PersonDialogsDto {
 
     private int id;

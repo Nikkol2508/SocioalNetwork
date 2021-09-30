@@ -80,6 +80,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception, HttpServletRequest request) {
+
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(

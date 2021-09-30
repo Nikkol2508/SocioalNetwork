@@ -5,7 +5,6 @@ import application.models.FriendshipStatus;
 import application.models.PermissionMessagesType;
 import application.models.Person;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.security.core.Authentication;
@@ -175,15 +174,15 @@ public class DaoPerson {
         return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, String.class);
     }
 
-    public void deleteFriendForID(int srcId, int dtcId) {
+    public void deleteFriendForID(int srcId, int dstId) {
 
         String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
                 "AND dst_person_id IN (?, ?)";
         String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
-        Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId},
+        Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dstId, srcId, dstId},
                 Integer.class);
-        jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
+        jdbcTemplate.update(deleteFriendship, srcId, dstId, dstId, srcId);
         jdbcTemplate.update(deleteFriendshipStatus, selectedId);
     }
 
@@ -201,14 +200,14 @@ public class DaoPerson {
     }
 
     @Transactional
-    public void updateDeclined(int srcId, int dtcId) {
+    public void updateDeclined(int srcId, int dstId) {
 
         String updateFriendship = "UPDATE friendship SET src_person_id = ?, dst_person_id = ? " +
                 "WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE src_person_id = ? AND dst_person_id = ?)";
-        jdbcTemplate.update(updateFriendship, srcId, dtcId, srcId, dtcId, dtcId, srcId);
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST, srcId, dtcId);
+        jdbcTemplate.update(updateFriendship, srcId, dstId, srcId, dstId, dstId, srcId);
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST.toString(), srcId, dstId);
     }
 
     public List<Person> getRecommendationsOnRegDate(int id) {

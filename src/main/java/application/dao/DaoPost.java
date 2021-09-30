@@ -7,9 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -58,25 +57,37 @@ public class DaoPost {
 
     public void delete(int id) {
 
-        jdbcTemplate.update("DELETE FROM post WHERE id = "+ id);
+        jdbcTemplate.update("DELETE FROM post WHERE id = " + id);
     }
 
-    public void deleteByAuthorId(int id){
+    public void deleteByAuthorId(int id) {
 
         jdbcTemplate.update("DELETE FROM post WHERE author_id = ?", id);
     }
 
     public List<Post> getPosts(String text, String author, Long dateFrom, Long dateTo, List<String> tags) {
+
+        String textQuery = "SELECT * FROM post WHERE (post_text ILIKE ? OR title ILIKE ?) " +
+                "AND (time >= ? OR ?::bigint IS NULL) AND (time <= ? OR ?::bigint IS NULL)AND post.is_blocked = false";
+        List<Post> posts = jdbcTemplate.query(textQuery, new Object[]{prepareParam(text), prepareParam(text), dateFrom,
+                dateFrom, dateTo, dateTo}, new PostMapper());
+        if (posts.isEmpty()) {
+            return new ArrayList<>();
+        }
         String tagsInStr = tags != null ? String.join("|", tags) : null;
-        String query = "SELECT * FROM post_tag_user_view WHERE (post_text ILIKE ? OR title ILIKE ?) " +
-                "AND ((first_name ILIKE ? OR ?::text IS NULL) OR (last_name ILIKE ? OR ?::text IS NULL))" +
-                "AND (time >= ? OR ?::bigint IS NULL) AND (time <= ? OR ?::bigint IS NULL) " +
-                "AND (tag ~* ? OR ?::text IS NULL)";
-
-        return jdbcTemplate.query(query, new Object[]{prepareParam(text), prepareParam(text),
-                prepareParam(author), author, prepareParam(author), author, dateFrom, dateFrom, dateTo, dateTo,
-                tagsInStr, tagsInStr}, new PostMapper());
-
+        Set<Integer> postIdsFromTagQuery = new HashSet<>(jdbcTemplate.queryForList("SELECT post_id FROM post2tag " +
+                        "LEFT JOIN tag ON tag.id = post2tag.tag_id WHERE (tag ~* ? OR ?::text IS NULL)",
+                new Object[]{tagsInStr, tagsInStr}, Integer.class));
+        String authorIds = posts.stream().map(post -> String.valueOf(post.getAuthorId())).collect(
+                Collectors.joining(","));
+        Set<Integer> personIdsQuery = new HashSet<>(jdbcTemplate.queryForList("SELECT id FROM " +
+                "person WHERE ((first_name ILIKE ? OR ?::text IS NULL) OR (last_name ILIKE ? " +
+                "OR ?::text IS NULL)) AND id IN (" + authorIds + ")", new Object[]{prepareParam(author), author,
+                prepareParam(author), author}, Integer.class));
+        Set<Integer> resultSetPostIds = new HashSet<>(postIdsFromTagQuery);
+        resultSetPostIds.retainAll(posts.stream().filter(p -> personIdsQuery.contains(p.getAuthorId()))
+                .map(Post::getId).collect(Collectors.toSet()));
+        return posts.stream().filter(post -> resultSetPostIds.contains(post.getId())).collect(Collectors.toList());
     }
 
     private String prepareParam(String param) {

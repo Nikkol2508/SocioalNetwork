@@ -25,14 +25,13 @@ public class NotificationService {
                 .getId()));
     }
 
-    public MessageResponseDto readNotifications() {
+    public MessageResponseDto readNotifications(Boolean all, Integer id) {
 
-        daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
-        return new MessageResponseDto();
-    }
-
-    public MessageResponseDto readNotificationForId(int id) {
-        daoNotification.readNotificationForId(id);
+        if (id == null) {
+            daoNotification.readNotifications(daoPerson.getAuthPerson().getId());
+        } else if (all == null) {
+            daoNotification.readNotificationForId(id);
+        }
         return new MessageResponseDto();
     }
 

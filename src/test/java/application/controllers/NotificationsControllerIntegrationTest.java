@@ -1,6 +1,5 @@
 package application.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,9 +18,9 @@ import java.sql.SQLException;
 
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.DatabaseProvider.OPENTABLE;
 import static io.zonky.test.db.AutoConfigureEmbeddedDatabase.RefreshMode.AFTER_CLASS;
-
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,13 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
 
-public class NotificationsControllerIntegrationTest {
+class NotificationsControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private NotificationController notificationController;
@@ -62,7 +58,7 @@ public class NotificationsControllerIntegrationTest {
     @Test
     @WithUserDetails("petr@yandex.ru")
     void testReadNotification() throws Exception {
-        mockMvc.perform(put("/api/v1/notifications/2")).andExpect(status().isOk())
+        mockMvc.perform(put("/api/v1/notifications?id=2")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.error", is("Error")))
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(jsonPath("$.data.message", is("ok")));
