@@ -59,7 +59,7 @@ public class DaoFile {
         parameters.put("time", System.currentTimeMillis());
         parameters.put("data", fileDescription.getData());
         FileDescription returnedDescription = getById(sji.executeAndReturnKey(parameters).intValue());
-        log.debug("saveAndReturn(): returnedDescription = {}", returnedDescription);
+        //log.debug("saveAndReturn(): returnedDescription = {}", returnedDescription);
         log.info("saveAndReturn(): finish():");
         return returnedDescription;
     }
@@ -69,7 +69,7 @@ public class DaoFile {
         log.debug("getById(): id = {}", id);
         String query = "SELECT * FROM image WHERE id = ?";
         FileDescription fileDescription = jdbcTemplate.queryForObject(query, new Object[]{id}, new FileDescriptionMapper());
-        log.debug("getById(): fileDescription = {}", fileDescription);
+        //log.debug("getById(): fileDescription = {}", fileDescription);
         log.info("getById(): finish():");
         return fileDescription;
     }
@@ -79,7 +79,7 @@ public class DaoFile {
         log.debug("getByImageName(): name = {}", name);
         String query = "SELECT * FROM image WHERE name = ?";
         FileDescription fileDescription = jdbcTemplate.queryForObject(query, new Object[]{name}, new FileDescriptionMapper());
-        log.debug("getByImageName(): fileDescription = {}", fileDescription);
+        //log.debug("getByImageName(): fileDescription = {}", fileDescription);
         log.info("getByImageName(): finish():");
         return fileDescription;
     }

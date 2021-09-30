@@ -31,18 +31,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handlePasswordsNotEqualsException(
             PasswordsNotEqualsException exception, HttpServletRequest request) {
-
-        return buildError(exception, HttpStatus.BAD_REQUEST, request);
-    public ResponseEntity<ErrorResponse> handlePasswordsNotEqualsException(PasswordsNotEqualsException exception) {
-        ResponseEntity<ErrorResponse> error = buildError(exception, HttpStatus.BAD_REQUEST);
         log.error("PasswordsNotEqualsException stackTrace = {}", exception.getStackTrace());
-        return error;
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleEmailAlreadyExistsException(
             EmailAlreadyExistsException exception, HttpServletRequest request) {
+        log.error("EmailAlreadyExistsException stackTrace = {}", exception.getStackTrace());
 
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
@@ -51,6 +48,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(
             UsernameNotFoundException exception, HttpServletRequest request) {
+        log.error("UsernameNotFoundException stackTrace = {}", exception.getStackTrace());
 
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
@@ -59,6 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(
             EntityNotFoundException exception, HttpServletRequest request) {
+        log.error("EntityNotFoundException stackTrace = {}", exception.getStackTrace());
 
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
@@ -67,6 +66,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleBadCredentialsException(
             BadCredentialsException exception, HttpServletRequest request) {
+        log.error("BadCredentialsException stackTrace = {}", exception.getStackTrace());
 
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
@@ -75,6 +75,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(
             UnauthorizedException exception, HttpServletRequest request) {
+        log.error("UnauthorizedException stackTrace = {}", exception.getStackTrace());
 
         return buildError(exception, HttpStatus.UNAUTHORIZED, request);
     }
@@ -133,6 +134,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 ? Error.INVALID_REQUEST.getErrorName()
                 : Error.UNAUTHORIZED.getErrorName();
         ErrorResponse errorResponse = new ErrorResponse(error, exception.getMessage(), request.getPathInfo());
+        log.debug("buildError(): errorResponse = {}", errorResponse);
         return ResponseEntity.status(httpStatus).body(errorResponse);
     }
 }

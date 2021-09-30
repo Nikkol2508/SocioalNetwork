@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ public class DaoPerson {
     public Person getByEmail(String email) {
 
         log.info("getByEmail(): start():");
-        log.debug("getByEmail(): email = {}", email);
+        log.debug("getByEmail(): email={}", email);
         String selectPersonByEmail = "SELECT * FROM person WHERE e_mail = ?";
         Person person = jdbcTemplate.query(selectPersonByEmail, new Object[]{email}, new PersonMapper()).stream().findAny()
                 .orElse(null);
@@ -249,11 +250,8 @@ public class DaoPerson {
                 "AND dst_person_id IN (?, ?)";
         String deleteFriendshipStatus = "DELETE from friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
-        Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dtcId, srcId, dtcId},
-                Integer.class);
-        jdbcTemplate.update(deleteFriendship, srcId, dtcId, dtcId, srcId);
         Integer selectedId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{srcId, dstId, srcId, dstId},
-                    Integer.class);
+                Integer.class);
         jdbcTemplate.update(deleteFriendship, srcId, dstId, dstId, srcId);
         jdbcTemplate.update(deleteFriendshipStatus, selectedId);
         log.info("deleteFriendForID(): finish():");

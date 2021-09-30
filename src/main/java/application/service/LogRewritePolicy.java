@@ -18,6 +18,9 @@ public final class LogRewritePolicy implements RewritePolicy {
             Log4jLogEvent.Builder builder = new Log4jLogEvent.Builder(event);
             formattedMessage = formattedMessage.replaceAll("phone=[\\d]{8}", "phone=********");
             formattedMessage = formattedMessage.replaceAll("email=[A-Za-z0-9._%+-]+@", "email=****@");
+            formattedMessage = formattedMessage.replaceAll("password=[\\S]+,", "password=*******,");
+            formattedMessage = formattedMessage.replaceAll("lastName=[A-Za-zА-Яа-яё]+,", "lastName=******");
+            formattedMessage = formattedMessage.replaceAll("firstName=[A-Za-zА-Яа-яё]+,", "firstName=******");
 
             builder.setMessage(new StringFormattedMessage(formattedMessage));
 
