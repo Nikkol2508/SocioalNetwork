@@ -24,12 +24,12 @@ public class PlatformService {
         return languageList;
     }
 
-    public List<Country> getCountry(String country) {
+    public List<Country> getCountry() {
 
         return daoCity.getAllCountry();
     }
 
-    public List<City> getCity(Integer countryId, String country) {
+    public List<City> getCity() {
 
         return daoCity.getAllCity();
     }

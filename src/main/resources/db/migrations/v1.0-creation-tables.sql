@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS post
     post_text  TEXT    NOT NULL,
     is_blocked BOOLEAN NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friendship_status
@@ -71,9 +71,9 @@ CREATE TABLE IF NOT EXISTS post_comment
     comment_text TEXT    NOT NULL,
     is_blocked   BOOLEAN NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
-    FOREIGN KEY (parent_id) REFERENCES post_comment (id) ON DELETE RESTRICT,
-    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES post_comment (id) ON DELETE CASCADE,
+    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS block_history
@@ -85,9 +85,9 @@ CREATE TABLE IF NOT EXISTS block_history
     comment_id INT    NOT NULL,
     action     TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
-    FOREIGN KEY (comment_id) REFERENCES post_comment (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE,
+    FOREIGN KEY (comment_id) REFERENCES post_comment (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS message
@@ -99,8 +99,8 @@ CREATE TABLE IF NOT EXISTS message
     message_text TEXT,
     read_status  TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (recipient_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (author_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS friendship
@@ -110,9 +110,9 @@ CREATE TABLE IF NOT EXISTS friendship
     src_person_id INT    NOT NULL,
     dst_person_id INT    NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (status_id) REFERENCES friendship_status (id) ON DELETE RESTRICT,
-    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (dst_person_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (status_id) REFERENCES friendship_status (id) ON DELETE CASCADE,
+    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (dst_person_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_like
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS post_like
     item_id   INT    NOT NULL,
     type      TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post_file
@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS post_file
     name    TEXT,
     path    TEXT,
     PRIMARY KEY (id),
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT
+    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS post2tag
@@ -142,8 +142,8 @@ CREATE TABLE IF NOT EXISTS post2tag
     post_id INT    NOT NULL,
     tag_id  INT    NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE RESTRICT,
-    FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE RESTRICT
+    FOREIGN KEY (post_id) REFERENCES post (id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tag (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS notification
@@ -157,8 +157,8 @@ CREATE TABLE IF NOT EXISTS notification
     type          TEXT   NOT NULL,
     name          TEXT   NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (src_person_id) REFERENCES person (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS notification_setting_type
@@ -175,6 +175,6 @@ CREATE TABLE IF NOT EXISTS notification_settings
     person_id INT    NOT NULL,
     type_id   INT    NOT NULL,
     PRIMARY KEY (id),
-    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE RESTRICT,
-    FOREIGN KEY (type_id) REFERENCES notification_setting_type (id) ON DELETE RESTRICT
+    FOREIGN KEY (person_id) REFERENCES person (id) ON DELETE CASCADE,
+    FOREIGN KEY (type_id) REFERENCES notification_setting_type (id) ON DELETE CASCADE
 );

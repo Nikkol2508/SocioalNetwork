@@ -5,7 +5,6 @@ import application.models.responses.GeneralResponse;
 import application.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +18,6 @@ import java.io.IOException;
 public class StorageController {
 
     private final StorageService storageService;
-    private final ResourceLoader resourceLoader;
 
     @PostMapping("/api/v1/storage")
     public ResponseEntity<GeneralResponse<FileDescription>> handleFileUpload(
@@ -35,8 +33,14 @@ public class StorageController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("storage/{imageName}")
-    public ResponseEntity<Object> show(@PathVariable("imageName") String imageName) {
+    @GetMapping("/storage/{imageName}")
+    public ResponseEntity<Object> getImage(@PathVariable("imageName") String imageName) {
+        FileDescription image = storageService.getImage(imageName);
+        return ResponseEntity.ok().contentType(MediaType.valueOf(image.getFileFormat())).body(image.getData());
+    }
+
+    @GetMapping("/profile/storage/{imageName}")
+    public ResponseEntity<Object> getImageInProfile(@PathVariable("imageName") String imageName) {
         FileDescription image = storageService.getImage(imageName);
         return ResponseEntity.ok().contentType(MediaType.valueOf(image.getFileFormat())).body(image.getData());
     }

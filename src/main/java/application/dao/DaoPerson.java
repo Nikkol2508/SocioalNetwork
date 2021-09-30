@@ -91,6 +91,11 @@ public class DaoPerson {
         return personList;
     }
 
+    public List<Integer> getBlockId(int id) {
+        String query = "SELECT blocked_person_id FROM blocking_persons WHERE blocking_person_id = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
+    }
+
     public void save(Person person) {
 
         log.info("save(): start():");
@@ -104,10 +109,10 @@ public class DaoPerson {
 
     public void updatePersonData(int id,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
-                                         message = "First name has invalid characters") String firstName,
+                                         message = "{first.name.not.valid}") String firstName,
                                  @Pattern(regexp = "^[(a-zA-Zа-яёА-ЯЁ ,.'-]{2,50}$",
-                                         message = "Second name has invalid characters") String lastName,
-                                 long birthDate, String phone, String photo, String city, String country, String about) {
+                                         message = "{last.name.not.valid}") String lastName,
+                                 Long birthDate, String phone, String photo, String city, String country, String about) {
 
         log.info("updatePersonData(): start():");
         log.debug("updatePersonData(): id = {}, firstName = {}, lastName = {}, birthDate = {}, " +
@@ -352,5 +357,30 @@ public class DaoPerson {
         log.debug("getLastOnlineTime(): time = {}", time);
         log.info("getLastOnlineTime(): finish():");
         return time;
+    }
+
+    public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {
+        String query = "SELECT count(*) FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
+        return jdbcTemplate.queryForObject(query, new Object[]{blockingPerson, blockedPerson}, Integer.class) != 0;
+    }
+
+    public void blockPersonForId(int blockId, int personId) {
+        String query = "INSERT INTO blocking_persons (blocking_person_id, blocked_person_id) VALUES (?, ?)";
+        jdbcTemplate.update(query, personId, blockId);
+    }
+
+    public void unblockUser(int blockUserId, int userId) {
+        String query = "DELETE FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
+        jdbcTemplate.update(query, userId, blockUserId);
+    }
+
+    public void deleteRequest(int id, int id1) {
+        String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
+                "AND dst_person_id IN (?, ?)";
+        int statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
+        String queryForDeleteStatus = "DELETE FROM friendship_status WHERE id = ?";
+        String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+        jdbcTemplate.update(deleteFriendship, id, id1, id1, id);
+        jdbcTemplate.update(queryForDeleteStatus, statusId);
     }
 }

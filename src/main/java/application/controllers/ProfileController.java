@@ -62,7 +62,6 @@ public class ProfileController {
                 (profileService.getWall(id), offset, itemPerPage);
         log.debug("getWall(id = {}), response = {}", id, response);
         log.info("getPWall(id = {}): finish():", id);
-
         return ResponseEntity.ok(response);
     }
 
@@ -81,7 +80,7 @@ public class ProfileController {
 
         log.info("searchPerson: start():");
         log.debug("searchPerson: request: firstOrLastName = {}, firstName = {}, lastName = {}, " +
-                "ageFrom = {}, ageTo = {}, country = {}, city = {}", firstOrLastName, firstName, lastName,
+                        "ageFrom = {}, ageTo = {}, country = {}, city = {}", firstOrLastName, firstName, lastName,
                 ageFrom, ageTo, country, city);
         GeneralListResponse<PersonDto> response = new GeneralListResponse<>
                 (profileService.searchPersons(firstOrLastName, firstName, lastName, ageFrom, ageTo, country, city),
@@ -100,7 +99,6 @@ public class ProfileController {
         GeneralResponse<PersonDto> response = new GeneralResponse<>(profileService.changeProfile(request));
         log.debug("changeProfile: response = {}", response);
         log.info("changeProfile: finish():");
-
         return ResponseEntity.ok(response);
     }
 
@@ -115,7 +113,6 @@ public class ProfileController {
         GeneralResponse<Post> response = new GeneralResponse<>(profileService.setPost(id, publishDate, postRequest));
         log.debug("setPost: response = {}", response);
         log.info("setPost: finish():");
-
         return ResponseEntity.ok(response);
     }
 
@@ -127,7 +124,16 @@ public class ProfileController {
         GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.deleteProfile());
         log.debug("deleteProfile: response = {}", response);
         log.info("deleteProfile: finish():");
+        return ResponseEntity.ok(response);
+    }
 
-        return ResponseEntity.ok(new GeneralResponse<>(profileService.deleteProfile()));
+    @PutMapping("/block/{id}")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> blockUserForId(@PathVariable int id) {
+        return ResponseEntity.ok(new GeneralResponse<>(profileService.blockPersonForId(id)));
+    }
+
+    @DeleteMapping("/block/{id}")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
+        return ResponseEntity.ok(new GeneralResponse<>(profileService.unlockUser(id)));
     }
 }

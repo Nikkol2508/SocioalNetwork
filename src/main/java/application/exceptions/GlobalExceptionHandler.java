@@ -20,6 +20,7 @@ import javax.persistence.EntityNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.text.ParseException;
 import java.util.Optional;
 
 @Slf4j
@@ -76,6 +77,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             UnauthorizedException exception, HttpServletRequest request) {
 
         return buildError(exception, HttpStatus.UNAUTHORIZED, request);
+    }
+
+    @ExceptionHandler(ParseException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleParseException(
+            ParseException exception, HttpServletRequest request) {
+
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(UserIsBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleUserIsBlockedException(
+            UserIsBlockedException exception, HttpServletRequest request) {
+
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
