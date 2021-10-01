@@ -46,11 +46,13 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
+        Person activePerson = daoPerson.getAuthPerson();
         if (!person.isBlocked()) {
-            Person activePerson = daoPerson.getAuthPerson();
             person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
         }
-        return PersonDto.fromPerson(person);
+        PersonDto personDto = PersonDto.fromPerson(person);
+        personDto.setMe(personDto.getId() == activePerson.getId());
+        return personDto;
     }
 
     public PersonDto getProfile() throws EntityNotFoundException{
@@ -63,6 +65,7 @@ public class ProfileService {
         }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
+        personDto.setMe(true);
 
         return personDto;
     }

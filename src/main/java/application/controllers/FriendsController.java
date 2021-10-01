@@ -69,16 +69,6 @@ public class FriendsController {
         return ResponseEntity.ok(generalResponse);
     }
 
-//    @PostMapping("friends/decline/{id}")
-//    public ResponseEntity<GeneralResponse<MessageResponseDto>> declineFriendRequest(@PathVariable int id) {
-//        log.info("declineFriendRequest(): start():");
-//        log.debug("declineFriendRequest(): friendId = {}", id);
-//        GeneralResponse<MessageResponseDto> generalResponse = new GeneralResponse<>(friendService.declineFriendRequest(id));
-//        log.debug("declineFriendRequest(): response = {}", generalResponse);
-//        log.info("declineFriendRequest(): finish():");
-//        return ResponseEntity.ok(generalResponse);
-//    }
-
     @DeleteMapping("friends/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteFriendForId(@PathVariable int id) {
 
