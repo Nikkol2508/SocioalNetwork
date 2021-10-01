@@ -6,7 +6,7 @@
         <Property name="LOG_PATTERN_CONSOLE">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %highlight{%-5level}{FATAL=bg_red, ERROR=red, WARN=yellow, INFO=green} %logger{36} - %msg%n</Property>
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
         <Property name="APP_LOG_ROOT">logs</Property>
-        <Property name="SCHEDULE">0 0 2 * * ?</Property>
+        <Property name="SCHEDULE">0 0 2/2 * * ?</Property>
     </Properties>
 
     <Appenders>
