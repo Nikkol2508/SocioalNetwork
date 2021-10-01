@@ -117,11 +117,11 @@ public class DaoPerson {
 
         log.info("updatePersonData(): start():");
         log.debug("updatePersonData(): id = {}, firstName = {}, lastName = {}, birthDate = {}, " +
-                "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
+                        "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
                 phone, photo, city, country, about);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-                        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
-                birthDate, phone, photo, city, country, about, id);
+                        "birth_date = COALESCE(?, birth_date) , phone = ?, photo = ?, city = ?, country = ?, about = ? " +
+                        "WHERE id = ?", firstName, lastName, birthDate, phone, photo, city, country, about, id);
         log.info("updatePersonData(): finish():");
     }
 

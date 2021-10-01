@@ -135,8 +135,7 @@ public class ProfileService {
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-        Long birthDate = request.getBirthDate() == null ? person.getBirthDate()
-                : dateFormat.parse(request.getBirthDate()).getTime();
+        Long birthDate = request.getBirthDate() == null ? null : dateFormat.parse(request.getBirthDate()).getTime();
         String firstName = request.getFirstName() == null || request.getFirstName().isBlank() ? person.getFirstName()
                 : request.getFirstName();
         String lastName = request.getLastName() == null || request.getLastName().isBlank() ? person.getLastName()
