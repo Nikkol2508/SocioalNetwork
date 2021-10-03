@@ -36,12 +36,12 @@ public class ScheduledService {
                 idList, currentPerson.getEmail(), NotificationType.FRIEND_BIRTHDAY);
     }
 
-    @Scheduled(cron = "${scheduled.time.dropbox.save}")
+    @Scheduled(cron = "0 10 1 * * ?")
     private static void saveInDropbox() throws IOException, DbxException {
         DropboxService.saveInDropbox();
     }
 
-    @Scheduled(cron = "${scheduled.time.dropbox.save}")
+    @Scheduled(cron = "${scheduled.time.dropbox.delete}")
     private static void deleteFromDropbox() {
         DropboxService.deleteFromDropbox();
     }
