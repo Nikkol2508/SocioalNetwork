@@ -117,11 +117,11 @@ public class DaoPerson {
 
         log.info("updatePersonData(): start():");
         log.debug("updatePersonData(): id = {}, firstName = {}, lastName = {}, birthDate = {}, " +
-                "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
+                        "phone = {}, photo = {}, city = {}, country = {}, about = {}", id, firstName, lastName, birthDate,
                 phone, photo, city, country, about);
         jdbcTemplate.update("UPDATE person SET first_name = ?, last_name = ?," +
-                        "birth_date = ?, phone = ?, photo = ?, city = ?, country = ?, about = ? WHERE id = ?", firstName, lastName,
-                birthDate, phone, photo, city, country, about, id);
+                        "birth_date = COALESCE(?, birth_date) , phone = ?, photo = ?, city = ?, country = ?, about = ? " +
+                        "WHERE id = ?", firstName, lastName, birthDate, phone, photo, city, country, about, id);
         log.info("updatePersonData(): finish():");
     }
 
@@ -274,16 +274,16 @@ public class DaoPerson {
     }
 
     @Transactional
-    public void updateDeclined(int srcId, int dtcId) {
+    public void updateDeclined(int srcId, int dstId) {
 
         log.info("updateDeclined(): start():");
-        log.debug("updateDeclined(): srcId = {}, dtcId = {}", srcId, dtcId);
+        log.debug("updateDeclined(): srcId = {}, dstId = {}", srcId, dstId);
         String updateFriendship = "UPDATE friendship SET src_person_id = ?, dst_person_id = ? " +
                 "WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE src_person_id = ? AND dst_person_id = ?)";
-        jdbcTemplate.update(updateFriendship, srcId, dtcId, srcId, dtcId, dtcId, srcId);
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST.toString(), srcId, dtcId);
+        jdbcTemplate.update(updateFriendship, srcId, dstId, srcId, dstId, dstId, srcId);
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST.toString(), srcId, dstId);
         log.info("updateDeclined(): finish():");
     }
 
@@ -355,6 +355,15 @@ public class DaoPerson {
         log.debug("getLastOnlineTime(): time = {}", time);
         log.info("getLastOnlineTime(): finish():");
         return time;
+    }
+
+    public void setLastOnlineTime(int personId) {
+
+        log.info("setLastOnlineTime: start():");
+        log.debug("setLastOnlineTime: personId = {}", personId);
+        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
+        jdbcTemplate.update(query, System.currentTimeMillis(), personId);
+        log.info("setLastOnlineTime: finish():");
     }
 
     public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {

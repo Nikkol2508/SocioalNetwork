@@ -1,6 +1,5 @@
 package application.controllers;
 
-import application.models.Notification;
 import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,8 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @TestPropertySource("/application-test.properties")
 @AutoConfigureEmbeddedDatabase(provider = OPENTABLE, refresh = AFTER_CLASS)
-//@Sql(value = {"/test-data-for-profile-controller-test.sql"}, executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-public class ProfileControllerIntegrationTest {
+class ProfileControllerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;

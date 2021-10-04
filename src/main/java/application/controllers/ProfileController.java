@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.text.ParseException;
 
@@ -106,7 +107,7 @@ public class ProfileController {
     public ResponseEntity<GeneralResponse<Post>> addPost(
             @PathVariable int id,
             @RequestParam(value = "publish_date", required = false) Long publishDate,
-            @RequestBody PostRequest postRequest) {
+            @Valid @RequestBody PostRequest postRequest) {
 
         log.info("setPost: start():");
         log.debug("setPost: id = {}, postRequest = {}, publishDate = {}", id, postRequest, publishDate);
@@ -135,5 +136,15 @@ public class ProfileController {
     @DeleteMapping("/block/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
         return ResponseEntity.ok(new GeneralResponse<>(profileService.unlockUser(id)));
+    }
+
+    @PutMapping("/checkOnline")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> checkOnline() {
+
+        log.info("checkOnline: start():");
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.checkOnline());
+        log.debug("checkOnline: response = {}", response);
+        log.info("checkOnline: finish():");
+        return ResponseEntity.ok(response);
     }
 }

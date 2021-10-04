@@ -1,8 +1,8 @@
 package application.exceptions;
 
 import com.github.dockerjava.api.exception.UnauthorizedException;
-import org.springframework.http.HttpHeaders;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -92,6 +92,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleUserIsBlockedException(
             UserIsBlockedException exception, HttpServletRequest request) {
+
+        return buildError(exception, HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException exception, HttpServletRequest request) {
 
         return buildError(exception, HttpStatus.BAD_REQUEST, request);
     }

@@ -39,8 +39,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/v1/account/password/*",
             "/api/v1/account/email",
             "/profile/storage/*",
-            "/storage/*"
-            // other public endpoints of your API may be appended to this array
+            "/storage/*",
+            "api/v1/admin/login"
     };
 
 
@@ -55,6 +55,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic().disable()
                 .csrf().disable()
+                .cors().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()

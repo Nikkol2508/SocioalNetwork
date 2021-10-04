@@ -133,7 +133,7 @@ public class DaoNotification {
         String update = "UPDATE notification_settings SET type_id = ? WHERE person_id = ? AND " +
                 "type_id = (SELECT notification_setting_type.id FROM notification_setting_type " +
                 "WHERE notification_setting_type.code = ? AND notification_setting_type.id = notification_settings.type_id)";
-        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notificationType);
+        jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notificationType.toString());
         log.info("setSettings(): finish():");
         jdbcTemplate.update(update, simpleJdbcInsert.executeAndReturnKey(param).intValue(), id, notificationType.toString());
     }

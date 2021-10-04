@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -61,8 +59,7 @@ public class FriendsController {
     }
 
     @PostMapping("friends/{id}")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> addFriendForId(
-            @PathVariable int id) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> addFriendForId(@PathVariable int id) {
 
         log.info("addFriendForId(): start():");
         log.debug("addFriendForId(): friendId = {}", id);
@@ -73,8 +70,7 @@ public class FriendsController {
     }
 
     @DeleteMapping("friends/{id}")
-    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteFriendForId(
-            @PathVariable int id) {
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> deleteFriendForId(@PathVariable int id) {
 
         log.info("deleteFriendForId(): start():");
         log.debug("deleteFriendForId(): friendId = {}", id);
