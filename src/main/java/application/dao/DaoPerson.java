@@ -283,7 +283,7 @@ public class DaoPerson {
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
                 "FROM friendship WHERE src_person_id = ? AND dst_person_id = ?)";
         jdbcTemplate.update(updateFriendship, srcId, dtcId, srcId, dtcId, dtcId, srcId);
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST, srcId, dtcId);
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.REQUEST.toString(), srcId, dtcId);
         log.info("updateDeclined(): finish():");
     }
 

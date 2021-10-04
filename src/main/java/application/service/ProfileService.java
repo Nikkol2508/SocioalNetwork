@@ -43,11 +43,11 @@ public class ProfileService {
     public PersonDto getPerson(int id) {
 
         Person person = daoPerson.getById(id);
+        Person activePerson = daoPerson.getAuthPerson();
         if (person == null) {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
         if (!person.isBlocked()) {
-            Person activePerson = daoPerson.getAuthPerson();
             person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
         }
         return PersonDto.fromPerson(person);
