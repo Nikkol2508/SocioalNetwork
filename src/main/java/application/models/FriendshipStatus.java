@@ -6,4 +6,6 @@ public enum FriendshipStatus {
     BLOCKED,
     DECLINED,
     SUBSCRIBED,
+    REQUEST_RECEIVED,
+    REQUEST_SENT
 }

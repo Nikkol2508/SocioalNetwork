@@ -135,6 +135,6 @@ public class ProfileController {
 
     @DeleteMapping("/block/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
-        return ResponseEntity.ok(new GeneralResponse<>(profileService.unlockUser(id)));
+        return ResponseEntity.ok(new GeneralResponse<>(profileService.unblockUser(id)));
     }
 }

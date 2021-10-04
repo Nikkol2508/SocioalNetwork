@@ -52,6 +52,20 @@ public class ProfileService {
         }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setMe(personDto.getId() == activePerson.getId());
+        try {
+            String status = daoPerson.getFriendStatus(id, activePerson.getId());
+            if (status.equals(FriendshipStatus.FRIEND.toString())) {
+                personDto.setIsFriend(FriendshipStatus.FRIEND.toString());
+            } else if (status.equals(FriendshipStatus.REQUEST.toString())) {
+                if (daoPerson.getSrcPersonIdFriendRequest(id, activePerson.getId()) == activePerson.getId()) {
+                    personDto.setIsFriend(FriendshipStatus.REQUEST_SENT.toString());
+                } else {
+                    personDto.setIsFriend(FriendshipStatus.REQUEST_RECEIVED.toString());
+                }
+            }
+        } catch (EmptyResultDataAccessException exception) {
+            return personDto;
+        }
         return personDto;
     }
 
@@ -179,7 +193,7 @@ public class ProfileService {
         }
     }
 
-    public MessageResponseDto unlockUser(int id) {
+    public MessageResponseDto unblockUser(int id) {
         daoPerson.unblockUser(id, daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }

@@ -86,7 +86,7 @@ public class FriendsService {
         if (friendStatus.equals(FriendshipStatus.FRIEND.toString())) {
             daoPerson.deleteFriendForID(currentPerson.getId(), id);
         } else if (friendStatus.equals(FriendshipStatus.REQUEST.toString())) {
-            daoPerson.unAcceptRequest(currentPerson.getId(), id);
+            daoPerson.declineRequest(currentPerson.getId(), id);
         }
         return new MessageResponseDto();
     }

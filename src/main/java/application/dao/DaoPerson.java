@@ -242,6 +242,11 @@ public class DaoPerson {
         return status;
     }
 
+    public Integer getSrcPersonIdFriendRequest(int srcId, int dstId) {
+        String select = "SELECT src_person_id FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
+        return jdbcTemplate.queryForObject(select, new Object[]{srcId, dstId, dstId, srcId}, Integer.class);
+    }
+
     public void deleteFriendForID(int srcId, int dstId) {
 
         log.info("deleteFriendForID(): start():");
@@ -263,7 +268,7 @@ public class DaoPerson {
         return getByEmail(authentication.getName());
     }
 
-    public void unAcceptRequest(int dstId, int srcId) {
+    public void declineRequest(int dstId, int srcId) {
 
         log.info("unAcceptRequest(): start():");
         log.debug("unAcceptRequest(): srcId = {}, dstId = {}", srcId, dstId);
@@ -367,9 +372,9 @@ public class DaoPerson {
         jdbcTemplate.update(query, personId, blockId);
     }
 
-    public void unblockUser(int blockUserId, int userId) {
+    public void unblockUser(int blockedPersonId, int blockingPersonId) {
         String query = "DELETE FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
-        jdbcTemplate.update(query, userId, blockUserId);
+        jdbcTemplate.update(query, blockingPersonId, blockedPersonId);
     }
 
     public void deleteRequest(int id, int id1) {
