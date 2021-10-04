@@ -197,4 +197,9 @@ public class ProfileService {
         daoPerson.unblockUser(id, daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
     }
+
+    public MessageResponseDto checkOnline() {
+        daoPerson.setLastOnlineTime(daoPerson.getAuthPerson().getId());
+        return new MessageResponseDto();
+    }
 }

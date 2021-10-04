@@ -137,4 +137,14 @@ public class ProfileController {
     public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
         return ResponseEntity.ok(new GeneralResponse<>(profileService.unblockUser(id)));
     }
+
+    @PutMapping("/checkOnline")
+    public ResponseEntity<GeneralResponse<MessageResponseDto>> checkOnline() {
+
+        log.info("checkOnline: start():");
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.checkOnline());
+        log.debug("checkOnline: response = {}", response);
+        log.info("checkOnline: finish():");
+        return ResponseEntity.ok(response);
+    }
 }

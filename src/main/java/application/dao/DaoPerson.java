@@ -362,6 +362,15 @@ public class DaoPerson {
         return time;
     }
 
+    public void setLastOnlineTime(int personId) {
+
+        log.info("setLastOnlineTime: start():");
+        log.debug("setLastOnlineTime: personId = {}", personId);
+        String query = "UPDATE person SET last_online_time = ? WHERE id = ?";
+        jdbcTemplate.update(query, System.currentTimeMillis(), personId);
+        log.info("setLastOnlineTime: finish():");
+    }
+
     public boolean isPersonBlockedByAnotherPerson(int blockingPerson, int blockedPerson) {
         String query = "SELECT count(*) FROM blocking_persons WHERE blocking_person_id = ? AND blocked_person_id = ?";
         return jdbcTemplate.queryForObject(query, new Object[]{blockingPerson, blockedPerson}, Integer.class) != 0;
