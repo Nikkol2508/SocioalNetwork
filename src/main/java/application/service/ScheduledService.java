@@ -25,15 +25,17 @@ public class ScheduledService {
     @Scheduled(cron = "${scheduled.time.birthdate.friends}")
     private void getBirthDateId() {
         LocalDate now = LocalDate.now();
-        Person currentPerson = daoPerson.getAuthPerson();
-        List<Integer> idList = daoPerson.getFriends(currentPerson.getId()).stream().filter(person -> Instant
-                .ofEpochMilli(person.getBirthDate()).atZone(ZoneId.systemDefault())
-                .toLocalDate().getDayOfMonth() == now.getDayOfMonth() && Instant
-                .ofEpochMilli(person.getBirthDate()).atZone(ZoneId.systemDefault())
-                .toLocalDate().getMonth() == now.getMonth()).map(Person::getId).collect(Collectors.toList());
+        List<Person> allPerson = daoPerson.getAllPerson();
+        for (Person person : allPerson) {
+            List<Integer> idList = daoPerson.getFriends(person.getId()).stream().filter(p -> Instant
+                    .ofEpochMilli(person.getBirthDate()).atZone(ZoneId.systemDefault())
+                    .toLocalDate().getDayOfMonth() == now.getDayOfMonth() && Instant
+                    .ofEpochMilli(person.getBirthDate()).atZone(ZoneId.systemDefault())
+                    .toLocalDate().getMonth() == now.getMonth()).map(Person::getId).collect(Collectors.toList());
 
-        daoNotification.addFriendBirthdateNotification(System.currentTimeMillis(), currentPerson.getId(),
-                idList, currentPerson.getEmail(), NotificationType.FRIEND_BIRTHDAY);
+            daoNotification.addFriendBirthdateNotification(System.currentTimeMillis(), person.getId(),
+                    idList, person.getEmail(), NotificationType.FRIEND_BIRTHDAY);
+        }
     }
 
     @Scheduled(cron = "0 10 1 * * ?")

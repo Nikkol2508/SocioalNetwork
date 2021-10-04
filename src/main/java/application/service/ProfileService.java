@@ -25,7 +25,9 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,12 +49,16 @@ public class ProfileService {
         if (person == null) {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
-        Person activePerson = daoPerson.getAuthPerson();
+        List<Integer> blockedIdFromPerson = daoPerson.getBlockId(id);
         if (!person.isBlocked()) {
             person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
         }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setMe(personDto.getId() == activePerson.getId());
+        if (!blockedIdFromPerson.isEmpty()) {
+            personDto.setYouBlocked(blockedIdFromPerson.stream().filter(
+                    i -> blockedIdFromPerson.contains(id)).findFirst().orElse(0) == activePerson.getId());
+        }
         return personDto;
     }
 
@@ -131,8 +137,14 @@ public class ProfileService {
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
+        String regexForPhone = "^79\\d{9}$";
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
+        }
+
+        if (!request.getPhone().matches(regexForPhone)) {
+            throw new EntityNotFoundException("Number " + request.getPhone() + " is`t correct." +
+                    " Please write another number");
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -143,7 +155,8 @@ public class ProfileService {
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
-        daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, request.getPhone(),
+        daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate,
+                request.getPhone().replaceFirst("7", ""),
                 photo, request.getCity(), request.getCountry(), request.getAbout());
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }

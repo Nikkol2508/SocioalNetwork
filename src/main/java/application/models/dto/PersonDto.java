@@ -45,6 +45,9 @@ public class PersonDto {
     @JsonProperty("me")
     private boolean isMe;
 
+    @JsonProperty("is_you_blocked")
+    private boolean isYouBlocked;
+
     public static PersonDto fromPerson(Person person) {
         PersonDto personDto = new PersonDto();
         personDto.setId(person.getId());
