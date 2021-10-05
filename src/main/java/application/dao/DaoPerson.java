@@ -394,4 +394,9 @@ public class DaoPerson {
         jdbcTemplate.update(deleteFriendship, id, id1, id1, id);
         jdbcTemplate.update(queryForDeleteStatus, statusId);
     }
+
+    public List<Person> getAllPerson () {
+        String query = "SELECT * FROM person";
+        return jdbcTemplate.query(query, new PersonMapper());
+    }
 }

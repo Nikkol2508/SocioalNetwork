@@ -49,11 +49,23 @@ public class FriendsService {
         }
 
         List<Integer> finalListBlockPerson = listBlockPerson;
+
+        if (personList.size() > 0 && personList.size() < 20) {
+            val recommendOnRegDate = daoPerson.getRecommendationsOnRegDate(currentPerson.getId());
+            for (int i = 0; i < 20 - personList.size(); i++) {
+                personList.add(recommendOnRegDate.get(i));
+            }
+
+            return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
+                    .collect(Collectors.toSet()).stream()
+                    .map(PersonDto::fromPerson).collect(Collectors.toList());
+        }
+
         return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
                 .filter(person -> !finalListBlockPerson.contains(person.getId()))
                 .map(PersonDto::fromPerson).collect(Collectors.toList()) :
-                personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId())).map(PersonDto::fromPerson)
-                        .collect(Collectors.toList());
+                personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
+                        .map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public MessageResponseDto addFriendForId(int id) {

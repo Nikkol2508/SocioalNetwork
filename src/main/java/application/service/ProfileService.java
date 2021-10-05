@@ -47,11 +47,16 @@ public class ProfileService {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
         Person activePerson = daoPerson.getAuthPerson();
+        List<Integer> blockedIdFromPerson = daoPerson.getBlockId(id);
         if (!person.isBlocked()) {
             person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
         }
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setMe(personDto.getId() == activePerson.getId());
+        if (!blockedIdFromPerson.isEmpty()) {
+            personDto.setYouBlocked(blockedIdFromPerson.stream().filter(
+                    i -> blockedIdFromPerson.contains(id)).findFirst().orElse(0) == activePerson.getId());
+        }
         try {
             String status = daoPerson.getFriendStatus(id, activePerson.getId());
             if (status.equals(FriendshipStatus.FRIEND.toString())) {
@@ -144,8 +149,14 @@ public class ProfileService {
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
+        String regexForPhone = "^79\\d{9}$";
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
+        }
+
+        if (!request.getPhone().matches(regexForPhone)) {
+            throw new EntityNotFoundException("Number " + request.getPhone() + " is`t correct." +
+                    " Please write another number");
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

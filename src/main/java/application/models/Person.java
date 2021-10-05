@@ -1,8 +1,10 @@
 package application.models;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode
 public class Person {
 
     private int id;
