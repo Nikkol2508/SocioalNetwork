@@ -1,9 +1,14 @@
 package application.exceptions;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class UserIsBlockedException extends Exception {
+
+    private final String message;
 
     @Override
     public String getMessage() {
-        return "You can't send message (one of the participants of the dialog is blocked)";
+        return message;
     }
 }

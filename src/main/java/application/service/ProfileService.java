@@ -114,7 +114,7 @@ public class ProfileService {
         }
         ZonedDateTime zonedDateTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         ageFrom = ageFrom != null ? zonedDateTime.minusYears(ageFrom).toInstant().toEpochMilli() : null;
-        ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo).toInstant().toEpochMilli() : null;
+        ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo + 1).toInstant().toEpochMilli() : null;
         val listPersons = daoPerson.searchPersons(
                 firstName, lastName, ageFrom, ageTo, country, city);
         return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());

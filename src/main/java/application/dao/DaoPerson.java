@@ -85,8 +85,7 @@ public class DaoPerson {
                 "JOIN friendship_status f on f.id = friendship.status_id WHERE code = ? AND src_person_id " +
                 "IN (SELECT dst_person_id FROM friendship WHERE src_person_id = ?)) AND id != ?";
         List<Person> personList = jdbcTemplate.query(selectRecommendations, new Object[]{FriendshipStatus.FRIEND.toString(), id, id,
-                        FriendshipStatus.FRIEND.toString(), id, id},
-                new PersonMapper());
+                        FriendshipStatus.FRIEND.toString(), id, id}, new PersonMapper());
         log.debug("getRecommendations(): personList = {}", personList);
         log.info("getRecommendations(): finish():");
         return personList;
@@ -273,8 +272,8 @@ public class DaoPerson {
         log.info("unAcceptRequest(): start():");
         log.debug("unAcceptRequest(): srcId = {}, dstId = {}", srcId, dstId);
         String updateFriendshipStatus = "UPDATE friendship_status SET code = ? WHERE id = (SELECT status_id " +
-                "FROM friendship WHERE dst_person_id = ? AND src_person_id = ?)";
-        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(), dstId, srcId);
+                "FROM friendship WHERE dst_person_id IN (?, ?) AND src_person_id IN (?, ?))";
+        jdbcTemplate.update(updateFriendshipStatus, FriendshipStatus.DECLINED.toString(), dstId, srcId, dstId, srcId);
         log.info("unAcceptRequest(): finish():");
     }
 
@@ -314,7 +313,7 @@ public class DaoPerson {
 
         String query = "SELECT * FROM person WHERE (first_name ILIKE ? OR ?::text IS NULL)" +
                 "AND (last_name ILIKE ? OR ?::text IS NULL) AND (birth_date <= ? OR ?::bigint IS NULL) " +
-                "AND (birth_date >= ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
+                "AND (birth_date > ? OR ?::bigint IS NULL) AND (country ILIKE ? OR ?::text IS NULL) " +
                 "AND (city ILIKE ? OR ?::text IS NULL)";
         List<Person> personList = new ArrayList<>(jdbcTemplate.query(query, new Object[]{prepareParam(firstName), firstName,
                 prepareParam(lastName), lastName, ageFrom, ageFrom, ageTo, ageTo, prepareParam(country), country,

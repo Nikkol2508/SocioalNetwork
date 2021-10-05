@@ -36,6 +36,7 @@ public class FriendsService {
     }
 
     public List<PersonDto> getUserFriendsRecommendations() {
+
         Person currentPerson = daoPerson.getAuthPerson();
 
         List<Integer> listBlockPerson;

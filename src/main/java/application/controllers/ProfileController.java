@@ -138,7 +138,7 @@ public class ProfileController {
         return ResponseEntity.ok(new GeneralResponse<>(profileService.unblockUser(id)));
     }
 
-    @PutMapping("/checkOnline")
+    @PutMapping("/checkonline")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> checkOnline() {
 
         log.info("checkOnline: start():");
