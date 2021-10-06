@@ -30,7 +30,9 @@ public class AuthService {
             String email = request.getEmail();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, request.getPassword()));
             String token = jwtTokenProvider.createToken(email);
-            return getAuth(request, token);
+            PersonDto personDto = getAuth(request, token);
+            daoPerson.setLastOnlineTime(personDto.getId());
+            return personDto;
         } catch (AuthenticationException ex) {
             throw new BadCredentialsException("Invalid username or password");
         }

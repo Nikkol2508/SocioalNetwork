@@ -46,7 +46,7 @@ public class DropboxService {
         try {
             getDbxClient().files().deleteV2("/logs/" + calendar.get(Calendar.DAY_OF_MONTH));
         } catch (DbxException e) {
-            log.error("File not found: stecTrace {}", (Object) e.getStackTrace());
+            log.error("File not found: stackTrace {}", (Object) e.getStackTrace());
         }
     }
 
@@ -58,9 +58,9 @@ public class DropboxService {
 
     public void deleteImageFromDropbox(String fileName) {
         try {
-            getDbxClient().files().deleteV2("/storage/" + fileName);
+            getDbxClient().files().deleteV2("/" + fileName);
         } catch (DbxException e) {
-            log.error("File not found: stecTrace {}", (Object) e.getStackTrace());
+            log.error("File not found: stackTrace {}", (Object) e.getStackTrace());
         }
     }
 

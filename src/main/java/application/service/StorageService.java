@@ -5,12 +5,12 @@ import application.dao.DaoPerson;
 import application.models.FileDescription;
 import com.dropbox.core.DbxException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Objects;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StorageService {
@@ -24,6 +24,7 @@ public class StorageService {
         if (!file.isEmpty()) {
             if (daoPerson.getAuthPerson().getPhoto() != null){
             dropboxService.deleteImageFromDropbox(daoPerson.getAuthPerson().getPhoto());
+            log.debug("deleteImageFromDropbox: getPhoto() = {}", daoPerson.getAuthPerson().getPhoto());
             daoFile.deleteImage(daoPerson.getAuthPerson().getId());
             }
             fileDto.setOwnerId(daoPerson.getAuthPerson().getId());

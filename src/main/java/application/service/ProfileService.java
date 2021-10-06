@@ -25,9 +25,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -137,14 +135,8 @@ public class ProfileService {
     public PersonDto changeProfile(PersonSettingsDtoRequest request) throws ParseException {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         Person person = daoPerson.getByEmail(email);
-        String regexForPhone = "^79\\d{9}$";
         if (person == null) {
             throw new EntityNotFoundException("Person with email " + email + " is not found.");
-        }
-
-        if (!request.getPhone().matches(regexForPhone)) {
-            throw new EntityNotFoundException("Number " + request.getPhone() + " is`t correct." +
-                    " Please write another number");
         }
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
