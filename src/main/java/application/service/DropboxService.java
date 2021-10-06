@@ -4,6 +4,8 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,11 +16,12 @@ import java.nio.file.Paths;
 import java.util.Calendar;
 
 @Slf4j
+@Service
 public class DropboxService {
 
-    private static String ACCESS_TOKEN = "j45ajYtbzMUAAAAAAAAAARzdRDRVoUgtUPodzflFti0_KGFyh6xvANTFallXvuOa";
     public static Calendar calendar = Calendar.getInstance();
     public static int daysBeforeDeletion = -5;
+    private static final String ACCESS_TOKEN = "j45ajYtbzMUAAAAAAAAAARzdRDRVoUgtUPodzflFti0_KGFyh6xvANTFallXvuOa";
 
     private static DbxClientV2 getDbxClient() {
         DbxRequestConfig config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build();
@@ -43,8 +46,26 @@ public class DropboxService {
         try {
             getDbxClient().files().deleteV2("/logs/" + calendar.get(Calendar.DAY_OF_MONTH));
         } catch (DbxException e) {
-            log.error("File not found: stecTrace {}", e.getStackTrace());
+            log.error("File not found: stecTrace {}", (Object) e.getStackTrace());
         }
+    }
+
+    public void saveImageToDropbox(MultipartFile file, String name) throws IOException, DbxException {
+
+        getDbxClient().files().uploadBuilder("/storage/" + name)
+                .uploadAndFinish(file.getInputStream());
+    }
+
+    public void deleteImageFromDropbox(String fileName) {
+        try {
+            getDbxClient().files().deleteV2("/storage/" + fileName);
+        } catch (DbxException e) {
+            log.error("File not found: stecTrace {}", (Object) e.getStackTrace());
+        }
+    }
+
+    public byte[] getImageFromDropbox(String fileName) throws DbxException, IOException {
+        return getDbxClient().files().download("/storage/" + fileName).getInputStream().readAllBytes();
     }
 
 }

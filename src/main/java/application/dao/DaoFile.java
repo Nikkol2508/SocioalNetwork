@@ -27,7 +27,7 @@ public class DaoFile {
                 " url, format, bytes, type, time, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlInsertFileDescription, fileDescription.getOwnerId(), fileDescription.getFileName(),
                 fileDescription.getRelativeFilePath(), fileDescription.getRawFileURL(), fileDescription.getFileFormat(),
-                fileDescription.getBytes(), fileDescription.getFileType(), fileDescription.getCreatedAt(), fileDescription.getData());
+                fileDescription.getBytes(), fileDescription.getFileType(), fileDescription.getCreatedAt());
         log.info("save(): finish():");
     }
 
@@ -57,7 +57,6 @@ public class DaoFile {
         parameters.put("bytes", fileDescription.getBytes());
         parameters.put("type", fileDescription.getFileType());
         parameters.put("time", System.currentTimeMillis());
-        parameters.put("data", fileDescription.getData());
         FileDescription returnedDescription = getById(sji.executeAndReturnKey(parameters).intValue());
         //log.debug("saveAndReturn(): returnedDescription = {}", returnedDescription);
         log.info("saveAndReturn(): finish():");
@@ -90,16 +89,6 @@ public class DaoFile {
         jdbcTemplate.update("DELETE FROM image where owner_id = ?", personId);
         log.info("deleteImage(): finish():");
     }
-
-//    public void deleteByPersonId(int personId, String path) throws NullPointerException {
-//
-//        String query = "DELETE FROM image WHERE owner_id = ?";
-//        File file = new File(path);
-//        if (file.) {
-//            file.delete();
-//            jdbcTemplate.update(query, personId);
-//        }
-//    }
 }
 
 
