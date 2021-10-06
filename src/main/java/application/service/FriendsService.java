@@ -43,7 +43,7 @@ public class FriendsService {
         val personList = daoPerson.getRecommendations(currentPerson.getId());
 
         try {
-            listBlockPerson = daoPerson.getBlockId(currentPerson.getId());
+            listBlockPerson = daoPerson.getBlockedIds(currentPerson.getId());
         } catch (EmptyResultDataAccessException e) {
             listBlockPerson = Collections.emptyList();
         }

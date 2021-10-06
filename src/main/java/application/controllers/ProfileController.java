@@ -93,7 +93,7 @@ public class ProfileController {
 
     @PutMapping("/me")
     public ResponseEntity<GeneralResponse<PersonDto>> updateProfile(
-            @RequestBody PersonSettingsDtoRequest request) throws ParseException {
+            @Valid @RequestBody PersonSettingsDtoRequest request) throws ParseException {
 
         log.info("changeProfile: start():");
         log.debug("changeProfile: request = {}", request);

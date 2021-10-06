@@ -91,7 +91,7 @@ public class DaoPerson {
         return personList;
     }
 
-    public List<Integer> getBlockId(int id) {
+    public List<Integer> getBlockedIds(int id) {
         String query = "SELECT blocked_person_id FROM blocking_persons WHERE blocking_person_id = ?";
         return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
     }
