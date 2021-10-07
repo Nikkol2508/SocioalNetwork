@@ -102,7 +102,6 @@ class StorageControllerIntegrationTest {
         fileDescription.setFileFormat(file.getContentType());
         fileDescription.setBytes(file.getBytes().length);
         fileDescription.setFileType("IMAGE");
-        fileDescription.setData(file.getBytes());
         daoFile.saveAndReturn(fileDescription);
 
         mockMvc.perform(get("/storage/testImage")).andExpect(status().isOk())
@@ -124,7 +123,6 @@ class StorageControllerIntegrationTest {
         fileDescription.setFileFormat(file.getContentType());
         fileDescription.setBytes(file.getBytes().length);
         fileDescription.setFileType("IMAGE");
-        fileDescription.setData(file.getBytes());
         daoFile.saveAndReturn(fileDescription);
 
         mockMvc.perform(get("/profile/storage/testProfileImage2")).andExpect(status().isOk())

@@ -52,11 +52,16 @@ public class FriendsService {
 
         if (personList.size() > 0 && personList.size() < 20) {
             val recommendOnRegDate = daoPerson.getRecommendationsOnRegDate(currentPerson.getId());
-            for (int i = 0; i < 20 - personList.size(); i++) {
+            int size = recommendOnRegDate.size() > 20 ? 20 - personList.size() : recommendOnRegDate.size();
+            for (int i = 0; i < size; i++) {
                 personList.add(recommendOnRegDate.get(i));
             }
 
+            val userFriendsListId = getUserFriends().stream().map(PersonDto::getId)
+                    .collect(Collectors.toList());
+
             return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
+                    .filter(person -> !userFriendsListId.contains(person.getId()))
                     .collect(Collectors.toSet()).stream()
                     .map(PersonDto::fromPerson).collect(Collectors.toList());
         }
