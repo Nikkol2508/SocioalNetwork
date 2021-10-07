@@ -26,7 +26,11 @@ public class FriendsService {
     public List<PersonDto> getUserFriends() {
 
         return daoPerson.getFriends(daoPerson.getAuthPerson().getId()).stream()
-                .map(PersonDto::fromPerson).collect(Collectors.toList());
+                .map(person -> {
+                    PersonDto personDto = PersonDto.fromPerson(person);
+                    personDto.setFriendStatus(FriendshipStatus.FRIEND.toString());
+                    return personDto;
+                }).collect(Collectors.toList());
     }
 
     public List<PersonDto> getUserFriendsRequest() {

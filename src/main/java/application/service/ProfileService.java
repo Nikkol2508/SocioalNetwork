@@ -11,7 +11,6 @@ import application.models.dto.PostDto;
 import application.models.requests.PersonSettingsDtoRequest;
 import application.models.requests.PostRequest;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -47,30 +46,10 @@ public class ProfileService {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
         Person activePerson = daoPerson.getAuthPerson();
-        if (!person.isBlocked()) {
-            person.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePerson.getId(), id));
-        }
-        PersonDto personDto = PersonDto.fromPerson(person);
-        personDto.setMe(personDto.getId() == activePerson.getId());
-        personDto.setYouBlocked(daoPerson.getBlockedIds(id).contains(activePerson.getId()));
-        try {
-            String status = daoPerson.getFriendStatus(id, activePerson.getId());
-            if (status.equals(FriendshipStatus.FRIEND.toString())) {
-                personDto.setIsFriend(FriendshipStatus.FRIEND.toString());
-            } else if (status.equals(FriendshipStatus.REQUEST.toString())) {
-                if (daoPerson.getSrcPersonIdFriendRequest(id, activePerson.getId()) == activePerson.getId()) {
-                    personDto.setIsFriend(FriendshipStatus.REQUEST_SENT.toString());
-                } else {
-                    personDto.setIsFriend(FriendshipStatus.REQUEST_RECEIVED.toString());
-                }
-            }
-        } catch (EmptyResultDataAccessException exception) {
-            return personDto;
-        }
-        return personDto;
+        return getExtendedPersonDto(PersonDto.fromPerson(person), activePerson.getId());
     }
 
-    public PersonDto getProfile() throws EntityNotFoundException{
+    public PersonDto getProfile() throws EntityNotFoundException {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Person person = daoPerson.getByEmail(authentication.getName());
@@ -81,7 +60,6 @@ public class ProfileService {
         PersonDto personDto = PersonDto.fromPerson(person);
         personDto.setToken(personDto.getToken());
         personDto.setMe(true);
-
         return personDto;
     }
 
@@ -109,16 +87,18 @@ public class ProfileService {
                 && (country == null || country.isBlank()) && (city == null || city.isBlank())) {
             return new ArrayList<>();
         }
+        Person activePerson = daoPerson.getAuthPerson();
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
+                    .map(personDto -> getExtendedPersonDto(personDto, activePerson.getId()))
                     .collect(Collectors.toList());
         }
         ZonedDateTime zonedDateTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         ageFrom = ageFrom != null ? zonedDateTime.minusYears(ageFrom).toInstant().toEpochMilli() : null;
         ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo + 1).toInstant().toEpochMilli() : null;
-        val listPersons = daoPerson.searchPersons(
-                firstName, lastName, ageFrom, ageTo, country, city);
-        return listPersons.stream().map(PersonDto::fromPerson).collect(Collectors.toList());
+        return daoPerson.searchPersons(firstName, lastName, ageFrom, ageTo, country, city).stream()
+                .map(p -> getExtendedPersonDto(PersonDto.fromPerson(p), activePerson.getId()))
+                .collect(Collectors.toList());
     }
 
     public Post setPost(int authorId, Long publishDate, PostRequest postRequest) {
@@ -157,7 +137,7 @@ public class ProfileService {
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
-        String phone = request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone();
+        String phone = request.getPhone() != null ? request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone() : null;
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
                 photo, request.getCity(), request.getCountry(), request.getAbout());
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
@@ -203,5 +183,28 @@ public class ProfileService {
     public MessageResponseDto checkOnline() {
         daoPerson.setLastOnlineTime(daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
+    }
+
+    private PersonDto getExtendedPersonDto(PersonDto personDto, int activePersonId) {
+        if (!personDto.isBlocked()) {
+            personDto.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePersonId, personDto.getId()));
+        }
+        personDto.setMe(personDto.getId() == activePersonId);
+        personDto.setBlockedByThisPerson(daoPerson.isPersonBlockedByAnotherPerson(personDto.getId(), activePersonId));
+        try {
+            String status = daoPerson.getFriendStatus(personDto.getId(), activePersonId);
+            if (status.equals(FriendshipStatus.FRIEND.toString())) {
+                personDto.setFriendStatus(FriendshipStatus.FRIEND.toString());
+            } else if (status.equals(FriendshipStatus.REQUEST.toString())) {
+                if (daoPerson.getSrcPersonIdFriendRequest(personDto.getId(), activePersonId) == activePersonId) {
+                    personDto.setFriendStatus(FriendshipStatus.REQUEST_SENT.toString());
+                } else {
+                    personDto.setFriendStatus(FriendshipStatus.REQUEST_RECEIVED.toString());
+                }
+            }
+        } catch (EmptyResultDataAccessException exception) {
+            return personDto;
+        }
+        return personDto;
     }
 }

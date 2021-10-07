@@ -145,7 +145,7 @@ public class DialogsService {
         if (foundDialog == null) {
             int dialogId = daoDialog.createDialog(activeUserId, request.getUsersIds().get(0));
             Person personFromRequest = daoPerson.getById(request.getUsersIds().get(0));
-            sendMessage(dialogId, new MessageSendDtoRequest(String.format("Create new dialog with %s %s",
+            sendMessage(dialogId, new MessageSendDtoRequest(String.format("Hi, %s %s. Let's talk!",
                     personFromRequest.getFirstName(), personFromRequest.getLastName())));
             return new DialogIdDto(dialogId);
         } else {

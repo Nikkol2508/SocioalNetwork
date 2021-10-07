@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.exceptions.UserIsBlockedException;
 import application.models.dto.CommentDto;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PostDto;
@@ -75,7 +76,9 @@ public class PostsController {
 
     @PostMapping("/{id}/comments")
     public ResponseEntity<GeneralResponse<CommentDto>> postComment(@PathVariable String id,
-                                                                   @RequestBody CommentRequest commentRequest) {
+                                                                   @RequestBody CommentRequest commentRequest)
+            throws UserIsBlockedException {
+
         log.info("setComment(): start():");
         log.debug("setComment(): commentId = {}, requestBody = {}", id, commentRequest);
         GeneralResponse<CommentDto> generalResponse = new GeneralResponse<>(postsService.setComment(id, commentRequest));

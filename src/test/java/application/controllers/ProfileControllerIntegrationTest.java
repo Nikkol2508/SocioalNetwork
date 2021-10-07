@@ -1424,7 +1424,7 @@ class ProfileControllerIntegrationTest {
         request.setCity("Bobryisk");
         request.setCountry("Belarus");
         request.setAbout("Some information");
-        request.setPhone("89774743685");
+        request.setPhone("79774743685");
         request.setPhotoId("1");
 
         validateResultCorrectSearchPersonOrSetPost(mockMvc.perform(put("/api/v1/users/me")
@@ -1434,7 +1434,7 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.city", is("Bobryisk")))
                 .andExpect(jsonPath("$.data.country", is("Belarus")))
                 .andExpect(jsonPath("$.data.about", is("Some information")))
-                .andExpect(jsonPath("$.data.phone", is("89774743685")))
+                .andExpect(jsonPath("$.data.phone", is("79774743685")))
                 .andExpect(jsonPath("$.data.first_name", is("Some name")))
                 .andExpect(jsonPath("$.data.last_name", is("Some surname")))
                 .andExpect(jsonPath("$.data.photo", containsString("storage/testImagepng")))

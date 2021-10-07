@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.*;
+import application.exceptions.UserIsBlockedException;
 import application.models.*;
 import application.models.dto.*;
 import application.models.requests.CommentRequest;
@@ -85,7 +86,7 @@ public class PostsService {
         return getComments(Integer.valueOf(postId));
     }
 
-    public CommentDto setComment(String postId, CommentRequest commentRequest) {
+    public CommentDto setComment(String postId, CommentRequest commentRequest) throws UserIsBlockedException {
 
         Comment postComment = new Comment();
         postComment.setParentId(commentRequest.getParentId());
@@ -95,11 +96,14 @@ public class PostsService {
             undefinedPostId = postId;
         }
         postComment.setPostId(Integer.valueOf(postId));
-        postComment.setTime(System.currentTimeMillis());
         Person currentPerson = daoPerson.getAuthPerson();
+        Person person = daoPerson.getById(daoPost.getById(postComment.getPostId()).getAuthorId());
+        if (daoPerson.isPersonBlockedByAnotherPerson(person.getId(), currentPerson.getId())) {
+            throw new UserIsBlockedException("The author of the post has blocked you, you can't leave comment");
+        }
+        postComment.setTime(System.currentTimeMillis());
         postComment.setAuthorId(currentPerson.getId());
         int comId = daoComment.save(postComment);
-        Person person = daoPerson.getById(daoPost.getById(postComment.getPostId()).getAuthorId());
         daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), postComment.getTime(),
                 comId, person.getEmail(), postComment.getParentId() == null
                         ? NotificationType.POST_COMMENT.toString() : NotificationType.COMMENT_COMMENT.toString(),

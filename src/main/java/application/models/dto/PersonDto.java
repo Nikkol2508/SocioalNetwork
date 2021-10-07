@@ -46,10 +46,10 @@ public class PersonDto {
     private boolean isMe;
 
     @JsonProperty("is_friend")
-    private String isFriend;
+    private String friendStatus;
 
     @JsonProperty("is_you_blocked")
-    private boolean isYouBlocked;
+    private boolean isBlockedByThisPerson;
 
     public static PersonDto fromPerson(Person person) {
         PersonDto personDto = new PersonDto();
