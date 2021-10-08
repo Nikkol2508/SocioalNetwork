@@ -43,7 +43,7 @@ public class ScheduledService {
         DropboxService.saveInDropbox();
     }
 
-    @Scheduled(cron = "${scheduled.time.dropbox.delete}")
+    @Scheduled(cron = "0 0 2 * * ?")
     private static void deleteFromDropbox() {
         DropboxService.deleteFromDropbox();
     }
