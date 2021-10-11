@@ -1437,7 +1437,7 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.phone", is("79774743685")))
                 .andExpect(jsonPath("$.data.first_name", is("Some name")))
                 .andExpect(jsonPath("$.data.last_name", is("Some surname")))
-                .andExpect(jsonPath("$.data.photo", containsString("storage/testImagepng")))
+                .andExpect(jsonPath("$.data.photo", containsString("testImage.png")))
                 .andExpect(jsonPath("$.data.reg_date", is(1625127990000L)))
                 .andExpect(jsonPath("$.data.birth_date", is(-606798000000L)))
                 .andExpect(jsonPath("$.data.messages_permission", is("ALL")))

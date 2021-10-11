@@ -2,7 +2,6 @@ package application.service;
 
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
-import application.dao.mappers.MapperUtil;
 import application.models.FriendshipStatus;
 import application.models.NotificationType;
 import application.models.Person;
@@ -44,45 +43,35 @@ public class FriendsService {
     public List<PersonDto> getUserFriendsRecommendations() {
 
         Person currentPerson = daoPerson.getAuthPerson();
-
-
         List<Integer> listBlockPerson = new ArrayList<>();
         val personList = daoPerson.getRecommendations(currentPerson.getId());
-
         try {
             listBlockPerson.addAll(daoPerson.getBlockedIds(currentPerson.getId()));
             listBlockPerson.addAll(daoPerson.getYouBlockId(currentPerson.getId()));
-            listBlockPerson.addAll(daoPerson.getFriends(currentPerson.getId()).stream().map(Person::getId).collect(
-                    Collectors.toList()));
+            listBlockPerson.addAll(daoPerson.getFriends(currentPerson.getId()).stream().map(Person::getId)
+                    .collect(Collectors.toList()));
             listBlockPerson.addAll(daoPerson.getFriendsRequest(currentPerson.getId()).stream().map(Person::getId)
                     .collect(Collectors.toList()));
             listBlockPerson.addAll(daoPerson.getYourRequestId(currentPerson.getId()));
         } catch (EmptyResultDataAccessException e) {
             listBlockPerson = Collections.emptyList();
         }
-
         List<Integer> finalListBlockPerson = listBlockPerson;
-
         if (personList.size() > 0 && personList.size() < 20) {
             val recommendOnRegDate = daoPerson.getRecommendationsOnRegDate(currentPerson.getId());
             int size = recommendOnRegDate.size() > 20 ? 20 - personList.size() : recommendOnRegDate.size();
             for (int i = 0; i < size; i++) {
                 personList.add(recommendOnRegDate.get(i));
             }
-
             return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
                     .collect(Collectors.toSet()).stream()
-                    .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
-                            daoPerson)).collect(Collectors.toList());
+                    .map(PersonDto::fromPerson).collect(Collectors.toList());
         }
-
         return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
                 .filter(person -> !finalListBlockPerson.contains(person.getId()))
-                .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
-                        daoPerson)).collect(Collectors.toList()) : personList.stream().filter(person ->
+                .map(PersonDto::fromPerson).collect(Collectors.toList()) : personList.stream().filter(person ->
                         !finalListBlockPerson.contains(person.getId()))
-                .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
-                        daoPerson)).collect(Collectors.toList());
+                .map(PersonDto::fromPerson).collect(Collectors.toList());
     }
 
     public MessageResponseDto addFriendForId(int id) {
