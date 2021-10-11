@@ -172,7 +172,7 @@ public class ProfileService {
         try {
             friendshipStatus = daoPerson.getFriendStatus(id, currentPerson.getId());
             if (friendshipStatus.equals(FriendshipStatus.FRIEND.toString())) {
-                daoPerson.deleteFriendForID(id, daoPerson.getAuthPerson().getId());
+                daoPerson.deleteFriendForID(id, currentPerson.getId());
             } else if (friendshipStatus.equals(FriendshipStatus.REQUEST.toString())) {
                 daoPerson.deleteRequest(id, currentPerson.getId());
             }

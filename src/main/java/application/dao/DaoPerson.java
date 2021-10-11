@@ -25,17 +25,6 @@ public class DaoPerson {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Integer getPersonIdByEmail(String email) {
-
-        log.info("getPersonIdByEmail(): start():");
-        log.debug("getPersonIdByEmail(): email = {}", email);
-        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
-        Integer id = jdbcTemplate.queryForObject(selectPersonIdByEmail, new Object[]{email}, Integer.class);
-        log.debug("getPersonIdByEmail(): id = {}", id);
-        log.info("getPersonIdByEmail(): finish():");
-        return id;
-    }
-
     public Person getByEmail(String email) {
 
         log.info("getByEmail(): start():");
@@ -147,6 +136,7 @@ public class DaoPerson {
         log.info("delete(): finish():");
     }
 
+    @Transactional
     public void deleteFriendshipByPersonId(int id) {
 
         log.info("deleteFriendshipByPersonId(): start():");
@@ -385,7 +375,7 @@ public class DaoPerson {
     public void deleteRequest(int id, int id1) {
         String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
                 "AND dst_person_id IN (?, ?)";
-        int statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
+        Integer statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
         String queryForDeleteStatus = "DELETE FROM friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         jdbcTemplate.update(deleteFriendship, id, id1, id1, id);

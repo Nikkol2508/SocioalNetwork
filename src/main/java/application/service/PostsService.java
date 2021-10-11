@@ -104,7 +104,7 @@ public class PostsService {
         postComment.setTime(System.currentTimeMillis());
         postComment.setAuthorId(currentPerson.getId());
         int comId = daoComment.save(postComment);
-        daoNotification.addNotification(person.getId(), daoPerson.getAuthPerson().getId(), postComment.getTime(),
+        daoNotification.addNotification(person.getId(), currentPerson.getId(), postComment.getTime(),
                 comId, person.getEmail(), postComment.getParentId() == null
                         ? NotificationType.POST_COMMENT.toString() : NotificationType.COMMENT_COMMENT.toString(),
                 postComment.getCommentText());

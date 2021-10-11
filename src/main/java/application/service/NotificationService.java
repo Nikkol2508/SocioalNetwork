@@ -22,11 +22,12 @@ public class NotificationService {
 
     public List<NotificationDto> getNotifications() {
 
-        return cleanNotifications(getNotificationsDtoForNotifications(daoNotification.getUserNotifications(daoPerson.getAuthPerson()
-                .getId())));
+        return cleanNotifications(getNotificationsDtoForNotifications(daoNotification.getUserNotifications(
+                daoPerson.getAuthPerson().getId())));
     }
 
     private List<NotificationDto> cleanNotifications (List<NotificationDto> list) {
+
         List<String> userBlockNotifications = daoNotification.getBlockNotification(daoPerson.getAuthPerson().getId());
         list.forEach(notificationDto -> {
             if (userBlockNotifications.contains(notificationDto.getNotificationType())) {
