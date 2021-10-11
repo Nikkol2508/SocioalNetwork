@@ -1313,7 +1313,7 @@ class ProfileControllerIntegrationTest {
                 .andExpect(jsonPath("$.timestamp").isNotEmpty())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error", is("invalid_request")))
-                .andExpect(jsonPath("$.error_description", is("Unparseable date: \"09.06.1988\"")))
+                .andExpect(jsonPath("$.error_description", is("Date is not valid")))
                 .andExpect(jsonPath("$.data").doesNotExist());
     }
 

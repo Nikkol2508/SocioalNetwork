@@ -1,6 +1,7 @@
 package application.service;
 
 import application.dao.*;
+import application.dao.mappers.MapperUtil;
 import application.models.FriendshipStatus;
 import application.models.NotificationType;
 import application.models.Person;
@@ -46,7 +47,7 @@ public class ProfileService {
             throw new EntityNotFoundException(String.format("Person with id %d is not found.", id));
         }
         Person activePerson = daoPerson.getAuthPerson();
-        return getExtendedPersonDto(PersonDto.fromPerson(person), activePerson.getId());
+        return MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), activePerson.getId(), daoPerson);
     }
 
     public PersonDto getProfile() throws EntityNotFoundException {
@@ -90,14 +91,14 @@ public class ProfileService {
         Person activePerson = daoPerson.getAuthPerson();
         if (firstOrLastName != null && !firstOrLastName.isBlank()) {
             return daoPerson.getPersonsByFirstNameSurname(firstOrLastName.trim()).stream().map(PersonDto::fromPerson)
-                    .map(personDto -> getExtendedPersonDto(personDto, activePerson.getId()))
+                    .map(personDto -> MapperUtil.getExtendedPersonDto(personDto, activePerson.getId(), daoPerson))
                     .collect(Collectors.toList());
         }
         ZonedDateTime zonedDateTime = LocalDate.now().atStartOfDay(ZoneId.systemDefault());
         ageFrom = ageFrom != null ? zonedDateTime.minusYears(ageFrom).toInstant().toEpochMilli() : null;
         ageTo = ageTo != null ? zonedDateTime.minusYears(ageTo + 1).toInstant().toEpochMilli() : null;
         return daoPerson.searchPersons(firstName, lastName, ageFrom, ageTo, country, city).stream()
-                .map(p -> getExtendedPersonDto(PersonDto.fromPerson(p), activePerson.getId()))
+                .map(p -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(p), activePerson.getId(), daoPerson))
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +138,10 @@ public class ProfileService {
                 : request.getLastName();
         String photo = request.getPhotoId() == null ? person.getPhoto()
                 : daoFile.getPath(Integer.parseInt(request.getPhotoId()));
-        String phone = request.getPhone() != null ? request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone() : null;
+        String phone = request.getPhone();
+        if (phone != null) {
+            phone = request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone();
+        }
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
                 photo, request.getCity(), request.getCountry(), request.getAbout());
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
@@ -183,28 +187,5 @@ public class ProfileService {
     public MessageResponseDto checkOnline() {
         daoPerson.setLastOnlineTime(daoPerson.getAuthPerson().getId());
         return new MessageResponseDto();
-    }
-
-    private PersonDto getExtendedPersonDto(PersonDto personDto, int activePersonId) {
-        if (!personDto.isBlocked()) {
-            personDto.setBlocked(daoPerson.isPersonBlockedByAnotherPerson(activePersonId, personDto.getId()));
-        }
-        personDto.setMe(personDto.getId() == activePersonId);
-        personDto.setBlockedByThisPerson(daoPerson.isPersonBlockedByAnotherPerson(personDto.getId(), activePersonId));
-        try {
-            String status = daoPerson.getFriendStatus(personDto.getId(), activePersonId);
-            if (status.equals(FriendshipStatus.FRIEND.toString())) {
-                personDto.setFriendStatus(FriendshipStatus.FRIEND.toString());
-            } else if (status.equals(FriendshipStatus.REQUEST.toString())) {
-                if (daoPerson.getSrcPersonIdFriendRequest(personDto.getId(), activePersonId) == activePersonId) {
-                    personDto.setFriendStatus(FriendshipStatus.REQUEST_SENT.toString());
-                } else {
-                    personDto.setFriendStatus(FriendshipStatus.REQUEST_RECEIVED.toString());
-                }
-            }
-        } catch (EmptyResultDataAccessException exception) {
-            return personDto;
-        }
-        return personDto;
     }
 }

@@ -2,6 +2,7 @@ package application.service;
 
 import application.dao.DaoNotification;
 import application.dao.DaoPerson;
+import application.dao.mappers.MapperUtil;
 import application.models.FriendshipStatus;
 import application.models.NotificationType;
 import application.models.Person;
@@ -67,14 +68,17 @@ public class FriendsService {
             return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
                     .filter(person -> !userFriendsListId.contains(person.getId()))
                     .collect(Collectors.toSet()).stream()
-                    .map(PersonDto::fromPerson).collect(Collectors.toList());
+                    .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
+                            daoPerson)).collect(Collectors.toList());
         }
 
         return personList.size() == 0 ? daoPerson.getRecommendationsOnRegDate(currentPerson.getId()).stream()
                 .filter(person -> !finalListBlockPerson.contains(person.getId()))
-                .map(PersonDto::fromPerson).collect(Collectors.toList()) :
-                personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
-                        .map(PersonDto::fromPerson).collect(Collectors.toList());
+                .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
+                        daoPerson)).collect(Collectors.toList()) : personList.stream().filter(person ->
+                        !finalListBlockPerson.contains(person.getId()))
+                .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
+                        daoPerson)).collect(Collectors.toList());
     }
 
     public MessageResponseDto addFriendForId(int id) {
