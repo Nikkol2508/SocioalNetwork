@@ -171,4 +171,11 @@ public class DaoNotification {
         });
         log.info("addFriendBirthdateNotification(): finish():");
     }
+
+    public List<String> getBlockNotification(int id) {
+        String query = "SELECT code FROM notification_setting_type" +
+                " JOIN notification_settings ns on notification_setting_type.id = ns.type_id WHERE person_id = ? AND " +
+                "status = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id, false}, String.class);
+    }
 }

@@ -15,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -27,17 +24,6 @@ import java.util.Map;
 public class DaoPerson {
 
     private final JdbcTemplate jdbcTemplate;
-
-    public Integer getPersonIdByEmail(String email) {
-
-        log.info("getPersonIdByEmail(): start():");
-        log.debug("getPersonIdByEmail(): email = {}", email);
-        String selectPersonIdByEmail = "SELECT id FROM person WHERE e_mail = ?";
-        Integer id = jdbcTemplate.queryForObject(selectPersonIdByEmail, new Object[]{email}, Integer.class);
-        log.debug("getPersonIdByEmail(): id = {}", id);
-        log.info("getPersonIdByEmail(): finish():");
-        return id;
-    }
 
     public Person getByEmail(String email) {
 
@@ -150,6 +136,7 @@ public class DaoPerson {
         log.info("delete(): finish():");
     }
 
+    @Transactional
     public void deleteFriendshipByPersonId(int id) {
 
         log.info("deleteFriendshipByPersonId(): start():");
@@ -388,7 +375,7 @@ public class DaoPerson {
     public void deleteRequest(int id, int id1) {
         String selectStatusId = "SELECT status_id FROM friendship WHERE src_person_id IN (?, ?) " +
                 "AND dst_person_id IN (?, ?)";
-        int statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
+        Integer statusId = jdbcTemplate.queryForObject(selectStatusId, new Object[]{id, id1, id1, id}, Integer.class);
         String queryForDeleteStatus = "DELETE FROM friendship_status WHERE id = ?";
         String deleteFriendship = "DELETE FROM friendship WHERE src_person_id IN (?, ?) AND dst_person_id IN (?, ?)";
         jdbcTemplate.update(deleteFriendship, id, id1, id1, id);
@@ -398,5 +385,16 @@ public class DaoPerson {
     public List<Person> getAllPerson () {
         String query = "SELECT * FROM person";
         return jdbcTemplate.query(query, new PersonMapper());
+    }
+
+    public List<Integer> getYouBlockId(int id) {
+        String query = "SELECT blocking_person_id FROM blocking_persons WHERE blocked_person_id = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
+    }
+
+    public List<Integer> getYourRequestId(int id) {
+        String query = "SELECT dst_person_id FROM friendship JOIN friendship_status fs on fs.id = friendship.status_id" +
+                " WHERE src_person_id = ? AND code = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id, FriendshipStatus.REQUEST.toString()}, Integer.class);
     }
 }

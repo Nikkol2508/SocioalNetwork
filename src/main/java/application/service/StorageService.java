@@ -3,6 +3,7 @@ package application.service;
 import application.dao.DaoFile;
 import application.dao.DaoPerson;
 import application.models.FileDescription;
+import application.models.Person;
 import com.dropbox.core.DbxException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +22,14 @@ public class StorageService {
 
     public FileDescription saveFileInStorage(String type, MultipartFile file) throws IOException, DbxException {
         FileDescription fileDto = new FileDescription();
+        Person activePerson = daoPerson.getAuthPerson();
         if (!file.isEmpty()) {
-            if (daoPerson.getAuthPerson().getPhoto() != null){
-            dropboxService.deleteImageFromDropbox(daoPerson.getAuthPerson().getPhoto());
-            log.debug("deleteImageFromDropbox: getPhoto() = {}", daoPerson.getAuthPerson().getPhoto());
-            daoFile.deleteImage(daoPerson.getAuthPerson().getId());
+            if (activePerson.getPhoto() != null){
+            dropboxService.deleteImageFromDropbox(activePerson.getPhoto());
+            log.debug("deleteImageFromDropbox: getPhoto() = {}", activePerson.getPhoto());
+            daoFile.deleteImage(activePerson.getId());
             }
-            fileDto.setOwnerId(daoPerson.getAuthPerson().getId());
+            fileDto.setOwnerId(activePerson.getId());
             String fileName = System.currentTimeMillis() + file.getOriginalFilename();
             dropboxService.saveImageToDropbox(file, fileName);
             fileDto.setFileName(fileName);
