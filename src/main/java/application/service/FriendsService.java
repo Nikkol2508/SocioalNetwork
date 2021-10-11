@@ -13,6 +13,7 @@ import lombok.val;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,11 +45,18 @@ public class FriendsService {
 
         Person currentPerson = daoPerson.getAuthPerson();
 
-        List<Integer> listBlockPerson;
+
+        List<Integer> listBlockPerson = new ArrayList<>();
         val personList = daoPerson.getRecommendations(currentPerson.getId());
 
         try {
-            listBlockPerson = daoPerson.getBlockedIds(currentPerson.getId());
+            listBlockPerson.addAll(daoPerson.getBlockedIds(currentPerson.getId()));
+            listBlockPerson.addAll(daoPerson.getYouBlockId(currentPerson.getId()));
+            listBlockPerson.addAll(daoPerson.getFriends(currentPerson.getId()).stream().map(Person::getId).collect(
+                    Collectors.toList()));
+            listBlockPerson.addAll(daoPerson.getFriendsRequest(currentPerson.getId()).stream().map(Person::getId)
+                    .collect(Collectors.toList()));
+            listBlockPerson.addAll(daoPerson.getYourRequestId(currentPerson.getId()));
         } catch (EmptyResultDataAccessException e) {
             listBlockPerson = Collections.emptyList();
         }
@@ -62,11 +70,7 @@ public class FriendsService {
                 personList.add(recommendOnRegDate.get(i));
             }
 
-            val userFriendsListId = getUserFriends().stream().map(PersonDto::getId)
-                    .collect(Collectors.toList());
-
             return personList.stream().filter(person -> !finalListBlockPerson.contains(person.getId()))
-                    .filter(person -> !userFriendsListId.contains(person.getId()))
                     .collect(Collectors.toSet()).stream()
                     .map(person -> MapperUtil.getExtendedPersonDto(PersonDto.fromPerson(person), currentPerson.getId(),
                             daoPerson)).collect(Collectors.toList());

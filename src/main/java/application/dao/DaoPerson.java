@@ -15,10 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Pattern;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -398,5 +395,16 @@ public class DaoPerson {
     public List<Person> getAllPerson () {
         String query = "SELECT * FROM person";
         return jdbcTemplate.query(query, new PersonMapper());
+    }
+
+    public List<Integer> getYouBlockId(int id) {
+        String query = "SELECT blocking_person_id FROM blocking_persons WHERE blocked_person_id = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id}, Integer.class);
+    }
+
+    public List<Integer> getYourRequestId(int id) {
+        String query = "SELECT dst_person_id FROM friendship JOIN friendship_status fs on fs.id = friendship.status_id" +
+                " WHERE src_person_id = ? AND code = ?";
+        return jdbcTemplate.queryForList(query, new Object[]{id, FriendshipStatus.REQUEST.toString()}, Integer.class);
     }
 }

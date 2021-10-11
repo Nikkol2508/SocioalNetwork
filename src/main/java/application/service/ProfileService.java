@@ -39,6 +39,7 @@ public class ProfileService {
     private final DaoComment daoComment;
     private final DaoFile daoFile;
     private final DaoNotification daoNotification;
+    private final DaoCity daoCity;
 
     public PersonDto getPerson(int id) {
 
@@ -144,6 +145,8 @@ public class ProfileService {
         }
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
                 photo, request.getCity(), request.getCountry(), request.getAbout());
+        daoCity.saveCity(request.getCity());
+        daoCity.setCountry(request.getCountry());
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 

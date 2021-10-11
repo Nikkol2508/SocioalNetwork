@@ -2,6 +2,7 @@ package application.controllers;
 
 import application.dao.DaoFile;
 import application.models.FileDescription;
+import application.service.StorageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import org.junit.jupiter.api.MethodOrderer;
@@ -45,7 +46,7 @@ class StorageControllerIntegrationTest {
     private DataSource dataSource;
 
     @Autowired
-    private DaoFile daoFile;
+    private StorageService storageService;
 
     @Test
     void testPutImage() throws Exception {
@@ -59,8 +60,8 @@ class StorageControllerIntegrationTest {
                 .andExpect(jsonPath("$.timestamp", not(0)))
                 .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.ownerId", is(1)))
-                .andExpect(jsonPath("$.data.fileName", containsString("testImagepng")))
-                .andExpect(jsonPath("$.data.relativeFilePath", containsString("storage/testImagepng")))
+                .andExpect(jsonPath("$.data.fileName", containsString("testImage.png")))
+                .andExpect(jsonPath("$.data.relativeFilePath", containsString("testImage.png")))
                 .andExpect(jsonPath("$.data.rawFileURL").isEmpty())
                 .andExpect(jsonPath("$.data.bytes").isNotEmpty())
                 .andExpect(jsonPath("$.data.fileType", is("IMAGE")))
@@ -83,7 +84,6 @@ class StorageControllerIntegrationTest {
                 .andExpect(jsonPath("$.data.rawFileURL").isEmpty())
                 .andExpect(jsonPath("$.data.bytes",is(0)))
                 .andExpect(jsonPath("$.data.fileType").isEmpty())
-                .andExpect(jsonPath("$.data.data").isEmpty())
                 .andExpect(jsonPath("$.data.createdAt",is(0)));
     }
 
@@ -94,18 +94,11 @@ class StorageControllerIntegrationTest {
                 "file", "testImage.png", "image/png",
                 "src/test/resources/testImage.png".getBytes());
 
-        FileDescription fileDescription = new FileDescription();
-        fileDescription.setOwnerId(1);
-        fileDescription.setFileName("testImage");
-        fileDescription.setRelativeFilePath("storage/testImage");
-        fileDescription.setRawFileURL("url");
-        fileDescription.setFileFormat(file.getContentType());
-        fileDescription.setBytes(file.getBytes().length);
-        fileDescription.setFileType("IMAGE");
-        daoFile.saveAndReturn(fileDescription);
+        FileDescription fileDescription = storageService.saveFileInStorage("IMAGE",file);
 
-        mockMvc.perform(get("/storage/testImage")).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.IMAGE_PNG));
+        mockMvc.perform(get("/" + fileDescription.getRelativeFilePath())).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG))
+                .andExpect(content().bytes(file.getBytes()));
     }
 
     @Test
@@ -115,17 +108,10 @@ class StorageControllerIntegrationTest {
                 "file", "testProfileImage.png", "image/png",
                 "src/test/resources/testProfileImage.png".getBytes());
 
-        FileDescription fileDescription = new FileDescription();
-        fileDescription.setOwnerId(1);
-        fileDescription.setFileName("testProfileImage2");
-        fileDescription.setRelativeFilePath("storage/testProfileImage2");
-        fileDescription.setRawFileURL("url");
-        fileDescription.setFileFormat(file.getContentType());
-        fileDescription.setBytes(file.getBytes().length);
-        fileDescription.setFileType("IMAGE");
-        daoFile.saveAndReturn(fileDescription);
+        FileDescription fileDescription = storageService.saveFileInStorage("IMAGE",file);
 
-        mockMvc.perform(get("/profile/storage/testProfileImage2")).andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.IMAGE_PNG));
+        mockMvc.perform(get("/" + fileDescription.getRelativeFilePath())).andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG))
+                .andExpect(content().bytes(file.getBytes()));
     }
 }
