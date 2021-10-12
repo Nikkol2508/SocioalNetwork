@@ -23,7 +23,7 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
@@ -34,7 +34,7 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>
@@ -49,7 +49,7 @@
             </Filters>
             <Policies>
                 <CronTriggeringPolicy schedule="${SCHEDULE}"/>
-                <SizeBasedTriggeringPolicy size="50 MB"/>
+                <SizeBasedTriggeringPolicy size="5 MB"/>
             </Policies>
             <DefaultRolloverStrategy max="10"/>
         </RollingFile>

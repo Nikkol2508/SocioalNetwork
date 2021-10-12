@@ -27,7 +27,7 @@ public class NotificationController {
         GeneralListResponse<NotificationDto> generalListResponse = new GeneralListResponse<>(notificationService.getNotifications(), offset, itemPerPage);
         log.debug("getNotifications(): responseList = {}", generalListResponse);
         log.info("getNotifications(): finish():");
-        return ResponseEntity.ok(new GeneralListResponse<>(notificationService.getNotifications(), offset, itemPerPage));
+        return ResponseEntity.ok(generalListResponse);
     }
 
     @PutMapping("/notifications")

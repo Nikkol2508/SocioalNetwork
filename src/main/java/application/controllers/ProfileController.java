@@ -130,12 +130,24 @@ public class ProfileController {
 
     @PutMapping("/block/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> blockUserForId(@PathVariable int id) {
-        return ResponseEntity.ok(new GeneralResponse<>(profileService.blockPersonForId(id)));
+
+        log.info("blockPersonForId: start():");
+        log.debug("blockPersonForId: id = {}", id);
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.blockPersonForId(id));
+        log.debug("blockPersonForId: response = {}", response);
+        log.info("blockPersonForId: finish():");
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/block/{id}")
     public ResponseEntity<GeneralResponse<MessageResponseDto>> unblockUser (@PathVariable int id) {
-        return ResponseEntity.ok(new GeneralResponse<>(profileService.unblockUser(id)));
+
+        log.info("unblockUser: start():");
+        log.debug("unblockUser: id = {}", id);
+        GeneralResponse<MessageResponseDto> response = new GeneralResponse<>(profileService.unblockUser(id));
+        log.debug("unblockUser: response = {}", response);
+        log.info("unblockUser: finish():");
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/checkonline")
