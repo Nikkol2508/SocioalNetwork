@@ -9,5 +9,4 @@ CREATE TABLE IF NOT EXISTS country
 );
 
 INSERT INTO country (name)
-VALUES ('Россия'),
-       ('США');
+VALUES ('Россия');

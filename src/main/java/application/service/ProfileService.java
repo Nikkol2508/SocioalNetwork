@@ -2,10 +2,6 @@ package application.service;
 
 import application.dao.*;
 import application.dao.mappers.MapperUtil;
-import application.models.FriendshipStatus;
-import application.models.NotificationType;
-import application.models.Person;
-import application.models.Post;
 import application.models.*;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
@@ -155,9 +151,8 @@ public class ProfileService {
 
         if (city != null) {
             city = city.trim();
-            City cityFromBd = daoCity.getCityForName(city);
-
-            if (cityFromBd == null && !city.isBlank()) {
+            City cityFromDb = daoCity.getCityByName(city);
+            if (cityFromDb == null && !city.isBlank()) {
                 daoCity.saveCity(city);
             }
         }
@@ -165,15 +160,14 @@ public class ProfileService {
     }
 
     private String saveCountry(String country) {
+
         if (country != null) {
             country = country.trim();
-            Country countryFromBd = daoCity.getCountryForName(country);
-
-            if (countryFromBd == null && !country.isBlank()) {
+            Country countryFromDb = daoCity.getCountryByName(country);
+            if (countryFromDb == null && !country.isBlank()) {
                 daoCity.setCountry(country);
             }
         }
-
         return country;
     }
 

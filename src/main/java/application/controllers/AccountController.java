@@ -85,5 +85,4 @@ public class AccountController {
 
         return ResponseEntity.ok(new GeneralResponse<>(accountService.setNotificationSettings(notificationRequest)));
     }
-
 }

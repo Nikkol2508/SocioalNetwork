@@ -38,12 +38,12 @@ public class DaoLike {
         return likes;
     }
 
-    public Integer getMyLike(int item_id, String type, int person_id) {
+    public Integer getMyLike(int itemId, String type, int personId) {
 
         log.info("getMyLike(): start():");
-        log.debug("getMyLike(): itemId = {}, type = {}, personId = {}", item_id, type, person_id);
+        log.debug("getMyLike(): itemId = {}, type = {}, personId = {}", itemId, type, personId);
         Integer likes = jdbcTemplate.queryForObject("SELECT COUNT(id) FROM post_like WHERE item_id = ? AND type = ? AND person_id = ?",
-                new Object[]{item_id, type, person_id}, Integer.class);
+                new Object[]{itemId, type, personId}, Integer.class);
         log.debug("getMyLike(): likes = {}", likes);
         log.info("getMyLike(): finish():");
         return likes;
@@ -64,11 +64,11 @@ public class DaoLike {
         log.info("deleteByPersonId(): finish():");
     }
 
-    public void delete(int item_id, String type, int person_id) {
+    public void delete(int itemId, String type, int personId) {
         log.info("delete(): start():");
-        log.debug("delete(): itemId = {}, type = {}, personId = {}", item_id, type, person_id);
-        jdbcTemplate.update("DELETE FROM post_like WHERE item_id = ? AND type = ? AND person_id = ?", item_id, type,
-                person_id);
+        log.debug("delete(): itemId = {}, type = {}, personId = {}", itemId, type, personId);
+        jdbcTemplate.update("DELETE FROM post_like WHERE item_id = ? AND type = ? AND person_id = ?", itemId, type,
+                personId);
         log.info("delete(): finish():");
     }
 
