@@ -16,17 +16,6 @@ public class DaoTag {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Tag findByID(int id) {
-
-        log.info("findByID(): start():");
-        log.debug("findByID(): tagId = {}", id);
-        Tag tag = jdbcTemplate.query("SELECT * FROM tag WHERE id = ?", new Object[]{id}, new TagMapper()).stream()
-                .findAny().orElse(null);
-        log.debug("findByID(): tag = {}", tag);
-        log.info("findByID(): finish():");
-        return tag;
-    }
-
     public Tag findTagByName(String tagName) {
 
         log.info("findTagByName(): start():");

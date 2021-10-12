@@ -2,10 +2,7 @@ package application.service;
 
 import application.dao.*;
 import application.dao.mappers.MapperUtil;
-import application.models.FriendshipStatus;
-import application.models.NotificationType;
-import application.models.Person;
-import application.models.Post;
+import application.models.*;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
@@ -143,13 +140,36 @@ public class ProfileService {
         if (phone != null) {
             phone = request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone();
         }
+
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
-                photo, request.getCity(), request.getCountry(), request.getAbout());
-        daoCity.saveCity(request.getCity());
-        daoCity.setCountry(request.getCountry());
+                photo, saveCity(request.getCity()), saveCountry(request.getCountry()), request.getAbout());
+
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 
+    private String saveCity(String city) {
+
+        if (city != null) {
+            city = city.trim();
+            City cityFromDb = daoCity.getCityByName(city);
+            if (cityFromDb == null && !city.isBlank()) {
+                daoCity.saveCity(city);
+            }
+        }
+        return city;
+    }
+
+    private String saveCountry(String country) {
+
+        if (country != null) {
+            country = country.trim();
+            Country countryFromDb = daoCity.getCountryByName(country);
+            if (countryFromDb == null && !country.isBlank()) {
+                daoCity.setCountry(country);
+            }
+        }
+        return country;
+    }
 
     public MessageResponseDto deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

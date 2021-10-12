@@ -50,4 +50,14 @@ public class DaoCity {
         log.info("getAllCountry(): finish():");
         return countryList;
     }
+
+    public City getCityByName(String name) {
+        String query = "SELECT * FROM city WHERE name = ?";
+        return jdbcTemplate.query(query, new Object[]{name}, new CityMapper()).stream().findFirst().orElse(null);
+    }
+
+    public Country getCountryByName(String name) {
+        String query = "SELECT * FROM country WHERE name = ?";
+        return jdbcTemplate.query(query, new Object[]{name}, new CountryMapper()).stream().findFirst().orElse(null);
+    }
 }

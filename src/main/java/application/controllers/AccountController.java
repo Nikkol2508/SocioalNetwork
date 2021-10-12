@@ -120,5 +120,4 @@ public class AccountController {
         log.info("setNotificationSettings: finish():");
         return ResponseEntity.ok(generalResponse);
     }
-
 }

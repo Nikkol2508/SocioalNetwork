@@ -54,7 +54,7 @@ class PlatformControllerIntegrationTest {
     void testGetCity() throws Exception {
         mockMvc.perform(get("/api/v1/platform/cities"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].title", is("Абакан")));
+                .andExpect(jsonPath("$.data[0].title", is("Москва")));
     }
 
     @Test
