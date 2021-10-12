@@ -1,10 +1,7 @@
 package application.service;
 
 import application.dao.*;
-import application.models.FriendshipStatus;
-import application.models.NotificationType;
-import application.models.Person;
-import application.models.Post;
+import application.models.*;
 import application.models.dto.MessageResponseDto;
 import application.models.dto.PersonDto;
 import application.models.dto.PostDto;
@@ -141,9 +138,31 @@ public class ProfileService {
         String phone = request.getPhone() != null ? request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone() : null;
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
                 photo, request.getCity(), request.getCountry(), request.getAbout());
-        daoCity.saveCity(request.getCity());
-        daoCity.setCountry(request.getCountry());
+        saveCityAndCountry(request.getCity(), request.getCountry());
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
+    }
+
+    private void saveCityAndCountry(String city, String country) {
+        city = city.trim();
+        country = country.trim();
+        City cityFromBd = daoCity.getCityForName(city);
+        Country countryFromBd = daoCity.getCountryForName(country);
+
+        if (cityFromBd != null) {
+            if (city.length() != 0 && !city.equals(cityFromBd.getTitle())) {
+                daoCity.saveCity(city);
+            }
+        } else {
+            daoCity.saveCity(city);
+        }
+
+        if (countryFromBd != null) {
+            if (country.length() != 0 && !country.equals(countryFromBd.getTitle())) {
+                daoCity.setCountry(country);
+            }
+        } else {
+            daoCity.setCountry(country);
+        }
     }
 
 
