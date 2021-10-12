@@ -4,6 +4,7 @@ import application.dao.mappers.CityMapper;
 import application.dao.mappers.CountryMapper;
 import application.models.City;
 import application.models.Country;
+import liquibase.pro.packaged.S;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,5 +50,15 @@ public class DaoCity {
         log.debug("getAllCountry(): countryList = {}", countryList);
         log.info("getAllCountry(): finish():");
         return countryList;
+    }
+
+    public City getCityForName(String name) {
+        String query = "SELECT * FROM city WHERE name = ?";
+        return jdbcTemplate.query(query, new Object[]{name}, new CityMapper()).stream().findFirst().orElse(null);
+    }
+
+    public Country getCountryForName(String name) {
+        String query = "SELECT * FROM country WHERE name = ?";
+        return jdbcTemplate.query(query, new Object[]{name}, new CountryMapper()).stream().findFirst().orElse(null);
     }
 }
