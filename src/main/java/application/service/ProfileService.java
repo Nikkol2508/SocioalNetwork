@@ -144,35 +144,38 @@ public class ProfileService {
         if (phone != null) {
             phone = request.getPhone().length() == 10 ? "7" + request.getPhone() : request.getPhone();
         }
+
         daoPerson.updatePersonData(person.getId(), firstName.trim(), lastName.trim(), birthDate, phone,
-                photo, request.getCity(), request.getCountry(), request.getAbout());
-        saveCityAndCountry(request.getCity(), request.getCountry());
+                photo, saveCity(request.getCity()), saveCountry(request.getCountry()), request.getAbout());
+
         return PersonDto.fromPerson(daoPerson.getById(person.getId()));
     }
 
-    private void saveCityAndCountry(String city, String country) {
-        city = city.trim();
-        country = country.trim();
-        City cityFromBd = daoCity.getCityForName(city);
-        Country countryFromBd = daoCity.getCountryForName(country);
+    private String saveCity(String city) {
 
-        if (cityFromBd != null) {
-            if (city.length() != 0 && !city.equals(cityFromBd.getTitle())) {
+        if (city != null) {
+            city = city.trim();
+            City cityFromBd = daoCity.getCityForName(city);
+
+            if (cityFromBd == null && !city.isBlank()) {
                 daoCity.saveCity(city);
             }
-        } else {
-            daoCity.saveCity(city);
         }
-
-        if (countryFromBd != null) {
-            if (country.length() != 0 && !country.equals(countryFromBd.getTitle())) {
-                daoCity.setCountry(country);
-            }
-        } else {
-            daoCity.setCountry(country);
-        }
+        return city;
     }
 
+    private String saveCountry(String country) {
+        if (country != null) {
+            country = country.trim();
+            Country countryFromBd = daoCity.getCountryForName(country);
+
+            if (countryFromBd == null && !country.isBlank()) {
+                daoCity.setCountry(country);
+            }
+        }
+
+        return country;
+    }
 
     public MessageResponseDto deleteProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
