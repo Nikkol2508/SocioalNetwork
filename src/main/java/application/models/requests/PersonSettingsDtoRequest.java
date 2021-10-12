@@ -11,7 +11,11 @@ public class PersonSettingsDtoRequest {
     @Pattern(regexp = "^(7?\\d{10})?$", message = "{phone.not.valid}")
     private String phone;
     private String about;
+
+    @Pattern(regexp = "^([a-zA-Zа-яА-яёЁ -]{3,})?$", message = "{city.not.valid}")
     private String city;
+
+    @Pattern(regexp = "^([a-zA-Zа-яА-яёЁ -]{3,})?$", message = "{country.not.valid}")
     private String country;
 
     @JsonProperty("photo_id")
